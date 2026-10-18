@@ -1,0 +1,6 @@
+{
+  "capability_calls": [],
+  "response": null,
+  "silence": true,
+  "decision_rationale": "Anchors match the current scoped claims: low-risk pace, production-deletion confirmation, and no trust upgrade. The work outcome is a platform record, not my action outcome, so I will not write an operation experience or raise confidence. No cognitive policy is due. Leave cognition unchanged."
+}

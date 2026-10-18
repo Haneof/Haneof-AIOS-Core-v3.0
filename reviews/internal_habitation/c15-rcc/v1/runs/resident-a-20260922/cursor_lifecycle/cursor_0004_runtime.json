@@ -1,0 +1,24 @@
+{
+  "cursor": 4,
+  "occurred_at": "2026-11-02T12:40:00-08:00",
+  "world_revision_before_runtime": 14,
+  "index_watermark_before": 14,
+  "dimension_summaries": {
+    "attempted_jobs": [],
+    "commits": [],
+    "skipped_unchanged": [],
+    "skipped_empty": [],
+    "truncated": false
+  },
+  "cognitive_derivation_reconcile": {
+    "examined": 0,
+    "scheduled": []
+  },
+  "wake_dispatches": [],
+  "periodic_reviews": [],
+  "world_revision_after": 14,
+  "index_watermark_after": 14,
+  "index_lag": 0,
+  "pending_wakes_not_dispatched": [],
+  "errors": []
+}

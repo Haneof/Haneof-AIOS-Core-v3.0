@@ -1,0 +1,25 @@
+{
+  "trace_id": "cap0001",
+  "checkpoint_id": "cp0001",
+  "cursor": 1,
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "obs_conv_user_40aac9b697910640bab07507",
+          "revision": 1
+        },
+        "call_id": "cp0001-inspect-user"
+      },
+      {
+        "name": "read_ai_world",
+        "arguments": {},
+        "call_id": "cp0001-read-ai-world"
+      }
+    ],
+    "response": null,
+    "silence": false
+  },
+  "history_before": []
+}

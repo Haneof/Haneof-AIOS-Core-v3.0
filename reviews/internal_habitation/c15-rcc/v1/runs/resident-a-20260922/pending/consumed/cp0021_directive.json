@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "name": "read_periodic_review_anchors",
+      "arguments": {
+        "offset": 0,
+        "limit": 10
+      },
+      "call_id": "cp0021-anchors"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "A review is due and a new release_state dimension is on the map. Read the anchors before deciding whether the queued upload record changes anything."
+}

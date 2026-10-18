@@ -1,0 +1,12 @@
+{
+  "capability_calls": [
+    {
+      "name": "read_cognitive_policies",
+      "arguments": {},
+      "call_id": "cp0018-policies"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "Anchors already match the current claims. Check whether any cognitive policy is due before leaving the review unchanged."
+}

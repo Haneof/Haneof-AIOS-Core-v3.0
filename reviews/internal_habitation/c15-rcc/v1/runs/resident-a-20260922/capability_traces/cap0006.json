@@ -1,0 +1,20 @@
+{
+  "trace_id": "cap0006",
+  "checkpoint_id": "cp0006",
+  "cursor": 3,
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "search_world",
+        "arguments": {
+          "query": "Atlas staging",
+          "limit": 8
+        },
+        "call_id": "cp0006-search-atlas"
+      }
+    ],
+    "response": null,
+    "silence": false
+  },
+  "history_before": []
+}

@@ -1,0 +1,23 @@
+{
+  "trace_id": "cap0010",
+  "checkpoint_id": "cp0010",
+  "cursor": 5,
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "search_world",
+        "arguments": {
+          "query": "CI staging smoke",
+          "dimensions": [
+            "dim:work_outcome"
+          ],
+          "limit": 5
+        },
+        "call_id": "cp0010-search-outcome"
+      }
+    ],
+    "response": null,
+    "silence": false
+  },
+  "history_before": []
+}

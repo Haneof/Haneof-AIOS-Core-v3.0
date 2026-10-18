@@ -1,0 +1,91 @@
+{
+  "kind": "dimension_summary",
+  "checkpoint_id": "sum0007",
+  "summary_id": "sum0007",
+  "simulated_time": "2026-11-04T13:30:00-08:00",
+  "current_released_cursor": 7,
+  "world_revision_before": 43,
+  "request": {
+    "dimension": "dim:ai_user_understanding",
+    "granularity": "day",
+    "window_start": "2026-11-03T00:00:00Z",
+    "window_end": "2026-11-03T23:59:59.999999Z",
+    "source_world_revision": 43,
+    "sources": [
+      {
+        "object_id": "clm_3caae78c9c70ebb46a6cb483",
+        "revision": 1,
+        "object_type": "claim",
+        "occurred_at": "2026-11-03T18:15:00Z",
+        "text": "用户明确了一条 production 旧索引删除边界：要删的话，必须先给出具体对象、影响和回滚办法，并等用户明确确认后才能执行。随口一句“清一下”不是删除授权。这是确认规则，不是当前已经提出的删除请求，也不自动变成测试环境非生产改动的规则。",
+        "metadata": {
+          "ai_domain": "user_understanding",
+          "ai_world": true,
+          "dimension": "dim:ai_user_understanding",
+          "scope_key": "production-old-index-deletion",
+          "tags": [
+            "core_context",
+            "production",
+            "deletion",
+            "confirmation-required"
+          ],
+          "writeback_kind": "revisable_cognition"
+        }
+      },
+      {
+        "object_id": "evs_f6d647baa34d0ae877bebb59",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-03T18:15:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-03T18:15:00Z\", \"world_revision\": 22}, \"learned_at\": \"2026-11-03T18:15:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_a44137d1edddb299e74a940a\", \"revision\": 1}], \"metadata\": {\"ai_domain\": \"user_understanding\", \"ai_world\": true, \"dimension\": \"dim:ai_user_understanding\", \"scope_key\": \"production-old-index-deletion\", \"tags\": [\"core_context\", \"production\", \"deletion\", \"confirmation-required\"], \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_f6d647baa34d0ae877bebb59\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-03T18:15:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_a44137d1edddb299e74a940a\", \"revision\": 1}]}",
+        "metadata": {
+          "ai_domain": "user_understanding",
+          "ai_world": true,
+          "dimension": "dim:ai_user_understanding",
+          "scope_key": "production-old-index-deletion",
+          "tags": [
+            "core_context",
+            "production",
+            "deletion",
+            "confirmation-required"
+          ],
+          "writeback_kind": "cognition_evidence"
+        }
+      },
+      {
+        "object_id": "evs_revision_a986791086d9c8af35f6a8f9",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-03T18:15:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 3, \"missing_description\": [], \"observed_count\": 3}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-03T18:15:00Z\", \"world_revision\": 23}, \"learned_at\": \"2026-11-03T18:15:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_a44137d1edddb299e74a940a\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:ai_user_understanding\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_38ad6d12fe669e009a9aa3ea\", \"revision\": 2}}, \"object_id\": \"evs_revision_a986791086d9c8af35f6a8f9\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_38ad6d12fe669e009a9aa3ea@2\", \"recorded_at\": \"2026-11-03T18:15:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_a44137d1edddb299e74a940a\", \"revision\": 1}]}",
+        "metadata": {
+          "dimension": "dim:ai_user_understanding",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_38ad6d12fe669e009a9aa3ea",
+            "revision": 2
+          }
+        }
+      },
+      {
+        "object_id": "evs_revision_fb03149710f2c81dff032764",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-03T18:15:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 3, \"missing_description\": [], \"observed_count\": 3}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-03T18:15:00Z\", \"world_revision\": 24}, \"learned_at\": \"2026-11-03T18:15:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_504774f71adc2cc7423ea71d\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_a44137d1edddb299e74a940a\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:ai_user_understanding\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_ca5a8933b8e86d1a4df0cdf2\", \"revision\": 2}}, \"object_id\": \"evs_revision_fb03149710f2c81dff032764\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_ca5a8933b8e86d1a4df0cdf2@2\", \"recorded_at\": \"2026-11-03T18:15:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_504774f71adc2cc7423ea71d\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_a44137d1edddb299e74a940a\", \"revision\": 1}]}",
+        "metadata": {
+          "dimension": "dim:ai_user_understanding",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_ca5a8933b8e86d1a4df0cdf2",
+            "revision": 2
+          }
+        }
+      }
+    ],
+    "truncated": false
+  },
+  "resident_authored_response": "2026-11-03 的用户理解维度新增一条认知 clm_3caae78c9c70ebb46a6cb483：production 旧索引如果要删，必须先给出具体对象、影响和回滚办法，并等用户明确确认后才能执行；随口“清一下”不是删除授权。文本写明这是确认规则，不是已经提出的删除请求，也不自动变成测试环境非生产改动的规则。同日还有两条既有认知的修订证据：clm_38ad6d12fe669e009a9aa3ea 第 2 版、clm_ca5a8933b8e86d1a4df0cdf2 第 2 版，修订后的正文不在这批来源里。",
+  "decision_rationale": "Restate the new claim that is actually in the window, and only name the two revision evidence sets without inventing their resulting text.",
+  "world_revision_after": 47
+}

@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "name": "search_world",
+      "arguments": {
+        "query": "smoke test",
+        "limit": 5
+      },
+      "call_id": "cp0011-search-outcome"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "Retry the outcome search with the legal query-only arguments. The previous call failed on an unsupported filter."
+}

@@ -1,0 +1,6 @@
+{
+  "capability_calls": [],
+  "response": "先别通知门店。14:16 的 registry 记录说上传尝试被拒绝，原因是 checksum mismatch。edge-2026.11.4 未发布，tag 没创建，registry 里也没有对应 digest。这不是已经推送成功。",
+  "silence": false,
+  "decision_rationale": "Delivery is allowed, and the user was ready to notify stores if the image was pushed. The inspected record says the upload was rejected and the image was not published, so say that and do not invent a retry."
+}

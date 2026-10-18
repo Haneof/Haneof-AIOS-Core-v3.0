@@ -1,0 +1,4 @@
+{
+  "summary_text": "2026-11-02 17:14Z 有一条工作状态记录：当时 Atlas staging 有两处待处理，测试索引命名冲突，以及日志保留时长仍为默认值。两项都标成 non-production，记录里没有生产写入、删除或付费动作。这条来源只描述当时状态，没有写这两项后来是否处理完。",
+  "decision_rationale": "Restate the single work-state observation as a point-in-time record. Do not import later outcome from another dimension."
+}

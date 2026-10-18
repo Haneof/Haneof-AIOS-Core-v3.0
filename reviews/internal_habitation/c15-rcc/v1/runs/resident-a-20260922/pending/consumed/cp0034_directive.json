@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "name": "inspect_world_object",
+      "arguments": {
+        "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+        "revision": 1
+      },
+      "call_id": "cp0034-inspect-published"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "A release watch matched. Read the record before deciding whether it is a completion record or another queued plan."
+}

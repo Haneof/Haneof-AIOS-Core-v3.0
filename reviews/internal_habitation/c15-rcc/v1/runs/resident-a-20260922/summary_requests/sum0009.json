@@ -1,0 +1,97 @@
+{
+  "kind": "dimension_summary",
+  "checkpoint_id": "sum0009",
+  "summary_id": "sum0009",
+  "simulated_time": "2026-11-06T11:10:00-08:00",
+  "current_released_cursor": 13,
+  "world_revision_before": 79,
+  "request": {
+    "dimension": "dim:ai_user_understanding",
+    "granularity": "day",
+    "window_start": "2026-11-04T00:00:00Z",
+    "window_end": "2026-11-04T23:59:59.999999Z",
+    "source_world_revision": 79,
+    "sources": [
+      {
+        "object_id": "clm_cd72e732da9af444d863ca96",
+        "revision": 1,
+        "object_type": "claim",
+        "occurred_at": "2026-11-04T22:24:00Z",
+        "text": "用户要求以后把“准备提交、已排队”和“确实完成”分开说；没有完成记录时，按没确认完成处理。这是对这类发布状态说法的要求。用户同时说自己后台也看到 tag 还没出来。这还不是所有项目、所有状态的总规则。",
+        "metadata": {
+          "ai_domain": "user_understanding",
+          "ai_world": true,
+          "dimension": "dim:ai_user_understanding",
+          "scope_key": "release-status-language",
+          "tags": [
+            "core_context",
+            "release",
+            "status-language"
+          ],
+          "writeback_kind": "revisable_cognition"
+        }
+      },
+      {
+        "object_id": "evs_673b586db8c2e617a8cc4187",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-04T22:24:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-04T22:24:00Z\", \"world_revision\": 67}, \"learned_at\": \"2026-11-04T22:24:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_1b929906e9a92dce0e19ef96\", \"revision\": 1}], \"metadata\": {\"ai_domain\": \"user_understanding\", \"ai_world\": true, \"dimension\": \"dim:ai_user_understanding\", \"scope_key\": \"release-status-language\", \"tags\": [\"core_context\", \"release\", \"status-language\"], \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_673b586db8c2e617a8cc4187\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-04T22:24:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_1b929906e9a92dce0e19ef96\", \"revision\": 1}]}",
+        "metadata": {
+          "ai_domain": "user_understanding",
+          "ai_world": true,
+          "dimension": "dim:ai_user_understanding",
+          "scope_key": "release-status-language",
+          "tags": [
+            "core_context",
+            "release",
+            "status-language"
+          ],
+          "writeback_kind": "cognition_evidence"
+        }
+      },
+      {
+        "object_id": "clm_3b884846f2a60109552b3e53",
+        "revision": 1,
+        "object_type": "claim",
+        "occurred_at": "2026-11-04T23:07:00Z",
+        "text": "用户在 15:07 说状态对上了，并且门店测试通知已经由用户发出。这只是用户报告通知已发出，不说明门店已经开始测试，也不说明测试通过。",
+        "metadata": {
+          "ai_domain": "user_understanding",
+          "ai_world": true,
+          "dimension": "dim:ai_user_understanding",
+          "scope_key": "edge-2026.11.4-store-test",
+          "tags": [
+            "stores",
+            "notification",
+            "not-test-result"
+          ],
+          "writeback_kind": "revisable_cognition"
+        }
+      },
+      {
+        "object_id": "evs_73643f02ac83f9ccb217f775",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-04T23:07:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-04T23:07:00Z\", \"world_revision\": 76}, \"learned_at\": \"2026-11-04T23:07:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_498b81effac90ab9381a2533\", \"revision\": 1}], \"metadata\": {\"ai_domain\": \"user_understanding\", \"ai_world\": true, \"dimension\": \"dim:ai_user_understanding\", \"scope_key\": \"edge-2026.11.4-store-test\", \"tags\": [\"stores\", \"notification\", \"not-test-result\"], \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_73643f02ac83f9ccb217f775\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-04T23:07:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_498b81effac90ab9381a2533\", \"revision\": 1}]}",
+        "metadata": {
+          "ai_domain": "user_understanding",
+          "ai_world": true,
+          "dimension": "dim:ai_user_understanding",
+          "scope_key": "edge-2026.11.4-store-test",
+          "tags": [
+            "stores",
+            "notification",
+            "not-test-result"
+          ],
+          "writeback_kind": "cognition_evidence"
+        }
+      }
+    ],
+    "truncated": false
+  },
+  "resident_authored_response": "2026-11-04 的用户理解维度新增两条认知。22:24Z 的一条写：用户要求把“准备提交、已排队”和“确实完成”分开说，没有完成记录就按没确认完成处理；用户当时也说后台看到 tag 还没出来。文本限定这不是所有项目、所有状态的总规则。23:07Z 的一条写：用户说状态对上了，并且门店测试通知已经由用户发出；这只是通知已发出的报告，不说明门店已经开始测试或测试通过。同窗口各有一个证据集支撑，没有额外事实。",
+  "decision_rationale": "Restate the two supplied claims. Do not turn the store notice into a test result.",
+  "world_revision_after": 85
+}

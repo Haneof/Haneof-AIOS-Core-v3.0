@@ -1,0 +1,6 @@
+{
+  "capability_calls": [],
+  "response": "还不能通知门店。我这边只有 13:30 的记录：镜像 edge-2026.11.4 构建完成，状态是 READY_FOR_UPLOAD；registry 上传已排队，计划 14:00 才开始。那条记录没有 tag、digest，也没有 upload-complete。现在是 13:42，没有更新的完成记录，所以不能说已经推到 registry。",
+  "silence": false,
+  "decision_rationale": "The inspected release record is a queued plan before its stated start time, and search found no upload-complete. Do not tell the user the image is pushed or that stores can start testing."
+}

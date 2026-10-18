@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "name": "inspect_world_object",
+      "arguments": {
+        "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+        "revision": 1
+      },
+      "call_id": "cp0022-inspect-release"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "The new anchor is a build/upload record. Read the full object before deciding whether queued means started, finished, or related to Atlas."
+}

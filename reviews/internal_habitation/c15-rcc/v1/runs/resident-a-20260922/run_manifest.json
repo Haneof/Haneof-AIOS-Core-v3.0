@@ -1,0 +1,21 @@
+{
+  "task": "C15-RCC-RES-A-001",
+  "phase": "A",
+  "session_id": "resident-a-c15-rcc-20260922",
+  "subject_id": "user_1",
+  "starting_main": "cc00082b039a2931c474d6c2a19755218e23c052",
+  "branch": "arena/01a0c83a-haneof-aios-core-v3-0",
+  "cursor_range_completed": [1, 13],
+  "cursor_beyond_13_revealed": false,
+  "phase_b_initialized": false,
+  "world_db": "private_world.sqlite",
+  "world_revision": 90,
+  "index_db": "world_index.sqlite",
+  "index_watermark": 90,
+  "index_lag": 0,
+  "release_state": "release_state.json",
+  "runtime_checkpoint": "final/runtime_checkpoint.json",
+  "digests": "final/digests.json",
+  "python": "3.11.2",
+  "core_source_modified": false
+}
