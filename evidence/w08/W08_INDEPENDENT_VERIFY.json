@@ -1,0 +1,27 @@
+{
+  "verified_at_utc": "2026-09-30",
+  "method": "INDEPENDENT_FRESH_CLONE — git clone --depth 1 --branch persistence/c15-rcc-res-b-rerun-003-60997e04 from origin; local run cache NOT trusted; simulates an independent acceptor reconstructing terminal state from the remote alone",
+  "clone_head": "5692a32972f72afb6337aa68cc97310734f14c9c",
+  "checks": {
+    "clone_head_equals_expected_final_barrier": true,
+    "generation_head_file_bytes_identical_to_local_cache": true,
+    "generation_head_content": {"generation": 48, "head_sha256": "9cfe2639a15fe9785c0668726a55315f406ae45e43229c92b9e4b37b382ce410", "manifest_file_sha256": "c6a84e041281cc520303ed9bd73c6ae1be19836b48be8666a6eff7f17a68d8ee", "previous_head_sha256": "ea59ba36b2101c5de8f91fa7148c4ab6723fb479e643571640619817115cf502"},
+    "gen48_manifest_bytes_identical_to_local_cache": true,
+    "generation_count": 48,
+    "owner_run_id": "c15-rcc-res-b-rerun-003-60997e04",
+    "exchange_ledger_sha256": "fa7895c5103eebf3a2d8b7e635b80b54f7118d02d37065908cbbc0d930320ff8",
+    "exchange_ledger_records": 129,
+    "freeze_digests_recomputed_fresh": "10/10 PASS, zero drift",
+    "manifest_release_boundary": {"active_phase": "B", "last_acked_sequence": 22, "last_acked_event_id": "c15rcc-022", "next_sequence": 23, "pending_reveal": null},
+    "manifest_final_world_revision": 66,
+    "final_barrier_commit_message": "barrier FINAL_FREEZE: run_id=c15-rcc-res-b-rerun-003-60997e04 generation=48",
+    "committed_audit_tail": ["final_freeze", "generation_sealed"],
+    "pr296_lineage_check": {"state": "OPEN", "head": "317316299c332d82e0cbd0431b5c7d50f391bc17"},
+    "live_main_unchanged": "e25ec95bbe38c9127dd7234117466b429f8bfef6"
+  },
+  "nuances_documented": {
+    "final_barrier_field_ordering": "The AUTHORITATIVE (committed) freeze MANIFEST.json intentionally lacks the final_barrier field: seal_barrier seals the pre-barrier tree, so a generation's own commit sha cannot appear inside the state it seals. The post-seal local copy of MANIFEST.json carries final_barrier for convenience. Authoritative closure chain: remote ref -> commit 5692a329 (message binds run_id+generation=48) -> tree generation-head.json (sha-pins the gen48 manifest) -> committed audit records final_freeze + generation_sealed. No drift, no post-seal edits to the run tree.",
+    "post_freeze_artifacts": "TERMINAL_VERIFICATION.json, OPERATOR_LOG_SNAPSHOT_TERMINAL.txt, this file exist only in the LIVE run evidence dir / evidence PR, not in the sealed gen48 tree - by design (post-seal writes to sealed generations are forbidden)."
+  },
+  "conclusion": "Independent reconstruction from the remote alone reproduces the terminal state exactly. RUN_COMPLETE / AWAITING_INDEPENDENT_ACCEPTANCE re-attested."
+}

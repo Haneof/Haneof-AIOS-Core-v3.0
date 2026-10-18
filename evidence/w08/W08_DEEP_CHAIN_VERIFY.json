@@ -1,0 +1,29 @@
+{
+  "verified_at_utc": "2026-09-30",
+  "method": "DEEP_CHAIN_WALK — full generation chain walk 1..48 plus three-way ledger cross-check on an independent fresh clone (local cache not trusted)",
+  "clone_head": "5692a32972f72afb6337aa68cc97310734f14c9c",
+  "generation_chain": {
+    "generations": 48,
+    "artifacts_hash_reverified": 287,
+    "manifest_self_digest_failures": 0,
+    "artifact_byte_mismatches": 0,
+    "barrier_labels_present": ["INITIAL", "K1_AFTER_REVEAL", "K2_AFTER_INGEST", "K3_TRUSTED_RETURN_DURABLE+K4_CONTINUATION_APPLIED", "K5_AFTER_APPLIED_BEFORE_ACK", "DURABLE_ACK", "OPERATOR_RECOVERY_RECONCILE_NOT_SUBMITTED_PM_AUTHORIZED_2026-09-30", "FINAL_FREEZE"]
+  },
+  "three_way_cross_check": {
+    "background_model_attempts": {"total": 43, "metered": 43, "non_metered": 0, "wake_mix": {"periodic_review": 21, "user_interaction": 22}},
+    "metering_records_with_attempt": 43,
+    "attempts_to_meter_rows_one_to_one": true,
+    "attempt_meter_record_ids_match_rows": true,
+    "exchange_ledger": {"request_published": 43, "response_published": 43, "response_consumed": 43, "requests_with_exact_3event_completion": 43, "requests_total": 43}
+  },
+  "per_cursor_evidence_completeness": {
+    "cursors_14_to_22_base_kinds": ["ack_receipt.json", "binding.json", "current-event.json", "due_result.json", "event.json", "ingest_receipt.json"],
+    "turn_result_present_exactly_on_user_turn_cursors": [15, 17, 19, 22],
+    "structural_consistency": "PLATFORM cursors carry no turn_result; USER cursors do - matches the run shape exactly"
+  },
+  "identity_pins": {
+    "canonical_user_turn_fixture_pin_uniform": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46 (all canonical turns, matches Release-003 fixture pin)",
+    "gen48_sealed_run_identity": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "conversation_session_id": "sess-resident-b-003-8f7f1f11f568"}
+  },
+  "conclusion": "Deepest verification layer: every sealed generation byte-verifies, every model attempt is metered exactly once, every exchange request completes its exact 3-event lifecycle, and per-cursor evidence is structurally complete. Terminal state RUN_COMPLETE / AWAITING_INDEPENDENT_ACCEPTANCE stands with zero anomalies across 287 artifacts + 129 ledger records + 43 attempts + 9 cursor evidence sets."
+}

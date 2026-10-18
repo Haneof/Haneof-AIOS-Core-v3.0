@@ -1,0 +1,21 @@
+{
+  "verified_at_utc": "2026-09-30",
+  "mode": "READ_ONLY_POST_FREEZE_AUDIT",
+  "checks": {
+    "remote_authority_head": "5692a32972f72afb6337aa68cc97310734f14c9c",
+    "remote_head_matches_freeze_final_barrier": true,
+    "verify_local_remote_authority": "PASS",
+    "exchange_integrity_ok": true,
+    "exchange_aggregate_classification": "COMPLETE",
+    "open_dispatched": [],
+    "durable_unconsumed": [],
+    "release_state": {"active_phase": "B", "last_acked_sequence": 22, "last_acked_event_id": "c15rcc-022", "next_sequence": 23, "pending_reveal": null},
+    "freeze_digest_drift": [],
+    "background_model_attempt_states": {"metered": 43},
+    "wake_states_latest": {"completed": 7},
+    "non_terminal_wakes": 0,
+    "turn_executions": {"completed": 11},
+    "model_work_processes_running": false
+  },
+  "conclusion": "RUN quiesced at B/22 boundary; terminal state RUN_COMPLETE / AWAITING_INDEPENDENT_ACCEPTANCE re-verified post-freeze with zero residual in-flight state."
+}
