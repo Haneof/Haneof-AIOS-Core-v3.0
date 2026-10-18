@@ -1,0 +1,9 @@
+{
+  "world_revision": 38,
+  "pending_wakes": [],
+  "tasks": [
+    "object_id='task_d3a808b326066cce5a632626' object_type=<ObjectType.TASK: 'task'> subject_id='user_1' revision=1 occurred=TemporalExtent(start=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=TzInfo(0)), end=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=TzInfo(0)), precision=<TimePrecision.SECOND: 'second'>, timezone_name=None, unknown=False) learned_at=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=TzInfo(0)) recorded_at=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=TzInfo(0)) source_refs=[SourceRef(object_id='obs_c14_fixture_b798e2dbd5b0fabdec6680a2', revision=1, source_locator=None), SourceRef(object_id='obs_conv_user_9d7b2585dc63aa4b7d5cf2be', revision=1, source_locator=None)] created_by='execution_world:resident_ai' status='active' metadata={'task_origin': 'resident_ai'} task_type=<TaskType.OBSERVATION: 'observation'> task_state=<TaskState.WAITING_EVIDENCE: 'waiting_evidence'> goal_ref=None title='Registry publish outcome for edge-2026.11.4 (user is waiting before notifying stores)' reason_refs=[ObjectRef(object_id='obs_c14_fixture_b798e2dbd5b0fabdec6680a2', revision=1), ObjectRef(object_id='obs_conv_user_9d7b2585dc63aa4b7d5cf2be', revision=1)] priority=60 next_wake_at=None deadline=datetime.datetime(2026, 11, 18, 22, 24, tzinfo=TzInfo(0)) recurrence=None timezone_name=None dependency_refs=[] next_step='Mechanically watch matching Observation facts; Resident interprets meaning only after Wake.' completion_condition={'attention_class': 'background', 'cooldown_seconds': 0, 'dimensions': ['dim:release_state'], 'kind': 'attention_watch_v1', 'metadata_equals': {}, 'modality': None, 'numeric': None, 'predicate_semantics': 'mechanical_only', 'source_kind': 'registry', 'watch_mode': 'recurring'} cancel_condition={} related_entity_refs=[] app_id=None attempts=0 execution_refs=[] outcome_refs=[]"
+  ],
+  "goals": [],
+  "actions": []
+}

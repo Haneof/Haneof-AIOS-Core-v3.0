@@ -1,0 +1,697 @@
+{
+  "exchange": {
+    "integrity": {
+      "chain": {
+        "error": null,
+        "first_bad_seq": null,
+        "head_sha256": "93ddcffc5ef4c8efb077ae7254c36017451de0eac1f76e4a4ffe3b6791234bc8",
+        "ok": true,
+        "records": 15
+      },
+      "exchange_root": "/home/user/c003-run/exchange",
+      "ok": true,
+      "problems": [],
+      "requests": {
+        "req-0001-model_directive-390c8d84": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 1,
+          "request_sha256": "da661561372ac0e9cdd65dc86906121adb61bbcd9d27ce75dbca3435580ea941",
+          "response_sha256": "f0e14e26d0a2639a873a3c047034c9ba18e6e6768559803153d99354ecf16f3d"
+        },
+        "req-0002-model_directive-925a5644": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 4,
+          "request_sha256": "bb8801eed1b2d118d606d88742eb8936549b4cd1e3d172960026c7ede7a68aae",
+          "response_sha256": "be5d0a1371183c02df704b5abedf0af7037455a31ede3fbf71675e70f2a2f8dd"
+        },
+        "req-0003-model_directive-8f03e29e": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 7,
+          "request_sha256": "28d22ca3df6eaf3195a264707a8234f83ee162d6902c96f8ac2d1bdf3fba004c",
+          "response_sha256": "af4afb112704331606712cd9ac57384ce2f3a08aa8a6e6c2a458e551d103a47e"
+        },
+        "req-0004-model_directive-8cf4c8c3": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 10,
+          "request_sha256": "6cfda7ac7d7f5f3166836eaaf4a672faf9f21107959591a72d11d6d7c076e37c",
+          "response_sha256": "e6a4d67ba37300e84f2bbaf6178aa9809dd71a548516bd3a8aa50ce1a9ce1894"
+        },
+        "req-0005-model_directive-9dd1b76a": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 13,
+          "request_sha256": "623cea541af0683dbaabc6c5ec0d925a76ec0b4af8569f80c45fcee13bd5c704",
+          "response_sha256": "9e10911c934ecaa6d9063d768e2e35b326b50379617dabc364ad6897a7bd0d24"
+        }
+      }
+    },
+    "recovery_state": {
+      "classification": "COMPLETE",
+      "complete": [
+        "req-0001-model_directive-390c8d84",
+        "req-0002-model_directive-925a5644",
+        "req-0003-model_directive-8f03e29e",
+        "req-0004-model_directive-8cf4c8c3",
+        "req-0005-model_directive-9dd1b76a"
+      ],
+      "dispatch_boundary_event": "request_published",
+      "dispatch_boundary_rule": "not_submitted reconciliation is allowed only when no request_published record exists; after request publication the exchange fails closed instead of declaring the request unsubmitted",
+      "durable_unconsumed": [],
+      "ledger": {
+        "error": null,
+        "first_bad_seq": null,
+        "head_sha256": "93ddcffc5ef4c8efb077ae7254c36017451de0eac1f76e4a4ffe3b6791234bc8",
+        "ok": true,
+        "records": 15
+      },
+      "not_submitted_allowed": false,
+      "open_dispatched": [],
+      "requests": [
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 1
+            },
+            {
+              "event": "response_published",
+              "seq": 2
+            },
+            {
+              "event": "response_consumed",
+              "seq": 3
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0001-model_directive-390c8d84",
+          "request_sha256": "da661561372ac0e9cdd65dc86906121adb61bbcd9d27ce75dbca3435580ea941",
+          "response_sha256": "f0e14e26d0a2639a873a3c047034c9ba18e6e6768559803153d99354ecf16f3d",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 4
+            },
+            {
+              "event": "response_published",
+              "seq": 5
+            },
+            {
+              "event": "response_consumed",
+              "seq": 6
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0002-model_directive-925a5644",
+          "request_sha256": "bb8801eed1b2d118d606d88742eb8936549b4cd1e3d172960026c7ede7a68aae",
+          "response_sha256": "be5d0a1371183c02df704b5abedf0af7037455a31ede3fbf71675e70f2a2f8dd",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 7
+            },
+            {
+              "event": "response_published",
+              "seq": 8
+            },
+            {
+              "event": "response_consumed",
+              "seq": 9
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0003-model_directive-8f03e29e",
+          "request_sha256": "28d22ca3df6eaf3195a264707a8234f83ee162d6902c96f8ac2d1bdf3fba004c",
+          "response_sha256": "af4afb112704331606712cd9ac57384ce2f3a08aa8a6e6c2a458e551d103a47e",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 10
+            },
+            {
+              "event": "response_published",
+              "seq": 11
+            },
+            {
+              "event": "response_consumed",
+              "seq": 12
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0004-model_directive-8cf4c8c3",
+          "request_sha256": "6cfda7ac7d7f5f3166836eaaf4a672faf9f21107959591a72d11d6d7c076e37c",
+          "response_sha256": "e6a4d67ba37300e84f2bbaf6178aa9809dd71a548516bd3a8aa50ce1a9ce1894",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 13
+            },
+            {
+              "event": "response_published",
+              "seq": 14
+            },
+            {
+              "event": "response_consumed",
+              "seq": 15
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0005-model_directive-9dd1b76a",
+          "request_sha256": "623cea541af0683dbaabc6c5ec0d925a76ec0b4af8569f80c45fcee13bd5c704",
+          "response_sha256": "9e10911c934ecaa6d9063d768e2e35b326b50379617dabc364ad6897a7bd0d24",
+          "semantic_dispatch_occurred": true
+        }
+      ],
+      "semantic_dispatch_occurred": true
+    }
+  },
+  "handoffs": [
+    {
+      "declared_request_sha256": "623cea541af0683dbaabc6c5ec0d925a76ec0b4af8569f80c45fcee13bd5c704",
+      "path": "published_new_request",
+      "request_id": "req-0005-model_directive-9dd1b76a",
+      "request_sha256": "623cea541af0683dbaabc6c5ec0d925a76ec0b4af8569f80c45fcee13bd5c704",
+      "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+      "response_sha256": "9e10911c934ecaa6d9063d768e2e35b326b50379617dabc364ad6897a7bd0d24"
+    }
+  ],
+  "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "session_id": "sess-resident-a-c003-7089564bdf1d",
+  "status_after": {
+    "index_lag": 0,
+    "index_path": "/home/user/c003-run/world/c15-res-a-c003.world.search.sqlite",
+    "index_watermark": 9,
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/home/user/c003-run/world/c15-res-a-c003.world.sqlite",
+    "world_revision": 9,
+    "writer_lease_held": true
+  },
+  "status_before": {
+    "index_lag": 0,
+    "index_path": "/home/user/c003-run/world/c15-res-a-c003.world.search.sqlite",
+    "index_watermark": 8,
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/home/user/c003-run/world/c15-res-a-c003.world.sqlite",
+    "world_revision": 8,
+    "writer_lease_held": true
+  },
+  "subject_id": "user_1",
+  "turn_index": 2,
+  "turn_result": {
+    "context": {
+      "ai_identity": {},
+      "capability_catalog": [
+        {
+          "kind": "write",
+          "name": "commit_ai_world_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "commit_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "commit_operation_experience",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "compare_claims",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "create_attention_watch",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "create_task",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "drill_down_conversation",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "expand_recall",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "focus_entity",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "follow_relation",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "form_event",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "inspect_outcome",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "inspect_world_object",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_attention_watches",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_conversation_summaries",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_dimensions",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "propose_action",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_dimension",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_entity",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_goal",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "read_ai_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_background_budget",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_cognitive_policies",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_execution_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_periodic_review_anchors",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_world_map",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "record_communication_experience",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "request_all_dimensions_projection",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "retract_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "retrieve_original_observation",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "revise_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "revise_entity",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "rollback_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "search_conversation_summaries",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "search_timeline",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "search_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "transition_dimension",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_event",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_goal",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_task",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "update_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "upsert_relation",
+          "side_effecting": true
+        }
+      ],
+      "conversation_summaries": [],
+      "current_topic": "测试环境这些实现细节你自己定，别每一步都等我确认。做完给我看结果；如果碰到会改生产数据的边界，再一次性把需要我决定的东西列出来。",
+      "estimated_tokens": 1833,
+      "memory_cards": [
+        {
+          "dimension": "dim:work_state",
+          "excerpt": "Atlas staging 当前有两处待处理：测试索引命名冲突、日志保留时长仍为默认值。两项均标记为 non-production；没有生产写入、删除或付费动作。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+          "object_type": "observation",
+          "retrieval_score": 2,
+          "revision": 1
+        }
+      ],
+      "recent_turns": [
+        {
+          "assistant": {
+            "object_ref": {
+              "object_id": "obs_conv_ai_2f9e7a71f8be4570efadc4b1",
+              "revision": 1
+            },
+            "occurred_at": "2026-11-02T17:05:00+00:00",
+            "role": "assistant",
+            "text": "明白，接下来两周我按这个来配合你收尾 Atlas staging：日常工程细节我不逐条同步，只在阶段性结果和关键风险上给你汇报。真正会影响生产、删除数据或产生费用的动作，我会单独提出来说明影响，等你确认后再推进；有具体的里程碑或验收口径也可以随时补充给我。"
+          },
+          "turn_index": 1,
+          "user": {
+            "object_ref": {
+              "object_id": "obs_conv_user_ec4c81abf13da10be615fcd6",
+              "revision": 1
+            },
+            "occurred_at": "2026-11-02T17:05:00+00:00",
+            "role": "user",
+            "text": "接下来两周你持续帮我把 Atlas staging 收尾。日常工程细节我不想一直盯，你把结果和关键风险给我就行；真正会影响生产、删除数据或产生费用的事情再单独提出来。"
+          }
+        }
+      ],
+      "task_context": {
+        "cognitive_policy_context": {
+          "_meta": {
+            "included": 1,
+            "reader": "read_cognitive_policies",
+            "total": 1,
+            "truncated": false
+          },
+          "_policy_records": [
+            {
+              "allowed_range_or_choices": [
+                "results_and_key_risks_only",
+                "full_detail"
+              ],
+              "current_value": "results_and_key_risks_only",
+              "default_value": null,
+              "evaluation_window": "2w",
+              "mutable_by_ai": true,
+              "policy_class": "cognitive_policy",
+              "policy_id": "communication.detail_level",
+              "previous_version": null,
+              "rollback_pointer": null,
+              "scope": "communication",
+              "version": 1
+            }
+          ],
+          "communication.detail_level": "results_and_key_risks_only",
+          "memory.recommendation_limit": 5
+        },
+        "conversation_continuity": {
+          "pending_round_summary": null,
+          "raw_drill_down_capability": "drill_down_conversation",
+          "recent_turn_count": 1,
+          "round_summary_count": 0,
+          "session_id": "sess-resident-a-c003-7089564bdf1d",
+          "summary_index_capability": "list_conversation_summaries",
+          "summary_search_capability": "search_conversation_summaries"
+        },
+        "current_user_observation_ref": {
+          "object_id": "obs_conv_user_c27eefdbe08fba3e9c2b18fc",
+          "revision": 1
+        },
+        "related_execution_anchors": [],
+        "topic_state": {
+          "antecedent_recall_needed": false,
+          "continued_from_recent_turn": false,
+          "gate_open": true,
+          "history_may_help": true,
+          "reason": "current_utterance_topic:indexed_external_observation_anchor",
+          "topic": "测试环境这些实现细节你自己定，别每一步都等我确认。做完给我看结果；如果碰到会改生产数据的边界，再一次性把需要我决定的东西列出来。"
+        }
+      },
+      "token_budget": 3400,
+      "truncated": false,
+      "user_input": "测试环境这些实现细节你自己定，别每一步都等我确认。做完给我看结果；如果碰到会改生产数据的边界，再一次性把需要我决定的东西列出来。",
+      "world_map": {
+        "as_of": "2026-11-02T17:20:00+00:00",
+        "dimension_count": 4,
+        "dimensions": [
+          {
+            "current_object_count": 3,
+            "definition_ref": null,
+            "dimension": "dim:user_ai_interaction",
+            "latest_activity_at": "2026-11-02T17:20:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation"
+            ],
+            "recent_24h_count": 3,
+            "recent_7d_count": 3,
+            "registered": false
+          },
+          {
+            "current_object_count": 3,
+            "definition_ref": null,
+            "dimension": "dim_unclassified",
+            "latest_activity_at": "2026-11-02T17:05:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "dependency",
+              "wake"
+            ],
+            "recent_24h_count": 3,
+            "recent_7d_count": 3,
+            "registered": false
+          },
+          {
+            "current_object_count": 2,
+            "definition_ref": null,
+            "dimension": "dim:ai_cognitive_policy",
+            "latest_activity_at": "2026-11-02T17:05:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "cognitive_policy",
+              "evidence_set"
+            ],
+            "recent_24h_count": 2,
+            "recent_7d_count": 2,
+            "registered": false
+          },
+          {
+            "current_object_count": 1,
+            "definition_ref": null,
+            "dimension": "dim:work_state",
+            "latest_activity_at": "2026-11-02T17:14:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation"
+            ],
+            "recent_24h_count": 1,
+            "recent_7d_count": 1,
+            "registered": false
+          }
+        ],
+        "directory_only": true,
+        "expand_capabilities": {
+          "broader_recall": "expand_recall",
+          "dimension_definitions": "list_dimensions",
+          "exact_object": "inspect_world_object",
+          "multi_dimension_window": "request_all_dimensions_projection",
+          "refresh_directory": "read_world_map",
+          "semantic_recall": "search_world",
+          "single_dimension_timeline": "search_timeline"
+        },
+        "index_lag": 0,
+        "index_watermark": 8,
+        "schema": "aios.world-map.l0.v1",
+        "semantic_conclusions": false,
+        "truncated": false,
+        "world_revision": 8
+      }
+    },
+    "continuity_summary_commits": [],
+    "continuity_summary_error": null,
+    "conversation_commit": {
+      "assistant_observation_id": "obs_conv_ai_fc5dec8dae6dc8b76d004c8f",
+      "assistant_world_revision": 9,
+      "idempotent_replay": false,
+      "user_observation_id": "obs_conv_user_c27eefdbe08fba3e9c2b18fc",
+      "user_world_revision": 8,
+      "world_revision": 9
+    },
+    "recommendation": {
+      "cards": [
+        {
+          "dimension": "dim:work_state",
+          "excerpt": "Atlas staging 当前有两处待处理：测试索引命名冲突、日志保留时长仍为默认值。两项均标记为 non-production；没有生产写入、删除或付费动作。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+          "object_type": "observation",
+          "retrieval_score": 2,
+          "revision": 1
+        }
+      ],
+      "current_topic": "测试环境这些实现细节你自己定，别每一步都等我确认。做完给我看结果；如果碰到会改生产数据的边界，再一次性把需要我决定的东西列出来。",
+      "index_watermark": 8,
+      "reason": "topic_matched_history",
+      "topic_gate_open": true,
+      "world_revision": 8
+    },
+    "runtime": {
+      "capability_history": [],
+      "model_input_tokens": null,
+      "model_output_tokens": null,
+      "model_rounds": 1,
+      "model_total_tokens": null,
+      "model_usage_complete": false,
+      "recovered_response_attempts": [],
+      "response": "好，测试环境的实现细节我自己定，不再逐步找你确认。阶段性做完后我把结果和关键风险给你看；只有涉及会改生产数据这类边界时，我会把需要你拍板的决定一次性列全再找你。",
+      "silenced": false,
+      "termination_reason": "responded"
+    }
+  },
+  "world_path": "/home/user/c003-run/world/c15-res-a-c003.world.sqlite"
+}
