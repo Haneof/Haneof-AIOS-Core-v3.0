@@ -1,0 +1,39 @@
+{
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "gates": {
+    "A": {
+      "status": "PASS",
+      "result_file": "gate_a_result.json",
+      "result_sha256": "955863dbfb3ccfd5c19995cd9f5e29e452e2268d0530076f23536fc4db5d8fbf"
+    },
+    "B": {
+      "status": "PASS",
+      "result_file": "gate_b_result.json",
+      "result_sha256": "bbe59f1148b3cbdbbd1e22e1eb3d12bd794561b94fd7064f09622590f4c90531"
+    },
+    "C": {
+      "status": "PASS",
+      "result_file": "gate_c_result.json",
+      "result_sha256": "49d4a377bb46c616ff37fe38da4e2caaa4d270a8f8b6acec1ac8009661bdc6aa"
+    },
+    "D": {
+      "status": "PASS",
+      "result_file": "gate_d_result.json",
+      "result_sha256": "03a340645448ccc1169e2f95d4f549e4679370fddb82f8b7b4135dc077e0c6f2"
+    }
+  },
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "executable": "/opt/aios/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-28T18:37:09.550640+00:00"
+}

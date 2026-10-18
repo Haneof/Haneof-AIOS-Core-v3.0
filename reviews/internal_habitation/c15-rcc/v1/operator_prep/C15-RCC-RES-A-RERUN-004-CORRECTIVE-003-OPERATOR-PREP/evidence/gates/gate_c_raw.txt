@@ -1,0 +1,14 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /opt/aios/runtime/3.12.14/venv/bin/python
+rootdir: /home/user/Haneof-AIOS-Core-v3.0
+configfile: pyproject.toml
+collecting ... collected 2 items
+
+harness/tests/test_gate_c_two_round_integration.py::test_gate_c_two_round_integration PASSED [ 50%]
+harness/tests/test_gate_c_two_round_integration.py::test_gate_c_second_turn_reuses_durable_exchange PASSED [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED harness/tests/test_gate_c_two_round_integration.py::test_gate_c_two_round_integration
+PASSED harness/tests/test_gate_c_two_round_integration.py::test_gate_c_second_turn_reuses_durable_exchange
+============================== 2 passed in 1.07s ===============================

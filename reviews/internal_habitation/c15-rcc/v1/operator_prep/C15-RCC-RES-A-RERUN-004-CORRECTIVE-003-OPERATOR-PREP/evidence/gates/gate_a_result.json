@@ -1,0 +1,32 @@
+{
+  "gate": "A",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "returncode": 0,
+  "test_file": "tests/test_gate_a_durable_exchange.py",
+  "test_count": 0,
+  "test_ids": [],
+  "outcomes": {
+    "passed": 19,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "duration_s": 2.81,
+  "raw_output": "gate_a_raw.txt",
+  "raw_output_sha256": "dc878de501ee5250fc3ff1cc22549c352dc07d98c61273022533a5bb570868a0",
+  "enumeration_sha256": "d4ec9fc66e499c71c6a19f78537aafa7691c2aa55d80057b444a7348d991e8f9",
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "executable": "/opt/aios/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-28T18:37:03.929098+00:00"
+}

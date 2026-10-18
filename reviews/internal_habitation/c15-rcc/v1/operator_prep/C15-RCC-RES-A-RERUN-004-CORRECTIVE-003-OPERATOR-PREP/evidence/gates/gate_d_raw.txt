@@ -1,0 +1,20 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /opt/aios/runtime/3.12.14/venv/bin/python
+rootdir: /home/user/Haneof-AIOS-Core-v3.0
+configfile: pyproject.toml
+collecting ... collected 5 items
+
+harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_scan_passes PASSED [ 20%]
+harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_individual_checks PASSED [ 40%]
+harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_response_mode_is_external_session PASSED [ 60%]
+harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_package_does_not_import_tests PASSED [ 80%]
+harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_test_only_responder_is_outside_package PASSED [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_scan_passes
+PASSED harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_individual_checks
+PASSED harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_response_mode_is_external_session
+PASSED harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_package_does_not_import_tests
+PASSED harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_test_only_responder_is_outside_package
+============================== 5 passed in 0.59s ===============================

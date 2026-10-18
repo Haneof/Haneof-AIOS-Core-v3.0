@@ -1,0 +1,32 @@
+{
+  "gate": "C",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "returncode": 0,
+  "test_file": "tests/test_gate_c_two_round_integration.py",
+  "test_count": 0,
+  "test_ids": [],
+  "outcomes": {
+    "passed": 2,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "duration_s": 1.365,
+  "raw_output": "gate_c_raw.txt",
+  "raw_output_sha256": "92dab99c6ac3c5891077c41bfcf66b3de1605d5f409fc3352dc451b9233546a4",
+  "enumeration_sha256": "b4c82907b0c65584f3125ea73c389a1f823977c57fd76226218c8eeddf83f788",
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "executable": "/opt/aios/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-28T18:37:07.894443+00:00"
+}
