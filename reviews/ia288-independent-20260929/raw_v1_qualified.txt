@@ -1,0 +1,43 @@
+test_concurrent_append_preserves_validity (__main__.Probes.test_concurrent_append_preserves_validity) ... concurrent outcomes: ['success', 'success'] chain: {'ok': False, 'records': None, 'error': 'non-monotonic sequence at seq 2', 'first_bad_seq': 2}
+FAIL
+test_duplicate_rejected (__main__.Probes.test_duplicate_rejected) ... ok
+test_interior_mutation (__main__.Probes.test_interior_mutation) ... ok
+test_legal_chain (__main__.Probes.test_legal_chain) ... ok
+test_request_mutation_before_consume (__main__.Probes.test_request_mutation_before_consume) ... ERROR
+test_valid_tail_boundary (__main__.Probes.test_valid_tail_boundary) ... ok
+
+======================================================================
+ERROR: test_request_mutation_before_consume (__main__.Probes.test_request_mutation_before_consume)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/.cache/ia288/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/responses.py", line 80, in publish_bytes
+    envelope = parse_response_envelope(decoded)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/.cache/ia288/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/schema.py", line 267, in parse_response_envelope
+    raise SchemaContractError(f"response envelope missing keys: {sorted(missing)}")
+aios_exchange.schema.SchemaContractError: response envelope missing keys: ['authored_by']
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/ia288-independent-20260929/probes_v1.py", line 52, in test_request_mutation_before_consume
+    b.responses.publish_object(request_id=rid,response=response)
+  File "/home/user/.cache/ia288/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/responses.py", line 190, in publish_object
+    return self.publish_bytes(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/user/.cache/ia288/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/responses.py", line 82, in publish_bytes
+    raise ResponsePublishError(f"response envelope is invalid: {exc}") from exc
+aios_exchange.responses.ResponsePublishError: response envelope is invalid: response envelope missing keys: ['authored_by']
+
+======================================================================
+FAIL: test_concurrent_append_preserves_validity (__main__.Probes.test_concurrent_append_preserves_validity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/ia288-independent-20260929/probes_v1.py", line 45, in test_concurrent_append_preserves_validity
+    self.assertTrue(self.ledger.verify_chain()['ok'], 'successful appends must not corrupt the durable ledger')
+AssertionError: False is not true : successful appends must not corrupt the durable ledger
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.491s
+
+FAILED (failures=1, errors=1)

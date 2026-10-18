@@ -1,0 +1,13 @@
+{
+  "signature": "(user_input: 'str', wake_reason: 'str', cockpit: 'Mapping[str, Any]', capability_catalog: 'tuple[Mapping[str, Any], ...]', capability_history: 'tuple[CapabilityResult, ...]', round_index: 'int', remaining_tool_rounds: 'int') -> None",
+  "fields": [
+    "user_input",
+    "wake_reason",
+    "cockpit",
+    "capability_catalog",
+    "capability_history",
+    "round_index",
+    "remaining_tool_rounds"
+  ],
+  "capability_history_alone_raises_type_error": true
+}

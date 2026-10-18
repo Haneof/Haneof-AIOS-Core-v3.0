@@ -1,0 +1,90 @@
+[
+  {
+    "mode": "default",
+    "returncode": 0,
+    "expected_success": true,
+    "ok": true,
+    "stdout": "{\n  \"environment_record\": \"/home/user/.cache/ia288/runtime/evidence/environment_record.json\",\n  \"python\": \"3.12.14\",\n  \"pydantic\": \"2.13.5\",\n  \"pytest\": \"8.4.2\",\n  \"sqlite\": \"3.45.1\",\n  \"core_content_manifest_sha256\": \"220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa\"\n}\n",
+    "stderr": "<stdin>:18: DeprecationWarning: version is deprecated and will be removed in Python 3.14\n[bootstrap] version triple OK: python=3.12.14 pydantic=2.13.5 pytest=8.4.2 sqlite=3.45.1\n[bootstrap] VERIFY OK\n"
+  },
+  {
+    "mode": "explicit",
+    "returncode": 0,
+    "expected_success": true,
+    "ok": true,
+    "stdout": "{\n  \"environment_record\": \"/home/user/.cache/ia288/runtime/evidence/environment_record.json\",\n  \"python\": \"3.12.14\",\n  \"pydantic\": \"2.13.5\",\n  \"pytest\": \"8.4.2\",\n  \"sqlite\": \"3.45.1\",\n  \"core_content_manifest_sha256\": \"220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa\"\n}\n",
+    "stderr": "<stdin>:18: DeprecationWarning: version is deprecated and will be removed in Python 3.14\n[bootstrap] version triple OK: python=3.12.14 pydantic=2.13.5 pytest=8.4.2 sqlite=3.45.1\n[bootstrap] VERIFY OK\n"
+  },
+  {
+    "mode": "missing_git",
+    "returncode": 2,
+    "expected_success": false,
+    "ok": true,
+    "stdout": "",
+    "stderr": "[bootstrap] BLOCKED: AIOS_REPO_ROOT must identify a readable Git repository\n"
+  },
+  {
+    "mode": "core_byte",
+    "returncode": 2,
+    "expected_success": false,
+    "ok": true,
+    "stdout": "",
+    "stderr": "[bootstrap] BLOCKED: frozen RC or working-tree content identity verification failed\n"
+  },
+  {
+    "mode": "tests_byte",
+    "returncode": 2,
+    "expected_success": false,
+    "ok": true,
+    "stdout": "",
+    "stderr": "[bootstrap] BLOCKED: frozen RC or working-tree content identity verification failed\n"
+  },
+  {
+    "mode": "symlink",
+    "returncode": 2,
+    "expected_success": false,
+    "ok": true,
+    "stdout": "",
+    "stderr": "[bootstrap] BLOCKED: frozen RC or working-tree content identity verification failed\n"
+  },
+  {
+    "mode": "wrong_core_tree",
+    "returncode": 2,
+    "expected_success": false,
+    "ok": true,
+    "stdout": "",
+    "stderr": "[bootstrap] BLOCKED: frozen RC or working-tree content identity verification failed\n"
+  },
+  {
+    "mode": "wrong_tests_tree",
+    "returncode": 2,
+    "expected_success": false,
+    "ok": true,
+    "stdout": "",
+    "stderr": "[bootstrap] BLOCKED: frozen RC or working-tree content identity verification failed\n"
+  },
+  {
+    "mode": "foreign_import",
+    "returncode": 2,
+    "expected_success": false,
+    "ok": true,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"<stdin>\", line 7, in <module>\nRuntimeError: BLOCKED: aios_core import is outside the verified source root\n[bootstrap] BLOCKED: python self-check failed\n"
+  },
+  {
+    "mode": "wrong_sqlite",
+    "returncode": 2,
+    "expected_success": false,
+    "ok": true,
+    "stdout": "",
+    "stderr": "<stdin>:18: DeprecationWarning: version is deprecated and will be removed in Python 3.14\n[bootstrap] BLOCKED: SQLite version mismatch: want 3.45.1 got 0.0.0\n"
+  },
+  {
+    "mode": "wrong_openssl",
+    "returncode": 2,
+    "expected_success": false,
+    "ok": true,
+    "stdout": "",
+    "stderr": "<stdin>:18: DeprecationWarning: version is deprecated and will be removed in Python 3.14\n[bootstrap] BLOCKED: OpenSSL version mismatch: want 3.0.13 got 0.0.0\n"
+  }
+]

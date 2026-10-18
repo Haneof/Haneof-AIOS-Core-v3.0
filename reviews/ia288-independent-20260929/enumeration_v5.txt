@@ -1,0 +1,11 @@
+default
+explicit
+missing_git
+core_byte
+tests_byte
+symlink
+wrong_core_tree
+wrong_tests_tree
+foreign_import
+wrong_sqlite
+wrong_openssl
