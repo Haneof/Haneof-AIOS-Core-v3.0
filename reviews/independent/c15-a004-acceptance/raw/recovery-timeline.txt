@@ -1,0 +1,158 @@
+2026-09-28T16:34:23.943433+00:00 step cursor=1 start occurred_at=2026-11-02T17:05:00+00:00
+2026-09-28T16:34:23.994394+00:00 decision request written req-0001-model_directive-13f2b448 kind=model_directive
+2026-09-28T16:37:59.667348+00:00 step cursor=1 start occurred_at=2026-11-02T17:05:00+00:00
+2026-09-28T16:39:30.121815+00:00 step cursor=1 start occurred_at=2026-11-02T17:05:00+00:00
+2026-09-28T16:39:30.169998+00:00 decision request written req-0002-model_directive-983ede97 kind=model_directive
+2026-09-28T16:39:58.683770+00:00 decision response read req-0002-model_directive-983ede97
+2026-09-28T16:39:58.712540+00:00 decision request written req-0003-model_directive-dcc18eef kind=model_directive
+2026-09-28T16:40:19.224313+00:00 decision response read req-0003-model_directive-dcc18eef
+2026-09-28T16:40:19.244915+00:00 step cursor=1 done world_revision=3 watermark=3 pending_wakes=0 checkpoint=sha256:f9ede0e257ac66bebff28c08fb16bd134f44d33d8d15e88c6c17efdd90b2c79e result=sha256:f9ede0e257ac66bebff28c08fb16bd134f44d33d8d15e88c6c17efdd90b2c79e
+2026-09-28T16:41:54.832600+00:00 step cursor=2 start occurred_at=2026-11-02T17:14:00+00:00
+2026-09-28T16:41:54.870686+00:00 step cursor=2 done world_revision=4 watermark=4 pending_wakes=0 checkpoint=sha256:a6301ec63923632087eca8930ee4255bdf957cf4c3147bad494dea2db78b79a9 result=sha256:a6301ec63923632087eca8930ee4255bdf957cf4c3147bad494dea2db78b79a9
+2026-09-28T16:42:24.904101+00:00 step cursor=3 start occurred_at=2026-11-02T17:20:00+00:00
+2026-09-28T16:42:24.982675+00:00 decision request written req-0004-model_directive-364057ae kind=model_directive
+2026-09-28T16:43:19.009968+00:00 decision response read req-0004-model_directive-364057ae
+2026-09-28T16:43:19.042422+00:00 decision request written req-0005-model_directive-aa34f925 kind=model_directive
+2026-09-28T16:43:34.550417+00:00 decision response read req-0005-model_directive-aa34f925
+2026-09-28T16:43:34.571131+00:00 step cursor=3 done world_revision=7 watermark=7 pending_wakes=0 checkpoint=sha256:d9c66f5a0b7d23c119f8715dc2388b07df34db0bd2a176b59bc52426297f04f1 result=sha256:d9c66f5a0b7d23c119f8715dc2388b07df34db0bd2a176b59bc52426297f04f1
+2026-09-28T16:43:59.330014+00:00 step cursor=4 start occurred_at=2026-11-02T20:40:00+00:00
+2026-09-28T16:43:59.384952+00:00 step cursor=4 done world_revision=8 watermark=8 pending_wakes=0 checkpoint=sha256:8e98263317271e1bcfab115ee2d66140f7901556c9d9919c2505bd09f9ac477e result=sha256:8e98263317271e1bcfab115ee2d66140f7901556c9d9919c2505bd09f9ac477e
+2026-09-28T16:44:39.662283+00:00 step cursor=5 start occurred_at=2026-11-02T20:52:00+00:00
+2026-09-28T16:44:39.765138+00:00 decision request written req-0006-model_directive-41d2c262 kind=model_directive
+2026-09-28T16:45:09.782621+00:00 decision response read req-0006-model_directive-41d2c262
+2026-09-28T16:45:09.809014+00:00 decision request written req-0007-model_directive-88b1fa9b kind=model_directive
+2026-09-28T16:45:23.316364+00:00 decision response read req-0007-model_directive-88b1fa9b
+2026-09-28T16:45:23.340255+00:00 step cursor=5 done world_revision=11 watermark=11 pending_wakes=0 checkpoint=sha256:13a8986c2c7f2c602e6a2c9b967a8769ad7d18746b10cecbee6d38e6d9bf4964 result=sha256:13a8986c2c7f2c602e6a2c9b967a8769ad7d18746b10cecbee6d38e6d9bf4964
+2026-09-28T16:46:18.567415+00:00 step cursor=6 start occurred_at=2026-11-03T18:15:00+00:00
+2026-09-28T16:46:18.635424+00:00 decision request written req-0008-model_directive-10950fe4 kind=model_directive
+2026-09-28T16:46:55.716970+00:00 decision response read req-0008-model_directive-10950fe4
+2026-09-28T16:46:55.736284+00:00 decision request written req-0009-model_directive-71a2bd34 kind=model_directive
+2026-09-28T16:47:20.274059+00:00 decision response read req-0009-model_directive-71a2bd34
+2026-09-28T16:47:20.304361+00:00 decision request written req-0010-dimension_summary-7e278ca4 kind=dimension_summary
+2026-09-28T16:47:52.321879+00:00 decision response read req-0010-dimension_summary-7e278ca4
+2026-09-28T16:47:52.363956+00:00 decision request written req-0011-dimension_summary-d744f08c kind=dimension_summary
+2026-09-28T16:48:11.875477+00:00 decision response read req-0011-dimension_summary-d744f08c
+2026-09-28T16:48:11.953020+00:00 decision request written req-0012-dimension_summary-93c29bb0 kind=dimension_summary
+2026-09-28T16:48:27.961850+00:00 decision response read req-0012-dimension_summary-93c29bb0
+2026-09-28T16:48:28.035139+00:00 decision request written req-0013-dimension_summary-05a433b5 kind=dimension_summary
+2026-09-28T16:48:45.081948+00:00 decision response read req-0013-dimension_summary-05a433b5
+2026-09-28T16:48:45.123670+00:00 decision request written req-0014-dimension_summary-abcbdd00 kind=dimension_summary
+2026-09-28T16:48:54.629698+00:00 decision response read req-0014-dimension_summary-abcbdd00
+2026-09-28T16:48:54.843592+00:00 decision request written req-0015-model_directive-51871552 kind=model_directive
+2026-09-28T16:49:17.857096+00:00 decision response read req-0015-model_directive-51871552
+2026-09-28T16:49:17.900032+00:00 decision request written req-0016-model_directive-7ec8f615 kind=model_directive
+2026-09-28T16:49:25.904942+00:00 decision response read req-0016-model_directive-7ec8f615
+2026-09-28T16:49:26.067964+00:00 decision request written req-0017-model_directive-25070410 kind=model_directive
+2026-09-28T16:49:55.583457+00:00 decision response read req-0017-model_directive-25070410
+2026-09-28T16:49:55.610134+00:00 step cursor=6 done world_revision=30 watermark=30 pending_wakes=0 checkpoint=sha256:2ac916183444bb62a71d362d47caf2ea8ad74587ada8665d1d98e34f17b8a2b6 result=sha256:2ac916183444bb62a71d362d47caf2ea8ad74587ada8665d1d98e34f17b8a2b6
+2026-09-28T16:50:18.446016+00:00 step cursor=7 start occurred_at=2026-11-04T21:30:00+00:00
+2026-09-28T16:50:18.583237+00:00 decision request written req-0018-model_directive-f905d1b0 kind=model_directive
+2026-09-28T16:50:46.098700+00:00 decision response read req-0018-model_directive-f905d1b0
+2026-09-28T16:50:46.124495+00:00 decision request written req-0019-model_directive-78b2574c kind=model_directive
+2026-09-28T16:51:00.131901+00:00 decision response read req-0019-model_directive-78b2574c
+2026-09-28T16:51:00.220743+00:00 decision request written req-0020-dimension_summary-9543547b kind=dimension_summary
+2026-09-28T16:51:15.384984+00:00 decision response read req-0020-dimension_summary-9543547b
+2026-09-28T16:51:15.459541+00:00 decision request written req-0021-dimension_summary-cf425e76 kind=dimension_summary
+2026-09-28T16:53:06.019729+00:00 decision response read req-0021-dimension_summary-cf425e76
+2026-09-28T16:53:06.309415+00:00 decision request written req-0022-model_directive-ba865e4d kind=model_directive
+2026-09-28T16:53:12.813609+00:00 decision response read req-0022-model_directive-ba865e4d
+2026-09-28T16:53:12.842855+00:00 step cursor=7 done world_revision=41 watermark=41 pending_wakes=0 checkpoint=sha256:65b5c580c8699614db3879e2f351270154063c3260658193639b6089db5e34b3 result=sha256:65b5c580c8699614db3879e2f351270154063c3260658193639b6089db5e34b3
+2026-09-28T16:53:26.910074+00:00 step cursor=8 start occurred_at=2026-11-04T21:42:00+00:00
+2026-09-28T16:53:27.239356+00:00 decision request written req-0023-model_directive-4e974cb2 kind=model_directive
+2026-09-28T16:53:40.747460+00:00 decision response read req-0023-model_directive-4e974cb2
+2026-09-28T16:53:40.771421+00:00 decision request written req-0024-model_directive-ac90980f kind=model_directive
+2026-09-28T16:53:50.795355+00:00 decision response read req-0024-model_directive-ac90980f
+2026-09-28T16:53:50.824106+00:00 decision request written req-0025-model_directive-7e294de5 kind=model_directive
+2026-09-28T16:53:55.827500+00:00 decision response read req-0025-model_directive-7e294de5
+2026-09-28T16:53:55.854042+00:00 step cursor=8 done world_revision=44 watermark=44 pending_wakes=0 checkpoint=sha256:3a1db5f2a1e7f1f7abc7a0c601ca20ffc186275e6523637e87cd6dba6d0ccc7c result=sha256:3a1db5f2a1e7f1f7abc7a0c601ca20ffc186275e6523637e87cd6dba6d0ccc7c
+2026-09-28T16:55:07.017747+00:00 step cursor=9 start occurred_at=2026-11-04T22:17:00+00:00
+2026-09-28T16:55:07.046252+00:00 attention watch evaluation (cursor_09:pre_advance) emitted 1 wake(s)
+2026-09-28T16:55:07.184311+00:00 decision request written req-0026-model_directive-47f20c62 kind=model_directive
+2026-09-28T16:55:28.290713+00:00 decision response read req-0026-model_directive-47f20c62
+2026-09-28T16:55:28.312313+00:00 decision request written req-0027-model_directive-e371ef76 kind=model_directive
+2026-09-28T16:55:35.317395+00:00 decision response read req-0027-model_directive-e371ef76
+2026-09-28T16:55:35.356171+00:00 decision request written req-0028-model_directive-5b54225f kind=model_directive
+2026-09-28T16:55:40.359854+00:00 decision response read req-0028-model_directive-5b54225f
+2026-09-28T16:55:40.395418+00:00 decision request written req-0029-model_directive-08b03f26 kind=model_directive
+2026-09-28T16:55:49.959131+00:00 decision response read req-0029-model_directive-08b03f26
+2026-09-28T16:55:49.991943+00:00 decision request written req-0030-model_directive-161668ec kind=model_directive
+2026-09-28T16:55:54.995808+00:00 decision response read req-0030-model_directive-161668ec
+2026-09-28T16:55:55.323709+00:00 step cursor=9 done world_revision=53 watermark=53 pending_wakes=0 checkpoint=sha256:1ba9bdd36552f8ea7e05a13dd80ccb868a1469ebcb5cfe77268549e11f529f83 result=sha256:1ba9bdd36552f8ea7e05a13dd80ccb868a1469ebcb5cfe77268549e11f529f83
+2026-09-28T16:56:12.702373+00:00 step cursor=10 start occurred_at=2026-11-04T22:24:00+00:00
+2026-09-28T16:56:13.126862+00:00 decision request written req-0031-model_directive-263b9962 kind=model_directive
+2026-09-28T16:56:26.633639+00:00 decision response read req-0031-model_directive-263b9962
+2026-09-28T16:56:26.670622+00:00 decision request written req-0032-model_directive-9002a5bb kind=model_directive
+2026-09-28T17:00:34.893955+00:00 step cursor=10 start occurred_at=2026-11-04T22:24:00+00:00
+2026-09-28T17:00:35.282683+00:00 step cursor=10 done world_revision=56 watermark=56 pending_wakes=0 checkpoint=sha256:be9291944f32fe93ee86cc4f7ce487f30b27540b1a14b0ae23ab97c4f371bc80 result=sha256:be9291944f32fe93ee86cc4f7ce487f30b27540b1a14b0ae23ab97c4f371bc80
+2026-09-28T17:00:54.281628+00:00 step cursor=11 start occurred_at=2026-11-04T23:02:00+00:00
+2026-09-28T17:00:54.308627+00:00 attention watch evaluation (cursor_11:pre_advance) emitted 1 wake(s)
+2026-09-28T17:00:54.441809+00:00 decision request written req-0033-model_directive-718f4dbd kind=model_directive
+2026-09-28T17:01:09.542899+00:00 decision response read req-0033-model_directive-718f4dbd
+2026-09-28T17:01:09.560661+00:00 decision request written req-0034-model_directive-80c36c7b kind=model_directive
+2026-09-28T17:01:14.564185+00:00 decision response read req-0034-model_directive-80c36c7b
+2026-09-28T17:01:14.590591+00:00 decision request written req-0035-model_directive-688ef42c kind=model_directive
+2026-09-28T17:01:23.596490+00:00 decision response read req-0035-model_directive-688ef42c
+2026-09-28T17:01:23.627566+00:00 decision request written req-0036-model_directive-44771227 kind=model_directive
+2026-09-28T17:01:28.631039+00:00 decision response read req-0036-model_directive-44771227
+2026-09-28T17:01:28.670179+00:00 decision request written req-0037-model_directive-5085af6b kind=model_directive
+2026-09-28T17:01:34.674383+00:00 decision response read req-0037-model_directive-5085af6b
+2026-09-28T17:01:34.714811+00:00 decision request written req-0038-model_directive-fcdaba0e kind=model_directive
+2026-09-28T17:01:39.718766+00:00 decision response read req-0038-model_directive-fcdaba0e
+2026-09-28T17:01:40.087902+00:00 step cursor=11 done world_revision=65 watermark=65 pending_wakes=0 checkpoint=sha256:148c2c5165c57f5cc2c93b7a32391d738833581ba7e53637ec70850d260f670b result=sha256:148c2c5165c57f5cc2c93b7a32391d738833581ba7e53637ec70850d260f670b
+2026-09-28T17:02:18.868962+00:00 step cursor=12 start occurred_at=2026-11-04T23:07:00+00:00
+2026-09-28T17:02:19.286160+00:00 decision request written req-0039-model_directive-75c0da85 kind=model_directive
+2026-09-28T17:02:33.795304+00:00 decision response read req-0039-model_directive-75c0da85
+2026-09-28T17:02:33.827964+00:00 decision request written req-0040-model_directive-120d563e kind=model_directive
+2026-09-28T17:02:40.349960+00:00 decision response read req-0040-model_directive-120d563e
+2026-09-28T17:02:40.393812+00:00 decision request written req-0041-model_directive-bed31e5b kind=model_directive
+2026-09-28T17:02:45.897728+00:00 decision response read req-0041-model_directive-bed31e5b
+2026-09-28T17:02:45.957157+00:00 decision request written req-0042-model_directive-d585018a kind=model_directive
+2026-09-28T17:02:51.588283+00:00 decision response read req-0042-model_directive-d585018a
+2026-09-28T17:02:51.620878+00:00 step cursor=12 done world_revision=72 watermark=72 pending_wakes=0 checkpoint=sha256:d19de3c790418bc1e2e9b15af09bcde1a1473076927272f046f58830041949b4 result=sha256:d19de3c790418bc1e2e9b15af09bcde1a1473076927272f046f58830041949b4
+2026-09-28T17:03:07.339513+00:00 step cursor=13 start occurred_at=2026-11-06T19:10:00+00:00
+2026-09-28T17:03:07.509106+00:00 decision request written req-0043-model_directive-7fa0b9ed kind=model_directive
+2026-09-28T17:03:22.537174+00:00 decision response read req-0043-model_directive-7fa0b9ed
+2026-09-28T17:03:22.562683+00:00 decision request written req-0044-model_directive-efe201a9 kind=model_directive
+2026-09-28T17:03:36.098392+00:00 decision response read req-0044-model_directive-efe201a9
+2026-09-28T17:03:36.129748+00:00 decision request written req-0045-model_directive-cac39d14 kind=model_directive
+2026-09-28T17:03:41.681708+00:00 decision response read req-0045-model_directive-cac39d14
+2026-09-28T17:03:41.838388+00:00 decision request written req-0046-dimension_summary-49640370 kind=dimension_summary
+2026-09-28T17:03:52.893220+00:00 decision response read req-0046-dimension_summary-49640370
+2026-09-28T17:03:52.964358+00:00 decision request written req-0047-dimension_summary-a8f576e0 kind=dimension_summary
+2026-09-28T17:03:58.474103+00:00 decision response read req-0047-dimension_summary-a8f576e0
+2026-09-28T17:03:58.547656+00:00 decision request written req-0048-dimension_summary-48067d4c kind=dimension_summary
+2026-09-28T17:04:10.054006+00:00 decision response read req-0048-dimension_summary-48067d4c
+2026-09-28T17:04:10.135707+00:00 decision request written req-0049-dimension_summary-6626a27b kind=dimension_summary
+2026-09-28T17:04:19.141503+00:00 decision response read req-0049-dimension_summary-6626a27b
+2026-09-28T17:04:19.663257+00:00 decision request written req-0050-model_directive-91af2f07 kind=model_directive
+2026-09-28T17:04:29.169324+00:00 decision response read req-0050-model_directive-91af2f07
+2026-09-28T17:04:29.202377+00:00 step cursor=13 done world_revision=89 watermark=89 pending_wakes=0 checkpoint=sha256:17d89f6b773ef6773d4bc6eeef0dd80528122bcff7b21459313f92ed3a2ddfde result=sha256:17d89f6b773ef6773d4bc6eeef0dd80528122bcff7b21459313f92ed3a2ddfde
+RECOVERY 1
+{
+  "execution_id": "turnexec_f39507fdd4de6e7a6b46723c2128191e",
+  "state": "started",
+  "recovery_disposition": "retry_authorized",
+  "assistant_ref": null,
+  "model_attempts": [
+    "attempt_id='bgattempt_261339075d7c14c6bb32a353eb8f6a39' subject_id='user_1' work_kind='user_turn' work_id='turnexec_f39507fdd4de6e7a6b46723c2128191e' wake_reason='user_interaction' model_round_index=0 admission_world_revision=1 state='not_submitted' admitted_at=datetime.datetime(2026, 11, 2, 17, 5, tzinfo=datetime.timezone.utc) updated_at=datetime.datetime(2026, 11, 2, 17, 5, tzinfo=datetime.timezone.utc) provider=None model=None provider_request_id=None response_fingerprint=None meter_record_id=None failure_kind=None failure_detail=None reconciliation_evidence=\"attempt bgattempt_261339075d7c14c6bb32a353eb8f6a39 round 0 has provider=None, provider_request_id=None, meter_record_id=None, response_fingerprint=None; failure_kind=ValueError 'response request_id mismatch' occurred in the resident file handshake before any directive was returned, so this model attempt was never submitted to a provider.\""
+  ],
+  "retry_authorized": true,
+  "retry_count": 0,
+  "reconciliation_evidence": "Recovery per CG-003: round-0 attempt reconciled not_submitted (ledger proves provider=None, no provider_request_id, no meter, no response fingerprint); turn claim state='started', attempt_protocol='model_attempt_pre_admission_v1', no durable assistant output; safe to retry with resident re-decision."
+}RECOVERY 10
+{
+  "execution_id": "turnexec_fdfd32c93cf643efa33acbe6ae561af7",
+  "state": "completed",
+  "recovery_disposition": "completed",
+  "assistant_ref": "object_id='obs_conv_ai_0b440b106fa95aedec9a9f64' revision=1",
+  "model_attempts": [
+    "attempt_id='bgattempt_2ca286655baffe95e8cf9935aeab6d16' subject_id='user_1' work_kind='user_turn' work_id='turnexec_fdfd32c93cf643efa33acbe6ae561af7' wake_reason='user_interaction' model_round_index=0 admission_world_revision=54 state='metered' admitted_at=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=datetime.timezone.utc) updated_at=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=datetime.timezone.utc) provider=None model=None provider_request_id=None response_fingerprint='d8e13d4905db3f244f7a5c614de6497e8c089c80e12dae84ddd2cf3ac979250a' meter_record_id='meter_fb1c2d51b925b500552811cd96dc3256' failure_kind=None failure_detail=None reconciliation_evidence=None",
+    "attempt_id='bgattempt_4933387f54a0962be4a9936c30e37b13' subject_id='user_1' work_kind='user_turn' work_id='turnexec_fdfd32c93cf643efa33acbe6ae561af7' wake_reason='user_interaction' model_round_index=1 admission_world_revision=55 state='in_doubt' admitted_at=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=datetime.timezone.utc) updated_at=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=datetime.timezone.utc) provider=None model=None provider_request_id=None response_fingerprint=None meter_record_id=None failure_kind='JSONDecodeError' failure_detail='Expecting value: line 1 column 1 (char 0)' reconciliation_evidence=None"
+  ],
+  "retry_authorized": false,
+  "retry_count": 0,
+  "reconciliation_evidence": "Cursor-10 turn 6 (a004-conversation-fef437192f974e55b376a3bbf3e7f0d5) model round 0 returned and was applied (claim clm_e2d2b8bdbe0a23130e3ad85b committed, attempt bgattempt_2ca286655baffe95e8cf9935aeab6d16 state=metered). Round 1 (bgattempt_4933387f54a0962be4a9936c30e37b13) was marked in_doubt after the resident harness raised JSONDecodeError while reading the local handshake response file mid-write (provider=None, provider_request_id=None, response_fingerprint=None, meter=None). The resident session's exact reply bytes were durably preserved outside Core (decision_responses/req-0032-model_directive-9002a5bb.json sha256=b43589c2c13b3c30686e121b9f3c049b5ad9ff4fe50804a779db00b1797c37a1; reply text sha256=eb7cd7c20aa662715d15d7977d72fad653dbbfe74055e5a88e224705b3c78e3a) and are committed here as the turn's durable assistant output; the turn execution is reconciled to completed without reinvoking the model, per the supported durable-assistant-output recovery path.",
+  "assistant_reply_sha256": "eb7cd7c20aa662715d15d7977d72fad653dbbfe74055e5a88e224705b3c78e3a",
+  "response_file_sha256": "b43589c2c13b3c30686e121b9f3c049b5ad9ff4fe50804a779db00b1797c37a1",
+  "assistant_observation_id": "obs_conv_ai_0b440b106fa95aedec9a9f64"
+}

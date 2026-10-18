@@ -1,0 +1,5 @@
+From https://github.com/Haneof/Haneof-AIOS-Core-v3.0
+ * branch            main       -> FETCH_HEAD
+589e0347b646ade6eeb7f09cfa6f511fba99c1ef
+{"baseRefName":"main","headRefOid":"f251e9c0026a0f97fdee20397936cb5e3b18c61c","mergedAt":null,"state":"OPEN"}
+Mon Sep 28 17:18:36 UTC 2026

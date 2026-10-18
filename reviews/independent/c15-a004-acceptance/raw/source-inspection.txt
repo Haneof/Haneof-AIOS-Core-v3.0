@@ -1,0 +1,435 @@
+Fresh fetch at review start: origin/main=589e0347b646ade6eeb7f09cfa6f511fba99c1ef
+f251e9c0026a0f97fdee20397936cb5e3b18c61c 0b17c7f35697dc4a24b731185868d29967efcf58 fd312286b7b83cd550ecc49d72b78656e6e91b71
+ .../a004-27bb1fb3da404f4d/FREEZE_MANIFEST.json     |  478 ++++
+ .../runs/a004-27bb1fb3da404f4d/MANIFEST.sha256     |  188 ++
+ .../resident/runs/a004-27bb1fb3da404f4d/README.md  |  135 ++
+ .../checkpoints/checkpoint_cursor_01.json          |   60 +
+ .../checkpoints/checkpoint_cursor_02.json          |   32 +
+ .../checkpoints/checkpoint_cursor_03.json          |   60 +
+ .../checkpoints/checkpoint_cursor_04.json          |   32 +
+ .../checkpoints/checkpoint_cursor_05.json          |   60 +
+ .../checkpoints/checkpoint_cursor_06.json          |  182 ++
+ .../checkpoints/checkpoint_cursor_07.json          |  119 +
+ .../checkpoints/checkpoint_cursor_08.json          |   67 +
+ .../checkpoints/checkpoint_cursor_09.json          |  110 +
+ .../checkpoints/checkpoint_cursor_10.json          |   43 +
+ .../checkpoints/checkpoint_cursor_11.json          |  116 +
+ .../checkpoints/checkpoint_cursor_12.json          |   77 +
+ .../checkpoints/checkpoint_cursor_13.json          |  156 ++
+ .../req-0001-model_directive-13f2b448.json         |  904 ++++++++
+ .../req-0002-model_directive-983ede97.json         |  904 ++++++++
+ .../req-0003-model_directive-dcc18eef.json         |  927 ++++++++
+ .../req-0004-model_directive-364057ae.json         |  988 +++++++++
+ .../req-0005-model_directive-aa34f925.json         | 1006 +++++++++
+ .../req-0006-model_directive-41d2c262.json         | 1023 +++++++++
+ .../req-0007-model_directive-88b1fa9b.json         | 1036 +++++++++
+ .../req-0008-model_directive-10950fe4.json         | 1357 ++++++++++++
+ .../req-0009-model_directive-71a2bd34.json         | 1457 +++++++++++++
+ .../req-0010-dimension_summary-7e278ca4.json       |   35 +
+ .../req-0011-dimension_summary-d744f08c.json       |   67 +
+ .../req-0012-dimension_summary-93c29bb0.json       |  103 +
+ .../req-0013-dimension_summary-05a433b5.json       |   41 +
+ .../req-0014-dimension_summary-abcbdd00.json       |   41 +
+ .../req-0015-model_directive-51871552.json         | 1091 ++++++++++
+ .../req-0016-model_directive-7ec8f615.json         | 1115 ++++++++++
+ .../req-0017-model_directive-25070410.json         | 2261 +++++++++++++++++++
+ .../req-0018-model_directive-f905d1b0.json         | 1362 ++++++++++++
+ .../req-0019-model_directive-78b2574c.json         | 1453 +++++++++++++
+ .../req-0020-dimension_summary-9543547b.json       |   45 +
+ .../req-0021-dimension_summary-cf425e76.json       |   47 +
+ .../req-0022-model_directive-ba865e4d.json         | 1832 ++++++++++++++++
+ .../req-0023-model_directive-4e974cb2.json         | 1090 ++++++++++
+ .../req-0024-model_directive-ac90980f.json         | 1164 ++++++++++
+ .../req-0025-model_directive-7e294de5.json         | 1177 ++++++++++
+ .../req-0026-model_directive-47f20c62.json         | 1398 ++++++++++++
+ .../req-0027-model_directive-e371ef76.json         | 1447 ++++++++++++
+ .../req-0028-model_directive-5b54225f.json         | 1468 +++++++++++++
+ .../req-0029-model_directive-08b03f26.json         | 1481 +++++++++++++
+ .../req-0030-model_directive-161668ec.json         | 1494 +++++++++++++
+ .../req-0031-model_directive-263b9962.json         | 1173 ++++++++++
+ .../req-0032-model_directive-9002a5bb.json         | 1197 ++++++++++
+ .../req-0033-model_directive-718f4dbd.json         | 1398 ++++++++++++
+ .../req-0034-model_directive-80c36c7b.json         | 1447 ++++++++++++
+ .../req-0035-model_directive-688ef42c.json         | 1455 +++++++++++++
+ .../req-0036-model_directive-44771227.json         | 1468 +++++++++++++
+ .../req-0037-model_directive-5085af6b.json         | 1481 +++++++++++++
+ .../req-0038-model_directive-fcdaba0e.json         | 1494 +++++++++++++
+ .../req-0039-model_directive-75c0da85.json         | 1194 ++++++++++
+ .../req-0040-model_directive-120d563e.json         | 1207 ++++++++++
+ .../req-0041-model_directive-bed31e5b.json         | 1233 +++++++++++
+ .../req-0042-model_directive-d585018a.json         | 1259 +++++++++++
+ .../req-0043-model_directive-7fa0b9ed.json         | 1377 ++++++++++++
+ .../req-0044-model_directive-efe201a9.json         | 1576 ++++++++++++++
+ .../req-0045-model_directive-cac39d14.json         | 1588 ++++++++++++++
+ .../req-0046-dimension_summary-49640370.json       |   39 +
+ .../req-0047-dimension_summary-a8f576e0.json       |   45 +
+ .../req-0048-dimension_summary-48067d4c.json       |   85 +
+ .../req-0049-dimension_summary-6626a27b.json       |  181 ++
+ .../req-0050-model_directive-91af2f07.json         | 2296 ++++++++++++++++++++
+ .../req-0001-model_directive-13f2b448.json         |   23 +
+ .../req-0002-model_directive-983ede97.json         |   24 +
+ .../req-0003-model_directive-dcc18eef.json         |    6 +
+ .../req-0004-model_directive-364057ae.json         |   25 +
+ .../req-0005-model_directive-aa34f925.json         |    6 +
+ .../req-0006-model_directive-41d2c262.json         |   27 +
+ .../req-0007-model_directive-88b1fa9b.json         |    6 +
+ .../req-0008-model_directive-10950fe4.json         |    8 +
+ .../req-0009-model_directive-71a2bd34.json         |    6 +
+ .../req-0010-dimension_summary-7e278ca4.json       |    4 +
+ .../req-0011-dimension_summary-d744f08c.json       |    4 +
+ .../req-0012-dimension_summary-93c29bb0.json       |    4 +
+ .../req-0013-dimension_summary-05a433b5.json       |    4 +
+ .../req-0014-dimension_summary-abcbdd00.json       |    4 +
+ .../req-0015-model_directive-51871552.json         |   24 +
+ .../req-0016-model_directive-7ec8f615.json         |    6 +
+ .../req-0017-model_directive-25070410.json         |    6 +
+ .../req-0018-model_directive-f905d1b0.json         |    8 +
+ .../req-0019-model_directive-78b2574c.json         |    6 +
+ .../req-0020-dimension_summary-9543547b.json       |    4 +
+ .../req-0021-dimension_summary-cf425e76.json       |    4 +
+ .../req-0022-model_directive-ba865e4d.json         |    6 +
+ .../req-0023-model_directive-4e974cb2.json         |    8 +
+ .../req-0024-model_directive-ac90980f.json         |   23 +
+ .../req-0025-model_directive-7e294de5.json         |    6 +
+ .../req-0026-model_directive-47f20c62.json         |    8 +
+ .../req-0027-model_directive-e371ef76.json         |   38 +
+ .../req-0028-model_directive-5b54225f.json         |   22 +
+ .../req-0029-model_directive-08b03f26.json         |   20 +
+ .../req-0030-model_directive-161668ec.json         |    6 +
+ .../req-0031-model_directive-263b9962.json         |   24 +
+ .../req-0032-model_directive-9002a5bb.json         |    6 +
+ .../req-0033-model_directive-718f4dbd.json         |    8 +
+ .../req-0034-model_directive-80c36c7b.json         |   19 +
+ .../req-0035-model_directive-688ef42c.json         |   18 +
+ .../req-0036-model_directive-44771227.json         |   19 +
+ .../req-0037-model_directive-5085af6b.json         |   19 +
+ .../req-0038-model_directive-fcdaba0e.json         |    6 +
+ .../req-0039-model_directive-75c0da85.json         |   26 +
+ .../req-0040-model_directive-120d563e.json         |   31 +
+ .../req-0041-model_directive-bed31e5b.json         |   31 +
+ .../req-0042-model_directive-d585018a.json         |    6 +
+ .../req-0043-model_directive-7fa0b9ed.json         |    8 +
+ .../req-0044-model_directive-efe201a9.json         |   37 +
+ .../req-0045-model_directive-cac39d14.json         |    6 +
+ .../req-0046-dimension_summary-49640370.json       |    4 +
+ .../req-0047-dimension_summary-a8f576e0.json       |    4 +
+ .../req-0048-dimension_summary-48067d4c.json       |    1 +
+ .../req-0049-dimension_summary-6626a27b.json       |    4 +
+ .../req-0050-model_directive-91af2f07.json         |    1 +
+ .../events/cursor_01_event.json                    |    1 +
+ .../events/cursor_01_subject.txt                   |    1 +
+ .../events/cursor_01_turn_text.txt                 |    1 +
+ .../events/cursor_02_event.json                    |    1 +
+ .../events/cursor_03_event.json                    |    1 +
+ .../events/cursor_03_turn_text.txt                 |    1 +
+ .../events/cursor_04_event.json                    |    1 +
+ .../events/cursor_05_event.json                    |    1 +
+ .../events/cursor_05_turn_text.txt                 |    1 +
+ .../events/cursor_06_event.json                    |    1 +
+ .../events/cursor_06_turn_text.txt                 |    1 +
+ .../events/cursor_07_event.json                    |    1 +
+ .../events/cursor_08_event.json                    |    1 +
+ .../events/cursor_08_turn_text.txt                 |    1 +
+ .../events/cursor_09_event.json                    |    1 +
+ .../events/cursor_10_event.json                    |    1 +
+ .../events/cursor_10_turn_text.txt                 |    1 +
+ .../events/cursor_11_event.json                    |    1 +
+ .../events/cursor_12_event.json                    |    1 +
+ .../events/cursor_12_turn_text.txt                 |    1 +
+ .../events/cursor_13_event.json                    |    1 +
+ .../exports/background_model_attempts.jsonl        |   38 +
+ .../exports/metering_records.jsonl                 |   37 +
+ .../exports/request_bindings.jsonl                 |   38 +
+ .../exports/response_receipts.jsonl                |    0
+ .../exports/turn_executions.jsonl                  |    7 +
+ .../exports/world_object_index.jsonl               |  174 ++
+ .../runs/a004-27bb1fb3da404f4d/identity.json       |   29 +
+ .../resident/runs/a004-27bb1fb3da404f4d/index.db   |  Bin 0 -> 622592 bytes
+ .../logs/decision_chain.jsonl                      |   98 +
+ .../runs/a004-27bb1fb3da404f4d/logs/runner.log     |  129 ++
+ .../receipts/cursor_01_ack_stdout.json             |    1 +
+ .../receipts/cursor_01_ingest_stdout.json          |    1 +
+ .../receipts/cursor_01_turn_recovery.json          |   12 +
+ .../receipts/cursor_02_ack_stdout.json             |    1 +
+ .../receipts/cursor_02_ingest_stdout.json          |    1 +
+ .../receipts/cursor_03_ack_stdout.json             |    1 +
+ .../receipts/cursor_03_ingest_stdout.json          |    1 +
+ .../receipts/cursor_04_ack_stdout.json             |    1 +
+ .../receipts/cursor_04_ingest_stdout.json          |    1 +
+ .../receipts/cursor_05_ack_stdout.json             |    1 +
+ .../receipts/cursor_05_ingest_stdout.json          |    1 +
+ .../receipts/cursor_06_ack_stdout.json             |    1 +
+ .../receipts/cursor_06_ingest_stdout.json          |    1 +
+ .../receipts/cursor_07_ack_stdout.json             |    1 +
+ .../receipts/cursor_07_ingest_stdout.json          |    1 +
+ .../receipts/cursor_08_ingest_stdout.json          |    1 +
+ .../receipts/cursor_09_ack_stdout.json             |    1 +
+ .../receipts/cursor_09_ingest_stdout.json          |    1 +
+ .../receipts/cursor_10_ingest_stdout.json          |    1 +
+ .../receipts/cursor_10_turn_recovery.json          |   16 +
+ .../receipts/cursor_11_ack_stdout.json             |    1 +
+ .../receipts/cursor_11_ingest_stdout.json          |    1 +
+ .../receipts/cursor_12_ingest_stdout.json          |    1 +
+ .../receipts/cursor_13_ack_stdout.json             |    1 +
+ .../receipts/cursor_13_ingest_stdout.json          |    1 +
+ .../runs/a004-27bb1fb3da404f4d/release-state.json  |  218 ++
+ .../resident/runs/a004-27bb1fb3da404f4d/runner.py  |  716 ++++++
+ .../runs/a004-27bb1fb3da404f4d/runtime_state.json  |   10 +
+ .../runs/a004-27bb1fb3da404f4d/step_01_result.json |   60 +
+ .../runs/a004-27bb1fb3da404f4d/step_02_result.json |   32 +
+ .../runs/a004-27bb1fb3da404f4d/step_03_result.json |   60 +
+ .../runs/a004-27bb1fb3da404f4d/step_04_result.json |   32 +
+ .../runs/a004-27bb1fb3da404f4d/step_05_result.json |   60 +
+ .../runs/a004-27bb1fb3da404f4d/step_06_result.json |  182 ++
+ .../runs/a004-27bb1fb3da404f4d/step_07_result.json |  119 +
+ .../runs/a004-27bb1fb3da404f4d/step_08_result.json |   67 +
+ .../runs/a004-27bb1fb3da404f4d/step_09_result.json |  110 +
+ .../runs/a004-27bb1fb3da404f4d/step_10_result.json |   43 +
+ .../runs/a004-27bb1fb3da404f4d/step_11_result.json |  116 +
+ .../runs/a004-27bb1fb3da404f4d/step_12_result.json |   77 +
+ .../runs/a004-27bb1fb3da404f4d/step_13_result.json |  156 ++
+ .../resident/runs/a004-27bb1fb3da404f4d/world.db   |  Bin 0 -> 716800 bytes
+ 189 files changed, 58226 insertions(+)
+Frozen dispatch boundary
+    def _mark_background_model_dispatch(self, snapshot: RuntimeSnapshot) -> None:
+        if snapshot.model_attempt_id is None:
+            return
+        if self._active_meter_time is None:
+            raise RuntimeError("background model dispatch is missing execution time")
+        scope = self._active_model_attempt_scope()
+        if scope is None:
+            raise RuntimeError("background model dispatch is missing work scope")
+        work_kind, work_id = scope
+        fingerprint = self._outbound_request_fingerprint(
+            snapshot, work_kind=work_kind, work_id=work_id
+        )
+        self.background_model_attempts.mark_dispatching(
+            snapshot.model_attempt_id,
+            dispatched_at=self._active_meter_time,
+            outbound_request_fingerprint=fingerprint,
+        )
+        binding = self.background_model_attempts.outbound_request_binding(
+            snapshot.model_attempt_id
+        )
+        if binding is None:
+            raise RuntimeError(
+                "originating request binding was not durable before provider dispatch"
+            )
+        object.__setattr__(snapshot, "_outbound_relay_id", binding.relay_id)
+
+    def _authenticate_background_model_response(
+        self,
+        snapshot: RuntimeSnapshot,
+        directive: ModelDirective,
+    ) -> None:
+        """Capture a non-forgeable receipt at the trusted model-return boundary."""
+
+        if snapshot.model_attempt_id is None:
+            return
+        if self._active_meter_time is None:
+            raise RuntimeError("background model response is missing execution time")
+        # Anonymous/local handlers remain valid but cannot participate in exact
+        # external-response recovery because there is no provider identity to bind.
+        if any(
+            value is None
+            for value in self.background_model_attempts._provider_identity(directive)
+        ):
+            return
+        self.background_model_attempts._capture_trusted_response_return(
+            snapshot.model_attempt_id,
+            captured_at=self._active_meter_time,
+            directive=directive,
+        )
+
+    def _record_background_model_response(
+        self,
+        snapshot: RuntimeSnapshot,
+        directive: ModelDirective,
+    ) -> None:
+        if snapshot.model_attempt_id is None:
+            return
+        if self._active_meter_time is None:
+            raise RuntimeError("background model response is missing execution time")
+        self.background_model_attempts.record_response(
+            snapshot.model_attempt_id,
+            returned_at=self._active_meter_time,
+            directive=directive,
+        )
+
+    def _record_background_model_failure(
+Frozen reconciliation
+    def reconcile_not_submitted(
+        self,
+        attempt_id: str,
+        *,
+        reconciled_at: datetime,
+        evidence: str,
+    ) -> BackgroundModelAttempt:
+        if not isinstance(evidence, str) or not evidence.strip():
+            raise ValueError("reconciliation evidence must be non-blank")
+        moment = as_utc(reconciled_at, "reconciled_at")
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            receipt_row = conn.execute(
+                """
+                SELECT 1 FROM background_model_response_receipts
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            if receipt_row is not None:
+                attempt_row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.rollback()
+                if attempt_row is None:
+                    raise KeyError(f"unknown background model attempt: {attempt_id}")
+                raise BackgroundModelResponseConflict(
+                    self._from_row(attempt_row),
+                    "an authenticated provider return cannot be reconciled as "
+                    "not submitted",
+                )
+            conn.execute(
+                """
+                UPDATE background_model_attempts
+                SET state='not_submitted', updated_at=?,
+                    reconciliation_evidence=?, failure_kind=NULL,
+                    failure_detail=NULL
+                WHERE attempt_id=? AND state IN ('dispatching', 'in_doubt')
+                """,
+                (
+                    canonical_utc_iso(moment, "updated_at"),
+                    evidence.strip(),
+                    attempt_id,
+                ),
+            )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            conn.commit()
+        if row is None:
+            raise KeyError(f"unknown background model attempt: {attempt_id}")
+        attempt = self._from_row(row)
+        if attempt.state != "not_submitted":
+            raise BackgroundModelAttemptBlocked(attempt)
+        return attempt
+Watch listener
+            wake_bus=self.wake_bus,
+            subject_id=self.subject_id,
+        )
+        self.background_model_attempts = BackgroundModelAttemptStore(store)
+        self.metering = ModelMeteringLedger(store)
+        self.background_budget_gate = BackgroundBudgetGate(
+            store=store,
+            subject_id=self.subject_id,
+            metering_ledger=self.metering,
+        )
+        self.reality_ingest = RealityIngestService(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+            observation_listener=self.attention_watches.evaluate_observation,
+        )
+Watch evaluator
+            if actual is None or not _numeric_matches(actual, predicate):
+                return False
+
+        return True
+
+    def evaluate_observation(
+        self,
+        observation_ref: ObjectRef,
+    ) -> tuple[WakeSignalReceipt, ...]:
+        if observation_ref.revision is None:
+            raise ValueError("observation_ref must pin an exact revision")
+        payload = self.store.get_payload(
+            observation_ref.object_id,
+            revision=observation_ref.revision,
+        )
+        if payload.get("object_type") != ObjectType.OBSERVATION.value:
+            raise ValueError("attention watches evaluate Observation objects only")
+        observation = Observation.model_validate(payload)
+        if observation.subject_id != self.subject_id:
+            raise ValueError("Observation belongs to another subject")
+
+        self.expire_due(now=observation.recorded_at)
+        receipts: list[WakeSignalReceipt] = []
+        for task in self.current():
+            if task.deadline is not None and as_utc(
+                task.deadline, "deadline"
+            ) < as_utc(observation.recorded_at, "recorded_at"):
+                continue
+            if not self._matches(task, observation):
+                continue
+
+            condition = task.completion_condition
+            task_ref = ObjectRef(object_id=task.object_id, revision=task.revision)
+            receipt = self.wake_bus.emit(
+                WakeSignalRequest(
+                    wake_source=WakeSource.WATCH_MATCH,
+                    rule_id=f"attention_watch:{task.object_id}",
+                    observed_at=observation.recorded_at,
+                    evidence_refs=(task_ref, observation_ref),
+                    priority=task.priority,
+                    dedupe_key=f"attention_watch:{task.object_id}",
+                    cooldown_seconds=int(
+                        condition.get("cooldown_seconds") or 0
+                    ),
+                    attention_class=AttentionClass(
+                        str(
+                            condition.get("attention_class")
+                            or AttentionClass.BACKGROUND.value
+                        )
+                    ),
+                    metadata={
+                        "trigger_kind": "resident_attention_watch",
+                        "watch_task_ref": task_ref.model_dump(mode="json"),
+                        "matched_dimension": observation.metadata.get("dimension"),
+                        "watch_mode": str(
+                            condition.get("watch_mode") or "recurring"
+                        ),
+                        "predicate_semantics": "mechanical_only",
+                    },
+                )
+            )
+            receipts.append(receipt)
+
+            if str(condition.get("watch_mode") or "recurring") == "one_shot":
+                self._transition_watch_mechanically(
+                    task,
+                    target=TaskState.READY,
+                    changed_at=observation.recorded_at,
+                    metadata_update={
+                        "attention_watch_matched_at": observation.recorded_at.isoformat(),
+                        "attention_watch_match_observation_ref": (
+                            observation_ref.model_dump(mode="json")
+                        ),
+                        "attention_watch_match_wake_ref": {
+                            "object_id": receipt.wake_id,
+                            "revision": receipt.revision,
+                        },
+                    },
+                    source_ref=observation_ref,
+                )
+        return tuple(receipts)
+
+
+class AttentionRouter:
+    """Mechanically batch a short burst of pending non-safety Wakes into one Wake."""
+
+    def __init__(
+        self,
+        *,
+        store: SQLiteWorldStore,
+        wake_bus: WakeBus,
+        subject_id: str = "user_1",
+    ) -> None:
+        self.store = store
+        self.wake_bus = wake_bus
+        self.subject_id = subject_id.strip()
+
+    def next_dispatchable(
+        self,
+        *,
