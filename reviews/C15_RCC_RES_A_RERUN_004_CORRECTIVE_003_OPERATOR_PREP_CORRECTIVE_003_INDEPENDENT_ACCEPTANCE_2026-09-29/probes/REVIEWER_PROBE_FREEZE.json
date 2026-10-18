@@ -1,0 +1,361 @@
+{
+  "probe_suite": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003 independent reviewer probes",
+  "probe_suite_version": "1",
+  "frozen_before_execution": true,
+  "frozen_utc": "2026-09-29T10:22:33.239118+00:00",
+  "role": "Independent Resident Launch Infrastructure Acceptance Reviewer (not author, not Resident, not PM)",
+  "candidate_pins": {
+    "candidate_pr": 292,
+    "final_h2_sha": "42a63ed4416585fc0a02045e0bd5190f32a01a2b",
+    "final_h2_tree": "80440bdd70aa658053bc5bf33a902c46cd7138e0",
+    "corrected_h1_sha": "77dac70e0cf054c3f0fb7d94a66dba221fe7d5de",
+    "corrected_h1_tree": "52aa366bc6548e86e805585baddbc0470cb69660",
+    "h1_parent_red_sha": "083dd9506f01ade04d4cbe805f58bf80d40607b0",
+    "probe_freeze_sha": "4b2ca9fd48da2f1f44789c664de66bd471a39ee9",
+    "carry_288_sha": "41de3f6698146661e73f6e43c00143fb63516ef1",
+    "starting_main_sha": "c8e9e42f8ae6e6724c0c7e9eb9dbb21b100f4487",
+    "live_main_at_review_start": "1cdd9e0ef3fa0ee51f0791bc2309d100cd8e760a",
+    "frozen_rc_software": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+    "frozen_repository_tree": "1ac3a675b884167d3a29aa432e7ef3eaff94d404",
+    "frozen_core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+    "frozen_tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019",
+    "packet_sha256": "3c2d04c2de8557c3cb7329df4350c40b2ccc07520a7d3d51db206174b33266cc",
+    "package_freeze_manifest_sha256": "5e79464e7a2cc03dfd33429a64c04b902e0f6d5ff21e42e6c24d9c3674e91b8a",
+    "package_sha256sums_sha256": "27ab476aae2ec5b26224e708e73b41c76b1d11cbf5e020d1a70e9d035af695e2",
+    "final_packet_audit_sha256": "43fec69d72c84f22525ad8ab09e437614ff83ea0cccc38516a6fdc615570daf6",
+    "harness_manifest_content_sha256": "f3fbd788e3adb2ee600359e791273f87b444bc1991c7506d2683a643fd55a256",
+    "harness_manifest_file_sha256": "2bc303cdc09ea7fff91dd2340d9be2ac4abc810a01ffacf5f39d6d313e8388e8",
+    "wheel_trust_root_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+    "frozen_core_manifest_sha256": "220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa",
+    "c10_c11_baseline_red_result_sha256": "d29cde8bb51e17421fd7aea598ca98681b8c7955f00a63c6e4abb06418e41887",
+    "c10_c11_candidate_green_result_sha256": "64d7f3032eae547db09aab063bdfc1b94d9f5a0dadb96062e4474750420dc294",
+    "gate_result_sha256": {
+      "A": "9a60ce2a790a983160076d848348ea0f350172d69acd52c0a0521378f99406d8",
+      "B": "5349c8391b00707b2a619eb78d80d697a385c12388c4fe4b7b23df3034cd3c1d",
+      "C": "7c893f76fdf2491f5039dd19cd9183924101b2a36cd0ff0871d5099dcf435fb1",
+      "D": "79914e9013f787930e8d6998ace2e3eb12f9f9b55ab8f9fa5b05af42e89eb706"
+    }
+  },
+  "probe_source_sha256": {
+    "conftest.py": "391cd10d8178fab527d088d3eb5a52ec9baf3553e3b0f0a6de933b30415da572",
+    "fault_injection.py": "03be93797fd28508f85432e86083aec93a5254df28855d48ad74bd97762447ac",
+    "probe_worker.py": "1cccd760e3983b3c14e92ff0a6ce833b0fea7874a304c7eaefbb947d4e0a857d",
+    "test_ra01_cross_process.py": "8dfe919c91fc2b7537512a50b7e4070c955742153312c804d60c41ab38cd6e31",
+    "test_ra02_directory_durability.py": "7cf3ace49648281577314fed761181acae9548de7826f7275e039fe38318d9a3",
+    "test_ra03_visible_unproven_retry.py": "760366df81498c798aaf69847d4608a944cb86b6bf98131dd634eb2585834f8d",
+    "test_ra04_crash_boundaries.py": "36ad1797ff93522cd91fa7ab824faababa068cf5f350bb4a007eeee6b8b9f9cc",
+    "test_ra05_lock_attacks.py": "8eb212657ea7835b9cb0eb3cd30d7269b24c024ce54638c9a5315ed9349e4c34",
+    "test_ra06_races_and_integration.py": "8a89972d4d20c281a5160749e95d0db14d140527b7f8072cf229c7c282f5ca3f",
+    "test_ra07_historical_contracts.py": "0a0de31068a53daeab77166a29ba0a1fc761185e945b7375c408e92da87c004b"
+  },
+  "probe_source_hashes_sha256": "778d48e0e6cf9e0c6c04057eab1684e5d4dd0d4b22e621611cf1e0a9b060ae2f",
+  "enumeration": [
+    "test_ra01_cross_process.py::test_ra01_four_process_distinct_publishers",
+    "test_ra01_cross_process.py::test_ra01_handler_race_two_processes_same_snapshot",
+    "test_ra01_cross_process.py::test_ra01_publish_and_consume_race_across_processes",
+    "test_ra01_cross_process.py::test_ra01_two_process_consume_race",
+    "test_ra01_cross_process.py::test_ra01_two_process_response_publish_race",
+    "test_ra01_cross_process.py::test_ra01_two_process_same_intended_request_single_dispatch",
+    "test_ra02_directory_durability.py::test_ra02_first_ledger_creation_dir_fsync_failure_is_not_durable",
+    "test_ra02_directory_durability.py::test_ra02_first_ledger_creation_dir_open_failure_is_not_durable",
+    "test_ra02_directory_durability.py::test_ra02_ledger_append_file_fsync_failure_is_not_durable",
+    "test_ra02_directory_durability.py::test_ra02_request_dir_fsync_failure_is_not_dispatch",
+    "test_ra02_directory_durability.py::test_ra02_request_dir_open_failure_is_not_dispatch",
+    "test_ra02_directory_durability.py::test_ra02_response_dir_fsync_failure_is_not_published",
+    "test_ra02_directory_durability.py::test_ra02_response_dir_open_failure_is_not_published",
+    "test_ra03_visible_unproven_retry.py::test_ra03_first_ledger_retry_single_entry",
+    "test_ra03_visible_unproven_retry.py::test_ra03_request_retry_after_unproven_dir_fsync",
+    "test_ra03_visible_unproven_retry.py::test_ra03_request_retry_rejects_mutated_visible_bytes",
+    "test_ra03_visible_unproven_retry.py::test_ra03_response_retry_after_unproven_dir_fsync",
+    "test_ra03_visible_unproven_retry.py::test_ra03_response_retry_with_different_bytes_fails_closed",
+    "test_ra04_crash_boundaries.py::test_ra04_crash_points_leave_no_orphan_dispatch",
+    "test_ra04_crash_boundaries.py::test_ra04_crash_then_retry_converges",
+    "test_ra04_crash_boundaries.py::test_ra04_handler_crash_after_dispatch_resumes_without_second_dispatch",
+    "test_ra05_lock_attacks.py::test_ra05_contention_is_real_cross_process",
+    "test_ra05_lock_attacks.py::test_ra05_lock_inode_replacement_still_excludes",
+    "test_ra05_lock_attacks.py::test_ra05_lock_path_directory_fails_closed",
+    "test_ra05_lock_attacks.py::test_ra05_lock_path_is_stable_and_dedicated",
+    "test_ra05_lock_attacks.py::test_ra05_lock_released_while_awaiting_external_response",
+    "test_ra05_lock_attacks.py::test_ra05_lock_symlink_fails_closed",
+    "test_ra05_lock_attacks.py::test_ra05_nested_mutation_does_not_self_deadlock",
+    "test_ra05_lock_attacks.py::test_ra05_stale_lock_file_after_process_death",
+    "test_ra06_races_and_integration.py::test_ra06_direct_consume_after_request_file_mutation",
+    "test_ra06_races_and_integration.py::test_ra06_due_work_and_user_turn_share_exchange_root",
+    "test_ra06_races_and_integration.py::test_ra06_tamper_between_artifact_write_and_ledger_append",
+    "test_ra06_races_and_integration.py::test_ra06_two_processes_recover_same_dispatch",
+    "test_ra07_historical_contracts.py::test_c1_intact_replay_is_idempotent",
+    "test_ra07_historical_contracts.py::test_c1_missing_published_response_fails_closed",
+    "test_ra07_historical_contracts.py::test_c1_tampered_published_response_fails_closed",
+    "test_ra07_historical_contracts.py::test_c2_install_uses_no_index_no_resolver",
+    "test_ra07_historical_contracts.py::test_c2_wheel_trust_root_closed_set",
+    "test_ra07_historical_contracts.py::test_c4_recovery_snapshot_mismatch_fails_closed",
+    "test_ra07_historical_contracts.py::test_c5_digest_discontinuity_detected",
+    "test_ra07_historical_contracts.py::test_c5_duplicate_event_detected",
+    "test_ra07_historical_contracts.py::test_c5_illegal_event_order_detected",
+    "test_ra07_historical_contracts.py::test_c5_interior_deletion_detected",
+    "test_ra07_historical_contracts.py::test_c5_interior_mutation_detected",
+    "test_ra07_historical_contracts.py::test_c5_sequence_corruption_detected",
+    "test_ra07_historical_contracts.py::test_c6_frozen_rc_identity_checks",
+    "test_ra07_historical_contracts.py::test_c7_exact_runtime_pins",
+    "test_ra07_historical_contracts.py::test_c8_clean_room_startup_boundary"
+  ],
+  "enumeration_sha256": "cc2d805c22a6ffc2683252d6a1b5183d53fceec81275e4f35d0b88be5ae9fab1",
+  "expected_outcomes": [
+    {
+      "test_id": "test_ra01_cross_process.py::test_ra01_four_process_distinct_publishers",
+      "expected": "PASS",
+      "invariant": "Four independent OS processes publish distinct requests: all durable events unique, sequence monotonic and contiguous, payload sequence == ledger ordinal, no deadlock."
+    },
+    {
+      "test_id": "test_ra01_cross_process.py::test_ra01_handler_race_two_processes_same_snapshot",
+      "expected": "PASS",
+      "invariant": "Two handler processes on one snapshot: exactly one request_published, one response_published, one response_consumed, identical returned directive."
+    },
+    {
+      "test_id": "test_ra01_cross_process.py::test_ra01_publish_and_consume_race_across_processes",
+      "expected": "PASS",
+      "invariant": "Consume racing a distinct publication keeps a valid chain and one consume event."
+    },
+    {
+      "test_id": "test_ra01_cross_process.py::test_ra01_two_process_consume_race",
+      "expected": "PASS",
+      "invariant": "Two consuming processes leave exactly one response_consumed."
+    },
+    {
+      "test_id": "test_ra01_cross_process.py::test_ra01_two_process_response_publish_race",
+      "expected": "PASS",
+      "invariant": "Two processes publishing different response bytes for one request yield at most one durable response_published; the loser fails closed and durable bytes match the ledger digest."
+    },
+    {
+      "test_id": "test_ra01_cross_process.py::test_ra01_two_process_same_intended_request_single_dispatch",
+      "expected": "PASS",
+      "invariant": "Two processes publishing the same intended request produce exactly one durable request_published and cannot fork the deterministic request identity."
+    },
+    {
+      "test_id": "test_ra02_directory_durability.py::test_ra02_first_ledger_creation_dir_fsync_failure_is_not_durable",
+      "expected": "PASS",
+      "invariant": "First-ledger-creation directory fsync failure is not a durable ledger append; no request_published record exists afterwards."
+    },
+    {
+      "test_id": "test_ra02_directory_durability.py::test_ra02_first_ledger_creation_dir_open_failure_is_not_durable",
+      "expected": "PASS",
+      "invariant": "First-ledger-creation directory open failure is not a durable ledger append."
+    },
+    {
+      "test_id": "test_ra02_directory_durability.py::test_ra02_ledger_append_file_fsync_failure_is_not_durable",
+      "expected": "PASS",
+      "invariant": "Control: with no real path faulted the same publication succeeds (probe sanity)."
+    },
+    {
+      "test_id": "test_ra02_directory_durability.py::test_ra02_request_dir_fsync_failure_is_not_dispatch",
+      "expected": "PASS",
+      "invariant": "Injected request-directory fsync failure raises and records no dispatch while regular file fsync still succeeded."
+    },
+    {
+      "test_id": "test_ra02_directory_durability.py::test_ra02_request_dir_open_failure_is_not_dispatch",
+      "expected": "PASS",
+      "invariant": "Injected request-directory open failure raises and records no dispatch."
+    },
+    {
+      "test_id": "test_ra02_directory_durability.py::test_ra02_response_dir_fsync_failure_is_not_published",
+      "expected": "PASS",
+      "invariant": "Injected response-directory fsync failure raises before response_published."
+    },
+    {
+      "test_id": "test_ra02_directory_durability.py::test_ra02_response_dir_open_failure_is_not_published",
+      "expected": "PASS",
+      "invariant": "Injected response-directory open failure raises before response_published."
+    },
+    {
+      "test_id": "test_ra03_visible_unproven_retry.py::test_ra03_first_ledger_retry_single_entry",
+      "expected": "PASS",
+      "invariant": "First-ledger retry after unproven creation converges to exactly one valid seq-1 entry."
+    },
+    {
+      "test_id": "test_ra03_visible_unproven_retry.py::test_ra03_request_retry_after_unproven_dir_fsync",
+      "expected": "PASS",
+      "invariant": "After a visible-but-unproven request artifact, retry re-proves durability and yields exactly one durable dispatch whose digest equals the on-disk bytes."
+    },
+    {
+      "test_id": "test_ra03_visible_unproven_retry.py::test_ra03_request_retry_rejects_mutated_visible_bytes",
+      "expected": "PASS",
+      "invariant": "Mutating the visible unproven request bytes before retry must not be adopted as a dispatch; retry fails closed and no request_published exists."
+    },
+    {
+      "test_id": "test_ra03_visible_unproven_retry.py::test_ra03_response_retry_after_unproven_dir_fsync",
+      "expected": "PASS",
+      "invariant": "After a visible-but-unproven response artifact, retry yields exactly one response_published with a matching digest."
+    },
+    {
+      "test_id": "test_ra03_visible_unproven_retry.py::test_ra03_response_retry_with_different_bytes_fails_closed",
+      "expected": "PASS",
+      "invariant": "A different second response submission over an unproven visible artifact fails closed and creates no response_published."
+    },
+    {
+      "test_id": "test_ra04_crash_boundaries.py::test_ra04_crash_points_leave_no_orphan_dispatch",
+      "expected": "PASS",
+      "invariant": "Crash points before the ledger append record no dispatch at all."
+    },
+    {
+      "test_id": "test_ra04_crash_boundaries.py::test_ra04_crash_then_retry_converges",
+      "expected": "PASS",
+      "invariant": "Every software-visible crash boundary (temp fsync/replace/dir fsync/append/receipt) leaves a valid chain, unique events and bounded convergence after retry."
+    },
+    {
+      "test_id": "test_ra04_crash_boundaries.py::test_ra04_handler_crash_after_dispatch_resumes_without_second_dispatch",
+      "expected": "PASS",
+      "invariant": "A handler crashing immediately after the durable dispatch resumes that dispatch (path=resumed_dispatched_request) instead of dispatching a second time."
+    },
+    {
+      "test_id": "test_ra05_lock_attacks.py::test_ra05_contention_is_real_cross_process",
+      "expected": "PASS",
+      "invariant": "While a holder owns the lock an independent process observes exclusion (real cross-process authority, not a process-local mutex)."
+    },
+    {
+      "test_id": "test_ra05_lock_attacks.py::test_ra05_lock_inode_replacement_still_excludes",
+      "expected": "PASS",
+      "invariant": "Replacing the idle lock inode does not break mutual exclusion for later writers."
+    },
+    {
+      "test_id": "test_ra05_lock_attacks.py::test_ra05_lock_path_directory_fails_closed",
+      "expected": "PASS",
+      "invariant": "A directory at the lock path fails closed."
+    },
+    {
+      "test_id": "test_ra05_lock_attacks.py::test_ra05_lock_path_is_stable_and_dedicated",
+      "expected": "PASS",
+      "invariant": "The lock is a dedicated, stable, never-the-ledger path shared by independent objects."
+    },
+    {
+      "test_id": "test_ra05_lock_attacks.py::test_ra05_lock_released_while_awaiting_external_response",
+      "expected": "PASS",
+      "invariant": "A handler blocked on external bytes does not hold the mutation lock (an independent process can still acquire it)."
+    },
+    {
+      "test_id": "test_ra05_lock_attacks.py::test_ra05_lock_symlink_fails_closed",
+      "expected": "PASS",
+      "invariant": "A symlinked lock path fails closed."
+    },
+    {
+      "test_id": "test_ra05_lock_attacks.py::test_ra05_nested_mutation_does_not_self_deadlock",
+      "expected": "PASS",
+      "invariant": "Nested transactions (same path, different objects, same process) neither deadlock nor duplicate events."
+    },
+    {
+      "test_id": "test_ra05_lock_attacks.py::test_ra05_stale_lock_file_after_process_death",
+      "expected": "PASS",
+      "invariant": "A lock file left by a SIGKILLed holder does not starve a new writer."
+    },
+    {
+      "test_id": "test_ra06_races_and_integration.py::test_ra06_direct_consume_after_request_file_mutation",
+      "expected": "PASS",
+      "invariant": "#290 observation: direct consume remains bound to the durable response/ledger digests; the mutated request file is unusable and cannot enter the semantic result."
+    },
+    {
+      "test_id": "test_ra06_races_and_integration.py::test_ra06_due_work_and_user_turn_share_exchange_root",
+      "expected": "PASS",
+      "invariant": "Simultaneous due-work and user-turn traffic on one exchange root stays linear, consumed exactly once, with no cross-binding and no deadlock."
+    },
+    {
+      "test_id": "test_ra06_races_and_integration.py::test_ra06_tamper_between_artifact_write_and_ledger_append",
+      "expected": "PASS",
+      "invariant": "Bytes swapped inside the publication window are never dispatched and are detected on the semantic read path (fail closed)."
+    },
+    {
+      "test_id": "test_ra06_races_and_integration.py::test_ra06_two_processes_recover_same_dispatch",
+      "expected": "PASS",
+      "invariant": "Two recovery processes on one dispatch neither re-dispatch nor duplicate consume."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c1_intact_replay_is_idempotent",
+      "expected": "PASS",
+      "invariant": "C1: an intact replay is idempotent and adds no second response event."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c1_missing_published_response_fails_closed",
+      "expected": "PASS",
+      "invariant": "C1: deleted published response fails closed on read, consume and replay."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c1_tampered_published_response_fails_closed",
+      "expected": "PASS",
+      "invariant": "C1: tampered published response is refused by replay, read and consume."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c2_install_uses_no_index_no_resolver",
+      "expected": "PASS",
+      "invariant": "C2: installation is offline and hash-pinned (--no-index, --no-deps)."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c2_wheel_trust_root_closed_set",
+      "expected": "PASS",
+      "invariant": "C2: qualified closure verifies; wrong bytes, missing wheel and extra unlocked wheel each FAIL closed."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c4_recovery_snapshot_mismatch_fails_closed",
+      "expected": "PASS",
+      "invariant": "C4: a durable dispatch bound to another snapshot is refused (binding mismatch)."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c5_digest_discontinuity_detected",
+      "expected": "PASS",
+      "invariant": "C5: hash-chain discontinuity is detected."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c5_duplicate_event_detected",
+      "expected": "PASS",
+      "invariant": "C5: duplicated event is detected."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c5_illegal_event_order_detected",
+      "expected": "PASS",
+      "invariant": "C5: illegal event order (consume before publication) is detected."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c5_interior_deletion_detected",
+      "expected": "PASS",
+      "invariant": "C5: interior deletion is detected."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c5_interior_mutation_detected",
+      "expected": "PASS",
+      "invariant": "C5: interior record mutation is detected."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c5_sequence_corruption_detected",
+      "expected": "PASS",
+      "invariant": "C5: sequence corruption is detected."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c6_frozen_rc_identity_checks",
+      "expected": "PASS",
+      "invariant": "C6: the exact frozen RC verifies; missing git metadata, mutated Core working bytes and a foreign repository are each BLOCKED."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c7_exact_runtime_pins",
+      "expected": "PASS",
+      "invariant": "C7: exact CPython/Pydantic/pytest/SQLite/OpenSSL pins and Core imported from the verified working tree, not site-packages."
+    },
+    {
+      "test_id": "test_ra07_historical_contracts.py::test_c8_clean_room_startup_boundary",
+      "expected": "PASS",
+      "invariant": "C8: exactly four approved startup inputs, status PREP_REVIEW_READY, run package reaches no test/synthetic/fixture/evaluator module."
+    }
+  ],
+  "decision_rules": [
+    "Any duplicate durable seq/event, broken chain, or two successful mutations over one prefix.",
+    "Any success receipt or durable dispatch record produced while required directory durability failed.",
+    "Any adoption of visible-but-unproven bytes as an already-durable dispatch.",
+    "Any second semantic dispatch for one intended request (runner or publisher level).",
+    "Any lock authority that is process-local only, or any lock anomaly accepted silently.",
+    "Any tampered/mutated bytes entering a semantic result or being accepted as the durable request/response.",
+    "Any real Resident/C15 fixture/evaluator/release-state artifact reachable or used.",
+    "Any regression of C1-C9 guarantees listed in the historical tier.",
+    "Any candidate source or packet change relative to the frozen H1/H2 identities."
+  ],
+  "notes": [
+    "Expectations were written and hashed before the first adversarial execution against the candidate.",
+    "A probe defect is corrected by adding a new revision and preserving this one and its results.",
+    "Author suites (C1-C11, Gates A-D) are regression evidence only and do not substitute for these probes."
+  ]
+}

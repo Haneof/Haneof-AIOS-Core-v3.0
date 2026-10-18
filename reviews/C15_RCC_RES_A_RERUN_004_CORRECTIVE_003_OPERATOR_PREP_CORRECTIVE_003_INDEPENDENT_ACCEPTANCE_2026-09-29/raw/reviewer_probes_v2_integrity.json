@@ -1,0 +1,48 @@
+{
+  "purpose": "prove the revision-2 frozen sources were not modified after the first adversarial execution",
+  "frozen_probe_source_sha256": {
+    "conftest.py": "4dfed116c6183586f1b62e2d2956ceae4cacf5905a38522c02e9da206c145c9d",
+    "fault_injection.py": "03be93797fd28508f85432e86083aec93a5254df28855d48ad74bd97762447ac",
+    "probe_worker.py": "c0f315dca38c629aa6087f1fac17018f7b422f67f374b04d1984416b635da3cc",
+    "test_ra01_cross_process.py": "30bb18f62e2332450444d84070bf09fedc73a0241e641ab6fd630be62407f315",
+    "test_ra02_directory_durability.py": "7cf3ace49648281577314fed761181acae9548de7826f7275e039fe38318d9a3",
+    "test_ra03_visible_unproven_retry.py": "760366df81498c798aaf69847d4608a944cb86b6bf98131dd634eb2585834f8d",
+    "test_ra04_crash_boundaries.py": "793fa32aa2795bf13b8a40df4c768566278a0490b1b2dfaec2afef3231f5cba4",
+    "test_ra05_lock_attacks.py": "caf695358a3b02da361f132051e88bfe8e64486887ba0cb186f9ce09c8e76bbc",
+    "test_ra06_races_and_integration.py": "0dd6ed43a554d59611474a91a3c02e79b8126769b49130c0eadc99696cdcd859",
+    "test_ra07_historical_contracts.py": "a3bb7720e713ffcff1ccdd8241043bc9ffa6e46d6b2324499217a53ad47904e2"
+  },
+  "post_run_probe_source_sha256": {
+    "conftest.py": "4dfed116c6183586f1b62e2d2956ceae4cacf5905a38522c02e9da206c145c9d",
+    "fault_injection.py": "03be93797fd28508f85432e86083aec93a5254df28855d48ad74bd97762447ac",
+    "probe_worker.py": "c0f315dca38c629aa6087f1fac17018f7b422f67f374b04d1984416b635da3cc",
+    "test_ra01_cross_process.py": "30bb18f62e2332450444d84070bf09fedc73a0241e641ab6fd630be62407f315",
+    "test_ra02_directory_durability.py": "7cf3ace49648281577314fed761181acae9548de7826f7275e039fe38318d9a3",
+    "test_ra03_visible_unproven_retry.py": "760366df81498c798aaf69847d4608a944cb86b6bf98131dd634eb2585834f8d",
+    "test_ra04_crash_boundaries.py": "793fa32aa2795bf13b8a40df4c768566278a0490b1b2dfaec2afef3231f5cba4",
+    "test_ra05_lock_attacks.py": "caf695358a3b02da361f132051e88bfe8e64486887ba0cb186f9ce09c8e76bbc",
+    "test_ra06_races_and_integration.py": "0dd6ed43a554d59611474a91a3c02e79b8126769b49130c0eadc99696cdcd859",
+    "test_ra07_historical_contracts.py": "a3bb7720e713ffcff1ccdd8241043bc9ffa6e46d6b2324499217a53ad47904e2"
+  },
+  "identical": true,
+  "freeze_frozen_utc": "2026-09-29T10:30:15.294093+00:00",
+  "freeze_file_sha256": "fef3a011d733d8a7803efada79d8c74207ae9f3f12f48578da57abc8dbaa3738",
+  "raw_result_file": "raw/reviewer_probes_v2.raw.txt",
+  "raw_result_sha256": "5c4a345c273c75dfab1a558d74a5dae9d0b2563d827a783dd9f317015579f1ed",
+  "raw_result_mtime_utc": "2026-09-29T10:32:56.741691+00:00",
+  "probe_source_mtimes_utc": {
+    "conftest.py": "2026-09-29T10:29:25.682797+00:00",
+    "fault_injection.py": "2026-09-29T10:27:21.049089+00:00",
+    "probe_worker.py": "2026-09-29T10:29:29.102844+00:00",
+    "test_ra01_cross_process.py": "2026-09-29T10:29:46.771087+00:00",
+    "test_ra02_directory_durability.py": "2026-09-29T10:27:21.049089+00:00",
+    "test_ra03_visible_unproven_retry.py": "2026-09-29T10:27:21.049089+00:00",
+    "test_ra04_crash_boundaries.py": "2026-09-29T10:27:30.453218+00:00",
+    "test_ra05_lock_attacks.py": "2026-09-29T10:29:33.102899+00:00",
+    "test_ra06_races_and_integration.py": "2026-09-29T10:29:42.167024+00:00",
+    "test_ra07_historical_contracts.py": "2026-09-29T10:27:53.429533+00:00"
+  },
+  "collection_identical_to_freeze": true,
+  "execution_command": "pytest -vv -p no:cacheprovider -o addopts= -o pythonpath= --rootdir=<probes_v2> <probes_v2> --junitxml=<raw>/reviewer_probes_v2.xml",
+  "result": "49 passed in 154.31s (rc=0)"
+}

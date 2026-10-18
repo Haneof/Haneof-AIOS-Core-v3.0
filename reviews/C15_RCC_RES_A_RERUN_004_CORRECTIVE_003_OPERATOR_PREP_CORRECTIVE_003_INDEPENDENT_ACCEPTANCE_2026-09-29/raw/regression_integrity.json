@@ -1,0 +1,64 @@
+{
+  "tier": "author regression suites + gates under the reviewer runtime (independent execution)",
+  "c10_c11": {
+    "raw": "raw/c10_c11.raw.txt",
+    "sha256": "d8ae59431c3c378f4fd069139af93d74f58296f65d5a00b6cc4f226928e5c393",
+    "result": "18 passed in 13.58s",
+    "rc": 0
+  },
+  "c1_c3": {
+    "json": "raw/c1_c3.json",
+    "sha256": "b0eb40a0f25bcd8b2dad5854d77c018a698b7276324dd66ab5b35692fa3afef3",
+    "status": "GREEN",
+    "probes": [
+      "C1_IA_OP_001",
+      "C2_IA_OP_002",
+      "C3_IA_OP_003"
+    ],
+    "rc": 0
+  },
+  "c4_c9": {
+    "raw": "raw/c4_c9.raw.txt",
+    "sha256": "89e22d353224350ab4fc254be2cfd8c932208f97a4450dd3310810aad5c45d4d",
+    "collected": 103,
+    "result": "103 passed in 8.91s",
+    "rc": 0
+  },
+  "gates": {
+    "evidence_dir": "raw/gates/gates",
+    "summary_sha256": "52ebf12c50c5a6b4dfd332ec50819f7ae80cc560f7cadd8c1e1ec064c90ea07c",
+    "A": {
+      "status": "PASS",
+      "count": 24,
+      "enumeration_sha256": "14de1d5d39a3ccbaa96e56cab04110f6b99fc2911e93fee97971a21ea8d8bdf8",
+      "result_sha256": "6d4280c22724f61e91bedcdc4c8355baac5419b765bd593e1a0ca3c422c0e889"
+    },
+    "B": {
+      "status": "PASS",
+      "count": 7,
+      "enumeration_sha256": "b4d99aa42d7d2e640a204c85fd38327fef7092db773945a25089380f0d7c4f07",
+      "result_sha256": "666ab4d858eb43461fb2cb4544e6b7c61e33b3a5f6ac9efb0b43027236b4f257"
+    },
+    "C": {
+      "status": "PASS",
+      "count": 2,
+      "enumeration_sha256": "910f9f5f4ba2ca43858716d0e4a4677e5906ed396334320268d9ee0bb27a3654",
+      "result_sha256": "fba9d7bfc94eac924e54cc528b8d877da608f5a98fdf09968989e2588d2b1fb8"
+    },
+    "D": {
+      "status": "PASS",
+      "count": 5,
+      "enumeration_sha256": "bc0afa61cc38adfa396ced950ea3e6b1cdab1e96da6583ef64bdffe97c579a7e",
+      "result_sha256": "ecc118e79951278b262799df031b35cf07b313147d6df490cb6c17047be5aae6"
+    }
+  },
+  "gate_environment": {
+    "python": "3.12.14",
+    "pydantic": "2.13.5",
+    "pytest": "8.4.2",
+    "sqlite": "3.45.1",
+    "openssl": "3.0.13",
+    "executable": "/home/user/ia_review/runtime/runtime/3.12.14/venv/bin/python"
+  },
+  "note": "gate_runner writes one directory level below the given evidence dir (raw/gates/gates/); the summary printer path in scripts/run_regression.sh expected raw/gates/gate_summary.json, which is why it printed 'gate_summary.json missing'. The evidence itself is complete."
+}

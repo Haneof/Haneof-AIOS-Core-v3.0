@@ -1,0 +1,228 @@
+{
+  "record_version": 1,
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "role": "Resident Launch / Test Infrastructure Operator (non-Resident)",
+  "generated_utc": "2026-09-29T10:24:13.119026+00:00",
+  "runtime_root": "/home/user/ia_review/runtime",
+  "repo_root": "/home/user/ia_review/rc",
+  "paths": {
+    "deps": "/home/user/ia_review/runtime/runtime/3.12.14/deps",
+    "python_prefix": "/home/user/ia_review/runtime/runtime/3.12.14/python",
+    "venv": "/home/user/ia_review/runtime/runtime/3.12.14/venv",
+    "wheelhouse": "/home/user/ia_review/runtime/runtime/3.12.14/wheelhouse",
+    "venv_python": "/home/user/ia_review/runtime/runtime/3.12.14/venv/bin/python"
+  },
+  "deps_fingerprint": "c2aad06c27a188d5",
+  "pins": {
+    "cpython": {
+      "version": "3.12.14",
+      "tag": "v3.12.14",
+      "tag_object_sha": "4b65faa0b452113bf130086fb1519be6d9cd9b06",
+      "commit_sha": "2abcf904b8dac8c999d2b3aac76681abb333798a",
+      "source_url": "https://codeload.github.com/python/cpython/tar.gz/refs/tags/v3.12.14",
+      "source_sha256": "5b8f5847fc28eea401f7415dc367b8365485ee97f068cd1a0cee124a096bb171"
+    },
+    "zlib": {
+      "version": "1.3.1",
+      "source_url": "https://codeload.github.com/madler/zlib/tar.gz/refs/tags/v1.3.1",
+      "source_sha256": "17e88863f3600672ab49182f217281b6fc4d3c762bde361935e436a95214d05c"
+    },
+    "openssl": {
+      "version": "3.0.13",
+      "tag": "openssl-3.0.13",
+      "commit_sha": "85cf92f55d9e2ac5aacf92bedd33fb890b9f8b4c",
+      "source_url": "https://codeload.github.com/openssl/openssl/tar.gz/refs/tags/openssl-3.0.13",
+      "source_sha256": "e74504ed7035295ec7062b1da16c15b57ff2a03cd2064a28d8c39458cacc45fc"
+    },
+    "sqlite": {
+      "version": "3.45.1",
+      "npm_package": "better-sqlite3",
+      "npm_version": "9.4.1",
+      "source_url": "https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-9.4.1.tgz",
+      "source_sha256": "b813ed754ff786d095fc34da8b8c9203f304d36e3f002dd252b126df80a4734c",
+      "npm_sri_sha512": "sha512-QpqiQeMI4WkE+dQ68zTMX5OzlPGc7lXIDP1iKUt4Omt9PdaVgzKYxHIJRIzt1E+RUBQoFmkip/IbvzyrxehAIg==",
+      "npm_shasum": "006bc6a899a69166c5fe89c9cff64509295d12b2",
+      "amalgamation_c_sha256": "a760118a161b77a79dd9acdd16af324ed059e70d1e7571c504966fc2e40712cc",
+      "amalgamation_h_sha256": "41e066ccd4f89e938f136ceb48c996c54dc381b59fe566dea48864c3750b779e",
+      "compile_flags": [
+        "-DSQLITE_THREADSAFE=1",
+        "-DSQLITE_ENABLE_COLUMN_METADATA=1",
+        "-DSQLITE_ENABLE_FTS3",
+        "-DSQLITE_ENABLE_FTS3_PARENTHESIS",
+        "-DSQLITE_ENABLE_FTS4",
+        "-DSQLITE_ENABLE_FTS5",
+        "-DSQLITE_ENABLE_RTREE",
+        "-DSQLITE_ENABLE_DBSTAT_VTAB=1",
+        "-DSQLITE_ENABLE_LOAD_EXTENSION=1",
+        "-DSQLITE_ENABLE_JSON1=1",
+        "-DSQLITE_ENABLE_MATH_FUNCTIONS=1"
+      ]
+    },
+    "pydantic": {
+      "version": "2.13.5"
+    },
+    "pytest": {
+      "version": "8.4.2"
+    },
+    "frozen_rc": {
+      "software": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+      "repository_tree": "1ac3a675b884167d3a29aa432e7ef3eaff94d404",
+      "core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+      "tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019"
+    }
+  },
+  "observed": {
+    "python_version": "3.12.14",
+    "python_full_version": "3.12.14",
+    "implementation": "CPython",
+    "config_args": "'--prefix=/home/user/ia_review/runtime/runtime/3.12.14/python' '--with-openssl=/home/user/ia_review/runtime/runtime/3.12.14/deps' '--with-ensurepip=install' '--enable-loadable-sqlite-extensions' 'LDFLAGS=-L/home/user/ia_review/runtime/runtime/3.12.14/deps/lib -Wl,-rpath,/home/user/ia_review/runtime/runtime/3.12.14/deps/lib -Wl,-rpath-link,/home/user/ia_review/runtime/runtime/3.12.14/deps/lib' 'CPPFLAGS=-I/home/user/ia_review/runtime/runtime/3.12.14/deps/include'",
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "sqlite_module_version": "2.6.0",
+    "openssl_version": "OpenSSL 3.0.13 30 Jan 2024",
+    "openssl_runtime_version": "OpenSSL 3.0.13 30 Jan 2024",
+    "stdlib_modules": {
+      "sqlite3": "ok",
+      "hashlib": "ok",
+      "zlib": "ok",
+      "ssl": "ok",
+      "uuid": "ok",
+      "zoneinfo": "ok",
+      "unicodedata": "ok",
+      "socket": "ok",
+      "fcntl": "ok",
+      "secrets": "ok",
+      "ctypes": "unavailable:ModuleNotFoundError",
+      "readline": "unavailable:ModuleNotFoundError",
+      "bz2": "unavailable:ModuleNotFoundError",
+      "lzma": "unavailable:ModuleNotFoundError",
+      "decimal": "ok"
+    },
+    "venv_prefix": "/home/user/ia_review/runtime/runtime/3.12.14/venv",
+    "venv_base_prefix": "/home/user/ia_review/runtime/runtime/3.12.14/python",
+    "executable": "/home/user/ia_review/runtime/runtime/3.12.14/venv/bin/python",
+    "aios_core_file": "/home/user/ia_review/rc/src/aios_core/__init__.py",
+    "installed_distributions": [
+      "annotated-types==0.8.0",
+      "iniconfig==2.3.0",
+      "packaging==26.3",
+      "pip==25.0.1",
+      "pluggy==1.6.0",
+      "pydantic==2.13.5",
+      "pydantic_core==2.46.5",
+      "Pygments==2.21.0",
+      "pytest==8.4.2",
+      "typing-inspection==0.4.4",
+      "typing_extensions==4.16.0"
+    ]
+  },
+  "system": {
+    "os": "Linux-6.1.158+-x86_64-with-glibc2.36",
+    "os_release": {
+      "PRETTY_NAME": "\"Debian GNU/Linux 12 (bookworm)\"",
+      "NAME": "\"Debian GNU/Linux\"",
+      "VERSION_ID": "\"12\"",
+      "VERSION": "\"12 (bookworm)\"",
+      "VERSION_CODENAME": "bookworm",
+      "ID": "debian",
+      "HOME_URL": "\"https://www.debian.org/\"",
+      "SUPPORT_URL": "\"https://www.debian.org/support\"",
+      "BUG_REPORT_URL": "\"https://bugs.debian.org/\""
+    },
+    "kernel": "6.1.158+",
+    "architecture": "x86_64",
+    "libc": "glibc 2.36",
+    "glibc_version": "glibc 2.36",
+    "cpu_count": 2,
+    "tzdata_dir_present": true
+  },
+  "artifacts": {
+    "venv_python": {
+      "path": "/home/user/ia_review/runtime/runtime/3.12.14/venv/bin/python",
+      "sha256": "f03dd0adaca84ca40b5e18a79e6370778cdc1ef08d67151b4c30b990072051f6",
+      "size": 31463480
+    },
+    "sqlite_shared_lib": {
+      "path": "/home/user/ia_review/runtime/runtime/3.12.14/deps/lib/libsqlite3.so.3.45.1",
+      "sha256": "98b5159d60c3fbec78a1c7857c1e5a8a669a8283546b28075de60374da7daa00",
+      "size": 1502512
+    },
+    "openssl_libssl": {
+      "path": "/home/user/ia_review/runtime/runtime/3.12.14/deps/lib/libssl.so.3",
+      "sha256": "e088f6c2218066c59ef1c69046a555e140f86ec4f5992ea599c14ee099625a9b",
+      "size": 788808
+    },
+    "requirements_lock": {
+      "path": "/home/user/ia_review/runtime/runtime/3.12.14/requirements.lock.txt",
+      "sha256": "1631a0190cafd88a770e0dd879864f19a5e98f9e3916c20d2fca72f75998be93",
+      "size": 1893
+    }
+  },
+  "wheels": [
+    {
+      "wheel": "annotated_types-0.8.0-py3-none-any.whl",
+      "sha256": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0",
+      "size": 13427
+    },
+    {
+      "wheel": "iniconfig-2.3.0-py3-none-any.whl",
+      "sha256": "f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12",
+      "size": 7484
+    },
+    {
+      "wheel": "packaging-26.3-py3-none-any.whl",
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "size": 129956
+    },
+    {
+      "wheel": "pip-25.0.1-py3-none-any.whl",
+      "sha256": "c46efd13b6aa8279f33f2864459c8ce587ea6a1a59ee20de055868d8f7688f7f",
+      "size": 1841526
+    },
+    {
+      "wheel": "pluggy-1.6.0-py3-none-any.whl",
+      "sha256": "e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746",
+      "size": 20538
+    },
+    {
+      "wheel": "pydantic-2.13.5-py3-none-any.whl",
+      "sha256": "346a034f080da3755d8e9cb5e00e8b07de1d39e4f6e2c87d8ab7cafa0b269a73",
+      "size": 472589
+    },
+    {
+      "wheel": "pydantic_core-2.46.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "sha256": "0fc5be0abd4a407e200d844b404e33639a554e7bd0d448e7b9ae181be4789ac2",
+      "size": 2066284
+    },
+    {
+      "wheel": "pygments-2.21.0-py3-none-any.whl",
+      "sha256": "2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9",
+      "size": 1250147
+    },
+    {
+      "wheel": "pytest-8.4.2-py3-none-any.whl",
+      "sha256": "872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79",
+      "size": 365750
+    },
+    {
+      "wheel": "typing_extensions-4.16.0-py3-none-any.whl",
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "size": 45571
+    },
+    {
+      "wheel": "typing_inspection-0.4.4-py3-none-any.whl",
+      "sha256": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147",
+      "size": 14750
+    }
+  ],
+  "frozen_core_content_manifest_sha256": "220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa",
+  "frozen_core_file_count": 77,
+  "bootstrap": {
+    "script": "bootstrap_runtime.sh",
+    "deterministic": true,
+    "resident_safe": true,
+    "contains_c15_semantics": false,
+    "repairable": "rerun this script with --build; pass --verify for offline verification only"
+  }
+}
