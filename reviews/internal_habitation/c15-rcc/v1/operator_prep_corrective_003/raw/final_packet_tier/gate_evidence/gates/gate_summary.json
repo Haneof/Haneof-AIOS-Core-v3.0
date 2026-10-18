@@ -1,0 +1,40 @@
+{
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "gates": {
+    "A": {
+      "status": "PASS",
+      "result_file": "gate_a_result.json",
+      "result_sha256": "3847247865dffa978181b920ad19d714ea2fb5037f4a3ce97edcfa0a24e97b70"
+    },
+    "B": {
+      "status": "PASS",
+      "result_file": "gate_b_result.json",
+      "result_sha256": "cf3af138042ce5cd04845519dcf1d97426c719da6f5beca9061b818cfd625fc1"
+    },
+    "C": {
+      "status": "PASS",
+      "result_file": "gate_c_result.json",
+      "result_sha256": "f5b22b39483fa9f34edf9d6e3f7ca86ebf0821f5a58c73c67e5e5c9212dde437"
+    },
+    "D": {
+      "status": "PASS",
+      "result_file": "gate_d_result.json",
+      "result_sha256": "a966d079310ed185e1493562512f56a0bfc39787e3367570e6f95b0df75c0f63"
+    }
+  },
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "openssl_version": "OpenSSL 3.0.13 30 Jan 2024",
+    "executable": "/home/user/.cache/c003/final-runtime-001/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-29T09:41:57.292115+00:00"
+}

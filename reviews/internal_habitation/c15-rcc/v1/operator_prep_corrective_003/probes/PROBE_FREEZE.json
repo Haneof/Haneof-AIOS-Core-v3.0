@@ -1,0 +1,133 @@
+{
+  "baseline_anticipated": "RED on two independently reproduced IA blockers, not a predeclared count; preserve raw result and every failure.",
+  "baseline_commit": "771b200c33dbd6055b1d209935f8e1552f13090f",
+  "baseline_corrected_code_parent": "63c972ad7a19671cbdf809177f7a552aa2c2ecc6",
+  "baseline_tree": "071b51c5fb37dc59fc8941dee2182637b9f87daa",
+  "candidate_expected": "18/18 PASS with unchanged sources, IDs and expectations.",
+  "enumeration_sha256": "7af537fd81790145e3a7874f2f24ae46d12794840c87476be726f474da1ef18e",
+  "exact_carry_commit": "41de3f6698146661e73f6e43c00143fb63516ef1",
+  "execution": "Qualified CPython 3.12.14 / pytest 8.4.2; PYTHONPATH=<target harness>:<frozen core src>; pytest --rootdir=<probes> --junitxml=<raw results> tests; disable plugin autoload and caches.",
+  "expected_outcomes": [
+    {
+      "expected": "PASS",
+      "group": "C10",
+      "invariant": "Two independent legal appends serialize or one fails closed; every success has a valid monotonic hash-chain.",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_independent_ledgers_same_valid_prefix"
+    },
+    {
+      "expected": "PASS",
+      "group": "C10",
+      "invariant": "Request ordinal, deterministic ID, actual ledger sequence and file SHA are self-consistent after concurrent different publications.",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_independent_publishers_distinct_identities"
+    },
+    {
+      "expected": "PASS",
+      "group": "C10",
+      "invariant": "Concurrent identical explicit identity has exactly one durable request_published; never two semantic dispatches.",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_duplicate_explicit_request_id_single_dispatch"
+    },
+    {
+      "expected": "PASS",
+      "group": "C10",
+      "invariant": "Response publication overlapping a distinct request preserves a valid chain, publication binding and at most one response event.",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_response_races_new_request"
+    },
+    {
+      "expected": "PASS",
+      "group": "C10",
+      "invariant": "Consumption overlapping a distinct request preserves a valid chain and at most one consume event.",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_consume_races_new_request"
+    },
+    {
+      "expected": "PASS",
+      "group": "C10",
+      "invariant": "Concurrent same-byte response publication creates one response_published and verified bytes; retries may be idempotent.",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_response_is_idempotent"
+    },
+    {
+      "expected": "PASS",
+      "group": "C10",
+      "invariant": "Concurrent duplicate consumes return verified bytes and leave exactly one response_consumed.",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_consume_is_idempotent"
+    },
+    {
+      "expected": "PASS",
+      "group": "C10",
+      "invariant": "Independent OS processes sharing a prefix cannot succeed with an invalid chain or stale request identity.",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_independent_subprocess_publishers"
+    },
+    {
+      "expected": "PASS",
+      "group": "C11",
+      "invariant": "Actual request-directory fsync failure with successful regular file fsync must raise and leave zero semantic-dispatch records.",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_request_artifact_fsync_failure_is_not_dispatch"
+    },
+    {
+      "expected": "PASS",
+      "group": "C11",
+      "invariant": "Actual response-directory fsync failure must raise before response_published, with regular file fsync successful.",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_response_artifact_fsync_failure_is_not_published"
+    },
+    {
+      "expected": "PASS",
+      "group": "C11",
+      "invariant": "First ledger entry directory-fsync failure cannot succeed or record a dispatch; legal retry converges once.",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_first_ledger_entry_fsync_failure_and_retry"
+    },
+    {
+      "expected": "PASS",
+      "group": "C11",
+      "invariant": "Required request-directory open error cannot yield a request dispatch receipt.",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_request_directory_open_failure_is_not_dispatch"
+    },
+    {
+      "expected": "PASS",
+      "group": "C11",
+      "invariant": "Required response-directory open error cannot yield a response publication receipt.",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_response_directory_open_failure_is_not_published"
+    },
+    {
+      "expected": "PASS",
+      "group": "C11",
+      "invariant": "Required initial ledger-directory open error cannot yield an append receipt.",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_ledger_creation_directory_open_failure_is_not_dispatch"
+    },
+    {
+      "expected": "PASS",
+      "group": "C11",
+      "invariant": "Visible artifact is not prior dispatch; fresh retry must reestablish file/directory durability, verify identity and append once.",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_request_artifact_sync"
+    },
+    {
+      "expected": "PASS",
+      "group": "C11",
+      "invariant": "While response directory still fails, no adoption or ledger record; after recovery, exact response converges once.",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_response_artifact_sync"
+    },
+    {
+      "expected": "PASS",
+      "group": "C11",
+      "invariant": "Mutated orphan request after failed directory durability cannot be silently adopted as a durable prior dispatch.",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_mutated_unproven_request_file_is_not_adopted"
+    },
+    {
+      "expected": "PASS",
+      "group": "C11",
+      "invariant": "After failed ledger-creation durability, retry reestablishes proof then creates exactly one request dispatch.",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_first_ledger_creation"
+    }
+  ],
+  "groups": {
+    "C10/IA288-01": 8,
+    "C11/IA288-02": 10
+  },
+  "probe_revision": "v1-frozen-before-baseline-execution",
+  "scope": "Only disposable synthetic exchange roots; never a real Resident, fixture, release-state, cursor or cognition.",
+  "source_sha256": {
+    "tests/synthetic/process_publisher.py": "11d75cf072d61ff32f6b3dc0a40c3bbc75da912817cbe8098b6664fc7262997e",
+    "tests/test_c10_concurrency.py": "9f5accda0da46046ead81e9d855a702221f3b218bb8f879540f5f68800838976",
+    "tests/test_c11_directory_durability.py": "4830ca43b6fff23008c41f64171bb1404f1df5d147ae73800e2557c3593ea5c5"
+  },
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003",
+  "task_start_live_main": "c8e9e42f8ae6e6724c0c7e9eb9dbb21b100f4487"
+}
