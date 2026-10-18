@@ -1,0 +1,20 @@
+{
+  "python": "3.12.14",
+  "implementation": "CPython",
+  "executable": "/tmp/ia/rt/runtime/3.12.14/venv/bin/python",
+  "prefix": "/tmp/ia/rt/runtime/3.12.14/venv",
+  "base_prefix": "/tmp/ia/rt/runtime/3.12.14/python",
+  "pydantic": "2.13.5",
+  "pydantic_core": "2.46.5",
+  "pytest": "8.4.2",
+  "sqlite": "3.45.1",
+  "openssl": "OpenSSL 3.0.13 30 Jan 2024",
+  "os": "Linux-6.1.158+-x86_64-with-glibc2.36",
+  "kernel": "6.1.158+",
+  "arch": "x86_64",
+  "libc": "glibc 2.36",
+  "aios_core__file__": "/tmp/ia/clone/src/aios_core/__init__.py",
+  "_sqlite3__file__": "/tmp/ia/rt/runtime/3.12.14/python/lib/python3.12/lib-dynload/_sqlite3.cpython-312-x86_64-linux-gnu.so",
+  "_sqlite3_ldd": "\tlinux-vdso.so.1 (0x00007fff859fb000)\n\tlibsqlite3.so.0 => /tmp/ia/rt/runtime/3.12.14/deps/lib/libsqlite3.so.0 (0x00007fd014a7a000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fd014894000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fd0147b4000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fd014bf3000)\n",
+  "os_release": "PRETTY_NAME=\"Debian GNU/Linux 12 (bookworm)\""
+}

@@ -1,0 +1,32 @@
+[bootstrap] fetch https://codeload.github.com/python/cpython/tar.gz/refs/tags/v3.12.14
+[bootstrap] fetch https://codeload.github.com/madler/zlib/tar.gz/refs/tags/v1.3.1
+[bootstrap] fetch https://codeload.github.com/openssl/openssl/tar.gz/refs/tags/openssl-3.0.13
+[bootstrap] fetch https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-9.4.1.tgz
+[bootstrap] npm SRI sha512 verified for better-sqlite3@9.4.1
+[bootstrap] sqlite amalgamation verified: 3.45.1 c=a760118a161b77a79dd9acdd16af324ed059e70d1e7571c504966fc2e40712cc
+[bootstrap] build zlib 1.3.1
+[bootstrap] build sqlite 3.45.1
+[bootstrap] build openssl 3.0.13 (several minutes)
+[bootstrap] deps prefix ready: /tmp/ia/rt/runtime/3.12.14/deps (fingerprint c2aad06c27a188d5)
+[bootstrap] building cpython 3.12.14 against deps fingerprint c2aad06c27a188d5
+[bootstrap] make -j2 (several minutes)
+[bootstrap] cpython installed at /tmp/ia/rt/runtime/3.12.14/python
+[bootstrap] create venv at /tmp/ia/rt/runtime/3.12.14/venv
+[bootstrap] populate wheelhouse: pydantic==2.13.5 pytest==8.4.2
+[bootstrap] wheels downloaded with the qualified interpreter
+[bootstrap] wheelhouse pinned: 10 distributions
+[bootstrap] venv ready: /tmp/ia/rt/runtime/3.12.14/venv
+<stdin>:12: DeprecationWarning: version is deprecated and will be removed in Python 3.14
+[bootstrap] version triple OK: python=3.12.14 pydantic=2.13.5 pytest=8.4.2 sqlite=3.45.1
+[bootstrap] WARNING: repo git metadata unavailable; frozen RC identity not machine-verified here
+{
+  "environment_record": "/tmp/ia/rt/evidence/environment_record.json",
+  "python": "3.12.14",
+  "pydantic": "2.13.5",
+  "pytest": "8.4.2",
+  "sqlite": "3.45.1",
+  "core_content_manifest_sha256": null
+}
+[bootstrap] BUILD OK — qualified runtime at /tmp/ia/rt/runtime/3.12.14
+{"aios_runtime_root":"/tmp/ia/rt","aios_repo_root":"/tmp/ia/clone/reviews","runtime_dir":"/tmp/ia/rt/runtime/3.12.14","deps_dir":"/tmp/ia/rt/runtime/3.12.14/deps","python_prefix":"/tmp/ia/rt/runtime/3.12.14/python","python_bin":"/tmp/ia/rt/runtime/3.12.14/python/bin/python3.12","venv_dir":"/tmp/ia/rt/runtime/3.12.14/venv","venv_python":"/tmp/ia/rt/runtime/3.12.14/venv/bin/python","wheelhouse_dir":"/tmp/ia/rt/runtime/3.12.14/wheelhouse","evidence_dir":"/tmp/ia/rt/evidence"}
+EXIT=0

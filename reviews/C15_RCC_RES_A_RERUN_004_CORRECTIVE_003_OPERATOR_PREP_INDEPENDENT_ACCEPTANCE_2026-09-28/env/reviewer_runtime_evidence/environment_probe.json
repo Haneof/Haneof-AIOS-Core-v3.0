@@ -1,0 +1,37 @@
+{
+  "python_version": "3.12.14",
+  "python_version_info": [
+    3,
+    12,
+    14
+  ],
+  "python_full_version": "3.12.14",
+  "implementation": "CPython",
+  "config_args": "'--prefix=/tmp/ia/rt/runtime/3.12.14/python' '--with-openssl=/tmp/ia/rt/runtime/3.12.14/deps' '--with-ensurepip=install' '--enable-loadable-sqlite-extensions' 'LDFLAGS=-L/tmp/ia/rt/runtime/3.12.14/deps/lib -Wl,-rpath,/tmp/ia/rt/runtime/3.12.14/deps/lib -Wl,-rpath-link,/tmp/ia/rt/runtime/3.12.14/deps/lib' 'CPPFLAGS=-I/tmp/ia/rt/runtime/3.12.14/deps/include'",
+  "prefix": "/tmp/ia/rt/runtime/3.12.14/venv",
+  "base_prefix": "/tmp/ia/rt/runtime/3.12.14/python",
+  "executable": "/tmp/ia/rt/runtime/3.12.14/venv/bin/python",
+  "sqlite_version": "3.45.1",
+  "sqlite_module_version": "2.6.0",
+  "pydantic_version": "2.13.5",
+  "pytest_version": "8.4.2",
+  "open_ssl_version": "OpenSSL 3.0.13 30 Jan 2024",
+  "stdlib_modules": {
+    "sqlite3": "ok",
+    "hashlib": "ok",
+    "zlib": "ok",
+    "ssl": "ok",
+    "uuid": "ok",
+    "zoneinfo": "ok",
+    "unicodedata": "ok",
+    "socket": "ok",
+    "fcntl": "ok",
+    "secrets": "ok",
+    "ctypes": "unavailable:ModuleNotFoundError",
+    "readline": "unavailable:ModuleNotFoundError",
+    "bz2": "unavailable:ModuleNotFoundError",
+    "lzma": "unavailable:ModuleNotFoundError",
+    "decimal": "ok"
+  },
+  "openssl_runtime_version": "OpenSSL 3.0.13 30 Jan 2024"
+}

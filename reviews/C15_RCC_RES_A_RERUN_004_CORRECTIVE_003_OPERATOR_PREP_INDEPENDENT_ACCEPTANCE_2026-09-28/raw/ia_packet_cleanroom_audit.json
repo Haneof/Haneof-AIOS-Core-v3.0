@@ -1,0 +1,365 @@
+{
+  "status_is_PREP_REVIEW_READY": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "status_not_READY_FOR_RESIDENT": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "cursor_range_1_13": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "real_response_mode": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "task_id": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "versions": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "packet_head_equals_parent": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "candidate_single_parent_is_packet_head": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "packet_absent_in_parent": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "packet_present_in_head": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "pin_bootstrap_sha256": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "pin_clean_room_contract_sha256": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "pin_resident_run_contract_sha256": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "pin_environment_record_sha256": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "pin_harness_manifest_sha256": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "pin_gate_a_hash": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "pin_gate_b_hash": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "pin_gate_c_hash": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "pin_gate_d_hash": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "rc_software_is_commit": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "rc_repo_tree": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "rc_core_tree": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "rc_tests_tree": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "freeze_packet_sha": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "freeze_audit_sha": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "freeze_harness_manifest": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "freeze_head": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "freeze_gate_summary_matches": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "sha256sums_all_match": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "sha256sums_uncovered_files": {
+    "observed": [
+      "evidence/SHA256SUMS"
+    ],
+    "expected": [
+      "evidence/SHA256SUMS"
+    ],
+    "status": "PASS"
+  },
+  "sha256sums_covers_bootstrap/bootstrap_runtime.sh": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "sha256sums_covers_RESIDENT_SAFE_LAUNCH_PACKET.json": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "sha256sums_covers_evidence/resident_safe_packet_audit.json": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "sha256sums_covers_evidence/environment_record.json": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "sha256sums_covers_evidence/FREEZE_MANIFEST.json": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "sha256sums_covers_evidence/harness_manifest.json": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "sha256sums_covers_harness/aios_exchange/runner.py": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "packet_free_text_values": {
+    "observed": [
+      [
+        "packet.allowed_startup_inputs[0]",
+        "RESIDENT_SAFE_LAUNCH_PACKET.json (this file)"
+      ],
+      [
+        "packet.allowed_startup_inputs[2]",
+        "mechanical environment/harness status emitted by the approved launch tools"
+      ],
+      [
+        "packet.bootstrap_verify_command",
+        "bash <bootstrap_path> --verify"
+      ]
+    ],
+    "expected": "MANUAL_REVIEW",
+    "status": "INFO"
+  },
+  "packet_allowed_inputs_include_clean_room_contract": {
+    "observed": false,
+    "expected": true,
+    "status": "RED"
+  },
+  "packet_allowed_inputs_exact": {
+    "observed": [
+      "RESIDENT_SAFE_LAUNCH_PACKET.json (this file)",
+      "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md",
+      "mechanical environment/harness status emitted by the approved launch tools"
+    ],
+    "expected": "MANUAL_REVIEW",
+    "status": "INFO"
+  },
+  "forbidden_categories_explicit": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "packet_mentions_board_or_checkpoint_as_allowed": {
+    "observed": false,
+    "expected": false,
+    "status": "PASS"
+  },
+  "startup_artifact_marker_hits": {
+    "observed": {
+      "clean_room_contract": [
+        "11: Every semantic judgment, search choice, evidence inspection, cognition write, revision, retraction, response, and silence decision must be made by you from real",
+        "59: Before cursor 1:",
+        "68: After cursor 1 is revealed, harness mutation is forbidden.",
+        "74: Run only cursor 1..13.",
+        "76: Never reveal cursor 14.",
+        "99: After cursor 13 is durably acknowledged and all normally due work attributable to available reality is complete:"
+      ],
+      "run_contract": [
+        "12: You are not a fixture designer, evaluator, benchmark author, test programmer, or Core engineer. Every semantic judgment, search choice, evidence inspection, cog",
+        "84: - run only maintenance, Summary, Wake, derivation, and Review work actually due at that time;",
+        "87: - allow UNKNOWN, retain, revise, retract, or silence when appropriate.",
+        "89: Do not create cognition merely to satisfy a quota. Do not treat task completion, Summary text, Wake completion, or your own self-description as reality proof.",
+        "95: After cursor 13 is durably acknowledged and all normally due work attributable to information available through that timestamp is complete:"
+      ],
+      "bootstrap": [
+        "12: #              Resident semantic content, decision, reply, claim or summary.",
+        "12: #              Resident semantic content, decision, reply, claim or summary.",
+        "12: #              Resident semantic content, decision, reply, claim or summary."
+      ]
+    },
+    "expected": "MANUAL_REVIEW",
+    "status": "INFO"
+  },
+  "no_release_state_or_world_files": {
+    "observed": [],
+    "expected": [],
+    "status": "PASS"
+  },
+  "no_release_operator_invocation_in_evidence": {
+    "observed": false,
+    "expected": false,
+    "status": "PASS"
+  },
+  "gate_c_user_input_synthetic": {
+    "observed": true,
+    "expected": true,
+    "status": "PASS"
+  },
+  "timeline": {
+    "observed": {
+      "environment_record": "2026-09-28T18:32:36.989597+00:00",
+      "rc_identity": "2026-09-28T18:35:52.318279+00:00",
+      "gates": {
+        "a": "2026-09-28T18:37:03.929098+00:00",
+        "b": "2026-09-28T18:37:05.569877+00:00",
+        "c": "2026-09-28T18:37:07.894443+00:00",
+        "d": "2026-09-28T18:37:09.550263+00:00"
+      },
+      "freeze": "2026-09-28T18:37:16.582507+00:00",
+      "packet": "2026-09-28T18:37:16.468092+00:00",
+      "commit_parent_author_committer": "2026-09-28T18:36:00+00:00 2026-09-28T18:37:13+00:00",
+      "commit_head_author_committer": "2026-09-28T18:37:22+00:00 2026-09-28T18:37:22+00:00",
+      "harness_changed_in_head_commit": ""
+    },
+    "expected": "MANUAL_REVIEW",
+    "status": "INFO"
+  },
+  "_value_classes": {
+    "packet.allowed_cursor_end": "int",
+    "packet.allowed_cursor_start": "int",
+    "packet.allowed_startup_inputs[0]": "FREE_TEXT",
+    "packet.allowed_startup_inputs[1]": "path",
+    "packet.allowed_startup_inputs[2]": "FREE_TEXT",
+    "packet.bootstrap_path": "path",
+    "packet.bootstrap_sha256": "hex64",
+    "packet.bootstrap_verify_command": "FREE_TEXT",
+    "packet.clean_room_contract_path": "path",
+    "packet.clean_room_contract_sha256": "hex64",
+    "packet.environment_record_path": "path",
+    "packet.environment_record_sha256": "hex64",
+    "packet.forbidden_startup_categories[0]": "token",
+    "packet.forbidden_startup_categories[1]": "token",
+    "packet.forbidden_startup_categories[2]": "token",
+    "packet.forbidden_startup_categories[3]": "token",
+    "packet.forbidden_startup_categories[4]": "token",
+    "packet.forbidden_startup_categories[5]": "token",
+    "packet.forbidden_startup_categories[6]": "token",
+    "packet.forbidden_startup_categories[7]": "token",
+    "packet.forbidden_startup_categories[8]": "token",
+    "packet.forbidden_startup_categories[9]": "token",
+    "packet.forbidden_startup_categories[10]": "token",
+    "packet.forbidden_startup_paths[0]": "path",
+    "packet.forbidden_startup_paths[1]": "token",
+    "packet.forbidden_startup_paths[2]": "path",
+    "packet.forbidden_startup_paths[3]": "path",
+    "packet.forbidden_startup_paths[4]": "path",
+    "packet.forbidden_startup_paths[5]": "path",
+    "packet.forbidden_startup_paths[6]": "path",
+    "packet.forbidden_startup_paths[7]": "path",
+    "packet.frozen_core_content_manifest_sha256": "hex64",
+    "packet.frozen_core_tree": "hex40",
+    "packet.frozen_repository_tree": "hex40",
+    "packet.frozen_software_sha": "hex40",
+    "packet.frozen_tests_tree": "hex40",
+    "packet.gate_a_hash": "hex64",
+    "packet.gate_a_status": "token",
+    "packet.gate_b_hash": "hex64",
+    "packet.gate_b_status": "token",
+    "packet.gate_c_hash": "hex64",
+    "packet.gate_c_status": "token",
+    "packet.gate_d_hash": "hex64",
+    "packet.gate_d_status": "token",
+    "packet.generated_utc": "ts",
+    "packet.harness_entrypoint": "token",
+    "packet.harness_file_count": "int",
+    "packet.harness_manifest_sha256": "hex64",
+    "packet.harness_root": "path",
+    "packet.harness_runner_module": "token",
+    "packet.ledger_module": "token",
+    "packet.operator_prep_exact_head": "hex40",
+    "packet.operator_prep_head_rule": "token",
+    "packet.packet_version": "int",
+    "packet.pydantic_version": "version",
+    "packet.pytest_version": "version",
+    "packet.python_version": "version",
+    "packet.real_response_mode": "token",
+    "packet.request_publisher_module": "token",
+    "packet.resident_run_contract_path": "path",
+    "packet.resident_run_contract_sha256": "hex64",
+    "packet.response_publisher_module": "token",
+    "packet.runtime_root_default": "path",
+    "packet.runtime_venv_python_default": "path",
+    "packet.sqlite_version": "version",
+    "packet.status": "token",
+    "packet.task_id": "token"
+  },
+  "_red": [
+    "packet_allowed_inputs_include_clean_room_contract"
+  ]
+}

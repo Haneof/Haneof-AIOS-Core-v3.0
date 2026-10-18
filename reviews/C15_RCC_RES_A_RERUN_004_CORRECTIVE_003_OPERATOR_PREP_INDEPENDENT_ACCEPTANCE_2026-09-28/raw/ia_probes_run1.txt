@@ -1,0 +1,103 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /tmp/ia/rt/runtime/3.12.14/venv/bin/python
+rootdir: /home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_INDEPENDENT_ACCEPTANCE_2026-09-28/probes
+configfile: ../../../pyproject.toml
+collecting ... collected 39 items
+
+test_ia_gate_a_adversarial.py::test_ia_a01_request_id_mismatch PASSED    [  2%]
+test_ia_gate_a_adversarial.py::test_ia_a02_request_sha_mismatch PASSED   [  5%]
+test_ia_gate_a_adversarial.py::test_ia_a03_response_sha_mismatch PASSED  [  7%]
+test_ia_gate_a_adversarial.py::test_ia_a04_partial_request PASSED        [ 10%]
+test_ia_gate_a_adversarial.py::test_ia_a05_partial_response PASSED       [ 12%]
+test_ia_gate_a_adversarial.py::test_ia_a06_torn_temp_write_not_consumed PASSED [ 15%]
+test_ia_gate_a_adversarial.py::test_ia_a06b_torn_ledger_tail_fails_closed PASSED [ 17%]
+test_ia_gate_a_adversarial.py::test_ia_a07_orphan_request_file PASSED    [ 20%]
+test_ia_gate_a_adversarial.py::test_ia_a08_orphan_response_file_not_consumed PASSED [ 23%]
+test_ia_gate_a_adversarial.py::test_ia_a09_duplicate_request_id_refused PASSED [ 25%]
+test_ia_gate_a_adversarial.py::test_ia_a09b_duplicate_request_record_is_ambiguous_fail_closed FAILED [ 28%]
+test_ia_gate_a_adversarial.py::test_ia_a10_duplicate_response_publication PASSED [ 30%]
+test_ia_gate_a_adversarial.py::test_ia_a11_overwrite_response_refused PASSED [ 33%]
+test_ia_gate_a_adversarial.py::test_ia_a12_consume_before_publish PASSED [ 35%]
+test_ia_gate_a_adversarial.py::test_ia_a13_ledger_interior_mutation_runner_fails_closed FAILED [ 38%]
+test_ia_gate_a_adversarial.py::test_ia_a13b_consume_on_broken_chain_fails_closed FAILED [ 41%]
+test_ia_gate_a_adversarial.py::test_ia_a14_ledger_interior_deletion_runner_fails_closed FAILED [ 43%]
+test_ia_gate_a_adversarial.py::test_ia_a15_tail_truncation_partial_line_fails_closed PASSED [ 46%]
+test_ia_gate_a_adversarial.py::test_ia_a15b_whole_record_tail_truncation_INFO PASSED [ 48%]
+test_ia_gate_a_adversarial.py::test_ia_a16_missing_request_published PASSED [ 51%]
+test_ia_gate_a_adversarial.py::test_ia_a17_missing_response_published PASSED [ 53%]
+test_ia_gate_a_adversarial.py::test_ia_a18_crash_before_request_publication PASSED [ 56%]
+test_ia_gate_a_adversarial.py::test_ia_a19_crash_after_request_same_snapshot_resumes PASSED [ 58%]
+test_ia_gate_a_adversarial.py::test_ia_a19b_crash_after_request_different_snapshot_fails_closed FAILED [ 61%]
+test_ia_gate_a_adversarial.py::test_ia_a20_durable_unconsumed_same_snapshot_consumed_once PASSED [ 64%]
+test_ia_gate_a_adversarial.py::test_ia_a20b_durable_unconsumed_different_snapshot_fails_closed FAILED [ 66%]
+test_ia_gate_a_adversarial.py::test_ia_a21_multiple_outstanding_is_ambiguous_fail_closed FAILED [ 69%]
+test_ia_gate_a_adversarial.py::test_ia_inv_dispatch_boundary_null_provider_fields PASSED [ 71%]
+test_ia_gates_bcd_rc.py::test_ia_rc_imported_core_is_byte_identical_to_frozen_tree PASSED [ 74%]
+test_ia_gates_bcd_rc.py::test_ia_b0_capability_result_exact_surface PASSED [ 76%]
+test_ia_gates_bcd_rc.py::test_ia_b1_empty_history PASSED                 [ 79%]
+test_ia_gates_bcd_rc.py::test_ia_b2_success_with_data PASSED             [ 82%]
+test_ia_gates_bcd_rc.py::test_ia_b3_failure_with_error_fields PASSED     [ 84%]
+test_ia_gates_bcd_rc.py::test_ia_b4_multiple_results_order_preserved PASSED [ 87%]
+test_ia_gates_bcd_rc.py::test_ia_b5_no_illegal_capabilityresult_attribute_access PASSED [ 89%]
+test_ia_gates_bcd_rc.py::test_ia_c1_two_round_success_history PASSED     [ 92%]
+test_ia_gates_bcd_rc.py::test_ia_c2_two_round_failure_result_history_then_silence PASSED [ 94%]
+test_ia_gates_bcd_rc.py::test_ia_isolation_runner_cannot_reach_synthetic_responder PASSED [ 97%]
+test_ia_gates_bcd_rc.py::test_ia_d_semantic_script_audit FAILED          [100%]
+
+=================================== FAILURES ===================================
+/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_INDEPENDENT_ACCEPTANCE_2026-09-28/probes/test_ia_gate_a_adversarial.py:153: Failed: DID NOT RAISE <class 'Exception'>
+/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_INDEPENDENT_ACCEPTANCE_2026-09-28/probes/test_ia_gate_a_adversarial.py:208: AssertionError: runner accepted a broken hash chain and returned 'FORGED'
+/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_INDEPENDENT_ACCEPTANCE_2026-09-28/probes/test_ia_gate_a_adversarial.py:223: Failed: DID NOT RAISE <class 'Exception'>
+/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_INDEPENDENT_ACCEPTANCE_2026-09-28/probes/test_ia_gate_a_adversarial.py:244: AssertionError: runner re-served a response after interior deletion: 'IA_REVIEWER_SYNTHETIC_TERMINAL'
+/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_INDEPENDENT_ACCEPTANCE_2026-09-28/probes/test_ia_gate_a_adversarial.py:361: AssertionError: round-0 snapshot received the directive decided for the round-1 request: 'DECIDED_FOR_ROUND_1'
+/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_INDEPENDENT_ACCEPTANCE_2026-09-28/probes/test_ia_gate_a_adversarial.py:387: AssertionError: durable response for round-1 request applied to round-0 snapshot: 'DECIDED_FOR_ROUND_1'
+/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_INDEPENDENT_ACCEPTANCE_2026-09-28/probes/test_ia_gate_a_adversarial.py:402: AssertionError: two unconsumed responses; runner silently picked 'FIRST'
+/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_INDEPENDENT_ACCEPTANCE_2026-09-28/probes/test_ia_gates_bcd_rc.py:274: AssertionError: schema.py:166: CapabilityResult(name=mapping['name'], ok=mapping['ok'], data=mapping['data'], error_code=mapping['error_code'], error_message=mapping['error_message'], call_id
+==================================== PASSES ====================================
+________________ test_ia_a15b_whole_record_tail_truncation_INFO ________________
+----------------------------- Captured stdout call -----------------------------
+INFO a15b classification after dropping trailing consume record: RESPONSE_DURABLE_UNCONSUMED chain_ok: True
+_________________ test_ia_a18_crash_before_request_publication _________________
+----------------------------- Captured stdout call -----------------------------
+INFO a18 restart outcome: RAISED RequestPublishError
+=========================== short test summary info ============================
+PASSED test_ia_gate_a_adversarial.py::test_ia_a01_request_id_mismatch
+PASSED test_ia_gate_a_adversarial.py::test_ia_a02_request_sha_mismatch
+PASSED test_ia_gate_a_adversarial.py::test_ia_a03_response_sha_mismatch
+PASSED test_ia_gate_a_adversarial.py::test_ia_a04_partial_request
+PASSED test_ia_gate_a_adversarial.py::test_ia_a05_partial_response
+PASSED test_ia_gate_a_adversarial.py::test_ia_a06_torn_temp_write_not_consumed
+PASSED test_ia_gate_a_adversarial.py::test_ia_a06b_torn_ledger_tail_fails_closed
+PASSED test_ia_gate_a_adversarial.py::test_ia_a07_orphan_request_file
+PASSED test_ia_gate_a_adversarial.py::test_ia_a08_orphan_response_file_not_consumed
+PASSED test_ia_gate_a_adversarial.py::test_ia_a09_duplicate_request_id_refused
+PASSED test_ia_gate_a_adversarial.py::test_ia_a10_duplicate_response_publication
+PASSED test_ia_gate_a_adversarial.py::test_ia_a11_overwrite_response_refused
+PASSED test_ia_gate_a_adversarial.py::test_ia_a12_consume_before_publish
+PASSED test_ia_gate_a_adversarial.py::test_ia_a15_tail_truncation_partial_line_fails_closed
+PASSED test_ia_gate_a_adversarial.py::test_ia_a15b_whole_record_tail_truncation_INFO
+PASSED test_ia_gate_a_adversarial.py::test_ia_a16_missing_request_published
+PASSED test_ia_gate_a_adversarial.py::test_ia_a17_missing_response_published
+PASSED test_ia_gate_a_adversarial.py::test_ia_a18_crash_before_request_publication
+PASSED test_ia_gate_a_adversarial.py::test_ia_a19_crash_after_request_same_snapshot_resumes
+PASSED test_ia_gate_a_adversarial.py::test_ia_a20_durable_unconsumed_same_snapshot_consumed_once
+PASSED test_ia_gate_a_adversarial.py::test_ia_inv_dispatch_boundary_null_provider_fields
+PASSED test_ia_gates_bcd_rc.py::test_ia_rc_imported_core_is_byte_identical_to_frozen_tree
+PASSED test_ia_gates_bcd_rc.py::test_ia_b0_capability_result_exact_surface
+PASSED test_ia_gates_bcd_rc.py::test_ia_b1_empty_history
+PASSED test_ia_gates_bcd_rc.py::test_ia_b2_success_with_data
+PASSED test_ia_gates_bcd_rc.py::test_ia_b3_failure_with_error_fields
+PASSED test_ia_gates_bcd_rc.py::test_ia_b4_multiple_results_order_preserved
+PASSED test_ia_gates_bcd_rc.py::test_ia_b5_no_illegal_capabilityresult_attribute_access
+PASSED test_ia_gates_bcd_rc.py::test_ia_c1_two_round_success_history
+PASSED test_ia_gates_bcd_rc.py::test_ia_c2_two_round_failure_result_history_then_silence
+PASSED test_ia_gates_bcd_rc.py::test_ia_isolation_runner_cannot_reach_synthetic_responder
+FAILED test_ia_gate_a_adversarial.py::test_ia_a09b_duplicate_request_record_is_ambiguous_fail_closed
+FAILED test_ia_gate_a_adversarial.py::test_ia_a13_ledger_interior_mutation_runner_fails_closed
+FAILED test_ia_gate_a_adversarial.py::test_ia_a13b_consume_on_broken_chain_fails_closed
+FAILED test_ia_gate_a_adversarial.py::test_ia_a14_ledger_interior_deletion_runner_fails_closed
+FAILED test_ia_gate_a_adversarial.py::test_ia_a19b_crash_after_request_different_snapshot_fails_closed
+FAILED test_ia_gate_a_adversarial.py::test_ia_a20b_durable_unconsumed_different_snapshot_fails_closed
+FAILED test_ia_gate_a_adversarial.py::test_ia_a21_multiple_outstanding_is_ambiguous_fail_closed
+FAILED test_ia_gates_bcd_rc.py::test_ia_d_semantic_script_audit - AssertionEr...
+========================= 8 failed, 31 passed in 3.68s =========================

@@ -1,0 +1,8 @@
+BA1 | expected=aios_repo_root=/tmp/ia/clone + RC identity OK | observed=aios_repo_root=/tmp/ia/clone/reviews ; exit=0 ; [bootstrap] WARNING: repo git metadata unavailable; frozen RC identity not machine-verified here | RED
+BA2 | expected=exit=2 | observed=exit=0 ; [bootstrap] WARNING: repo git metadata unavailable; frozen RC identity not machine-verified here | RED
+BA3 | expected=exit=2 | observed=bootstrap --verify exit=0 ([bootstrap] frozen RC identity OK: software=f20f2edfa7af00d0286493fd15196ca9503bc315 core=9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623 tests=7e33b5ef8432370234965d3ccd61248c703c4019); core_manifest=32a93963f81e7619450ee91a84efbdfbb5ec7d2643e2ac7224d399873373887c (packet=3ca61cf1a34aff504d6df4fe3696e3f6d521e39de3adac96a0898789b54f885a, not compared); rc_identity.py exit=0; CognitiveRuntime.__init__ max_tool_rounds default = 9 | RED
+BA4 | expected=exit=2 when sqlite!=3.45.1 | observed=exit=0 observed_sqlite=3.40.1 | RED
+BA5 | expected=wheel hashes pinned in frozen bootstrap | observed=pydantic wheel sha occurrences in bootstrap=0 ; reviewer wheel set == author wheel set: yes | RED
+BA6 | expected=exit=0, RC identity OK, manifest=3ca61cf1a34aff504d6df4fe3696e3f6d521e39de3adac96a0898789b54f885a | observed=exit=0 rc_ok_lines=1 manifest=3ca61cf1a34aff504d6df4fe3696e3f6d521e39de3adac96a0898789b54f885a | PASS
+BA7 | expected=0 changed/untracked paths in candidate checkout | observed=0 | PASS
+BA8 | expected=tar commit id == 2abcf904b8dac8c999d2b3aac76681abb333798a | observed= | RED

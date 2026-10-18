@@ -1,0 +1,4 @@
+167:  local sq="$BUILD_DIR/sqlite-$SQLITE_VERSION"
+202:    local sq="$BUILD_DIR/sqlite-$SQLITE_VERSION"
+374:  sq="$(printf '%s' "$out" | python3 -c 'import json,sys;print(json.load(sys.stdin)["sqlite_version"])')"
+201:  if [ ! -f "$DEPS_DIR/.stamp-sqlite-$SQLITE_VERSION" ]; then

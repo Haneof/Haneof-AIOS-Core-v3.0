@@ -1,0 +1,5 @@
+284:  if [ -x "$VENV_PY" ] && "$VENV_PY" -m pip download --quiet --only-binary :all: \
+287:  elif python3 -m pip download --quiet --only-binary :all: \
+297:  python3 - "$WHEELHOUSE_DIR" > "$WHEELHOUSE_DIR/requirements.hashes.txt" <<'PY'
+306:  log "wheelhouse pinned: $(wc -l < "$WHEELHOUSE_DIR/requirements.hashes.txt") distributions"
+317:      --require-hashes -r "$WHEELHOUSE_DIR/requirements.hashes.txt" \

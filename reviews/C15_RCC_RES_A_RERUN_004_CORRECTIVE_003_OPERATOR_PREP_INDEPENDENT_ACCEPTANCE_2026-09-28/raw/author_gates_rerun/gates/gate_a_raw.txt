@@ -1,0 +1,48 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /tmp/ia/rt/runtime/3.12.14/venv/bin/python
+rootdir: /tmp/ia/clone
+configfile: pyproject.toml
+collecting ... collected 19 items
+
+harness/tests/test_gate_a_durable_exchange.py::test_a01_request_id_roundtrip PASSED [  5%]
+harness/tests/test_gate_a_durable_exchange.py::test_a02_request_sha256_binding PASSED [ 10%]
+harness/tests/test_gate_a_durable_exchange.py::test_a03_response_sha256_binding PASSED [ 15%]
+harness/tests/test_gate_a_durable_exchange.py::test_a04_atomic_request_publication PASSED [ 21%]
+harness/tests/test_gate_a_durable_exchange.py::test_a05_atomic_response_publication PASSED [ 26%]
+harness/tests/test_gate_a_durable_exchange.py::test_a06_temp_write_and_file_fsync PASSED [ 31%]
+harness/tests/test_gate_a_durable_exchange.py::test_a07_os_replace_used PASSED [ 36%]
+harness/tests/test_gate_a_durable_exchange.py::test_a08_directory_fsync_supported PASSED [ 42%]
+harness/tests/test_gate_a_durable_exchange.py::test_a09_reader_never_observes_partial_response PASSED [ 47%]
+harness/tests/test_gate_a_durable_exchange.py::test_a10_monotonic_ledger_sequence PASSED [ 52%]
+harness/tests/test_gate_a_durable_exchange.py::test_a11_hash_chain_tamper_detection PASSED [ 57%]
+harness/tests/test_gate_a_durable_exchange.py::test_a12_crash_before_request_publication PASSED [ 63%]
+harness/tests/test_gate_a_durable_exchange.py::test_a13_crash_after_request_publication PASSED [ 68%]
+harness/tests/test_gate_a_durable_exchange.py::test_a14_torn_response_write_fails_closed PASSED [ 73%]
+harness/tests/test_gate_a_durable_exchange.py::test_a15_response_published_before_consume_is_recovered PASSED [ 78%]
+harness/tests/test_gate_a_durable_exchange.py::test_a16_request_id_mismatch_fails_closed PASSED [ 84%]
+harness/tests/test_gate_a_durable_exchange.py::test_a17_digest_mismatch_fails_closed PASSED [ 89%]
+harness/tests/test_gate_a_durable_exchange.py::test_a18_missing_ledger_publication_record_fails_closed PASSED [ 94%]
+harness/tests/test_gate_a_durable_exchange.py::test_a19_not_submitted_classification_requires_absence_of_dispatch PASSED [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a01_request_id_roundtrip
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a02_request_sha256_binding
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a03_response_sha256_binding
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a04_atomic_request_publication
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a05_atomic_response_publication
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a06_temp_write_and_file_fsync
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a07_os_replace_used
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a08_directory_fsync_supported
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a09_reader_never_observes_partial_response
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a10_monotonic_ledger_sequence
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a11_hash_chain_tamper_detection
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a12_crash_before_request_publication
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a13_crash_after_request_publication
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a14_torn_response_write_fails_closed
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a15_response_published_before_consume_is_recovered
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a16_request_id_mismatch_fails_closed
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a17_digest_mismatch_fails_closed
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a18_missing_ledger_publication_record_fails_closed
+PASSED harness/tests/test_gate_a_durable_exchange.py::test_a19_not_submitted_classification_requires_absence_of_dispatch
+============================== 19 passed in 2.20s ==============================
