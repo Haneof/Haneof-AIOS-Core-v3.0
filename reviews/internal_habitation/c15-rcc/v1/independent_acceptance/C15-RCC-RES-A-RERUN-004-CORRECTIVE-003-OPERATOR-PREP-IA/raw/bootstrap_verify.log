@@ -1,0 +1,12 @@
+<stdin>:12: DeprecationWarning: version is deprecated and will be removed in Python 3.14
+[bootstrap] version triple OK: python=3.12.14 pydantic=2.13.5 pytest=8.4.2 sqlite=3.45.1
+[bootstrap] WARNING: repo git metadata unavailable; frozen RC identity not machine-verified here
+{
+  "environment_record": "/tmp/aios-review-runtime/evidence/environment_record.json",
+  "python": "3.12.14",
+  "pydantic": "2.13.5",
+  "pytest": "8.4.2",
+  "sqlite": "3.45.1",
+  "core_content_manifest_sha256": "3ca61cf1a34aff504d6df4fe3696e3f6d521e39de3adac96a0898789b54f885a"
+}
+[bootstrap] VERIFY OK

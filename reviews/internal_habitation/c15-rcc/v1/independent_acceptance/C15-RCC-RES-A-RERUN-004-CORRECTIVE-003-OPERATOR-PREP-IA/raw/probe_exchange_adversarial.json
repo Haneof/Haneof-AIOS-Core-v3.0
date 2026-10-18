@@ -1,0 +1,6 @@
+{
+  "published-overwrite": "FAIL: accepted idempotent replay over tampered file",
+  "tampered-consume": "PASS: ExchangeContractError",
+  "orphan-request-integrity": true,
+  "tail-truncation-classification": true
+}
