@@ -1,0 +1,67 @@
+{
+  "correction_reason": "v1 execution was incomplete: frozen Core source path was not provided and actual pytest summary includes duration suffix. No candidate behavior informed changes; expected blocker outcomes remain identical to original freeze.",
+  "expected_candidate_results": {
+    "C1_IA_OP_001": {
+      "expected_candidate": "GREEN",
+      "expected_historical_baseline": "RED because tampered and/or missing publish replay is accepted",
+      "scenarios": [
+        "tampered durable response then exact original replay must fail in publish_bytes",
+        "missing durable response file with response_published ledger must fail in publish_bytes",
+        "intact exact replay must return idempotent_replay=true",
+        "changed replay input bytes must fail",
+        "tampered consume remains fail-closed"
+      ]
+    },
+    "C2_IA_OP_002": {
+      "expected_candidate": "GREEN",
+      "expected_historical_baseline": "RED because no pre-download complete wheel lock and hashes are generated after download",
+      "required_checks": [
+        "complete dependency closure",
+        "pre-download candidate lock",
+        "no downloaded-bytes-derived trust hashes",
+        "wrong bytes rejected",
+        "wrong hash rejected",
+        "unexpected wheel rejected",
+        "missing wheel rejected",
+        "clean scratch bootstrap and local no-resolver installation evidence"
+      ],
+      "required_distribution_versions": {
+        "pydantic": "2.13.5",
+        "pytest": "8.4.2"
+      },
+      "required_entry_fields": [
+        "project",
+        "version",
+        "filename",
+        "sha256",
+        "python_tag",
+        "abi_tag",
+        "platform_tag"
+      ]
+    },
+    "C3_IA_OP_003": {
+      "expected_candidate": "GREEN",
+      "expected_historical_baseline": "RED because exact IDs are stored as test_count=0/test_ids=[]",
+      "gate_counts": {
+        "A": 19,
+        "B": 7,
+        "C": 2,
+        "D": 5
+      },
+      "invariants": [
+        "parsed node IDs exactly equal frozen collect-only node IDs",
+        "test_count == len(test_ids)",
+        "collected total == test_count",
+        "passed+failed+error+skipped == test_count",
+        "nonzero collection return code blocks",
+        "malformed/empty/mismatched collection blocks"
+      ]
+    }
+  },
+  "expected_outcomes_unchanged": true,
+  "frozen_before_v2_historical_probe_execution": true,
+  "probe_revision": "v2",
+  "probe_source_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001/probes/corrective_probes_v2.py",
+  "probe_source_sha256": "9a3d3c581e14d6e8d51d08e8013c0049a989bb2a8557602d90cdb8f22d1ba046",
+  "supersedes": "v1"
+}

@@ -1,0 +1,311 @@
+{
+  "clean_room_inputs": [
+    {
+      "file": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_CORRECTIVE_003_CLEAN_ROOM_CONTRACT.md",
+      "frozen_control_plane_blob": "bca3715f9aaff1f3e6f813cf6d1b9f23b0945bef",
+      "observed_blob": "bca3715f9aaff1f3e6f813cf6d1b9f23b0945bef",
+      "packet_sha256": "1da3ed6685e434cdc6dceae707d255fb5f2110ff4d05bb1c69615f0b792662f1",
+      "result": "PASS",
+      "sha256": "1da3ed6685e434cdc6dceae707d255fb5f2110ff4d05bb1c69615f0b792662f1"
+    },
+    {
+      "file": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md",
+      "frozen_control_plane_blob": "1b45ca7fa441855d927b610ca2a93ef50b5eee66",
+      "observed_blob": "1b45ca7fa441855d927b610ca2a93ef50b5eee66",
+      "packet_sha256": "9b8a6cc5641710bef88943279eedc3c8c88959bece0f7a47d4bba08ead470dab",
+      "result": "PASS",
+      "sha256": "9b8a6cc5641710bef88943279eedc3c8c88959bece0f7a47d4bba08ead470dab"
+    }
+  ],
+  "excluded_from_raw_scan": [
+    {
+      "file": "harness/operator_tools/no_semantic_scan.py",
+      "reason": "gate D scanner: embeds the prohibited-vocabulary patterns",
+      "resident_readable": false
+    },
+    {
+      "file": "harness/operator_tools/packet_audit.py",
+      "reason": "audit tool: embeds the marker patterns",
+      "resident_readable": false
+    },
+    {
+      "file": "harness/tests/test_gate_d_no_semantic_script.py",
+      "reason": "gate D test: asserts the prohibited-vocabulary behaviour",
+      "resident_readable": false
+    }
+  ],
+  "forbidden_category_checks": {
+    "evaluator_language": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "expected_answer_or_cognition": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "prior_assistant_text": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "prior_claims_or_summaries": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "prior_cursor_semantic_decisions": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "prior_user_payload": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "run_lineage_semantic_detail": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "unmodified_clean_room_inputs": {
+      "findings": [],
+      "result": "PASS"
+    }
+  },
+  "frozen_control_plane": "026810533679d749d9a33b9c11a06585ae28d9f6",
+  "generated_utc": "2026-09-28T20:33:08.242969+00:00",
+  "packet": "RESIDENT_SAFE_LAUNCH_PACKET.json",
+  "packet_sha256": "c1ddfa6b2fe89be2a2b9533f2483251f7423eb961755c7777bbab044da8a6f12",
+  "packet_structure": {
+    "checked_keys": [
+      "allowed_cursor_end",
+      "allowed_cursor_start",
+      "allowed_startup_inputs",
+      "bootstrap_path",
+      "bootstrap_sha256",
+      "bootstrap_verify_command",
+      "clean_bootstrap_evidence_path",
+      "clean_bootstrap_evidence_sha256",
+      "clean_room_contract_path",
+      "clean_room_contract_sha256",
+      "corrective_parent_rule",
+      "corrective_probe_freeze_sha256",
+      "corrective_starting_main_sha",
+      "environment_record_path",
+      "environment_record_sha256",
+      "forbidden_startup_categories",
+      "forbidden_startup_paths",
+      "frozen_core_content_manifest_sha256",
+      "frozen_core_tree",
+      "frozen_repository_tree",
+      "frozen_software_sha",
+      "frozen_tests_tree",
+      "gate_a_hash",
+      "gate_a_status",
+      "gate_a_test_count",
+      "gate_b_hash",
+      "gate_b_status",
+      "gate_b_test_count",
+      "gate_c_hash",
+      "gate_c_status",
+      "gate_c_test_count",
+      "gate_d_hash",
+      "gate_d_status",
+      "gate_d_test_count",
+      "generated_utc",
+      "harness_entrypoint",
+      "harness_file_count",
+      "harness_manifest_file_sha256",
+      "harness_manifest_sha256",
+      "harness_root",
+      "harness_runner_module",
+      "historical_failed_candidate_exact",
+      "historical_failed_ia_exact",
+      "ledger_module",
+      "operator_prep_exact_head",
+      "operator_prep_exact_parent",
+      "operator_prep_head_rule",
+      "packet_version",
+      "pydantic_version",
+      "pytest_version",
+      "python_version",
+      "real_response_mode",
+      "request_publisher_module",
+      "resident_run_contract_path",
+      "resident_run_contract_sha256",
+      "response_publisher_module",
+      "runtime_root_default",
+      "runtime_venv_python_default",
+      "sqlite_version",
+      "status",
+      "targeted_baseline_red_result_sha256",
+      "targeted_candidate_green_result_sha256",
+      "task_id",
+      "wheel_lock_path",
+      "wheel_lock_sha256",
+      "wheel_lock_verification_sha256"
+    ],
+    "negated_matches": [],
+    "ok": true,
+    "problems": [],
+    "value_findings": []
+  },
+  "pin_check_count": 15,
+  "pin_checks": [
+    {
+      "expected_sha256": "09c655d35a0c1b9be28a210e9ac2d681e964628eb24ce34b5db0ca894772e3b0",
+      "label": "bootstrap",
+      "observed_sha256": "09c655d35a0c1b9be28a210e9ac2d681e964628eb24ce34b5db0ca894772e3b0",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/bootstrap_runtime.sh",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+      "label": "wheel_lock",
+      "observed_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/PYTHON_WHEEL_LOCK.json",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "f0667af956a9242a1f5317210c5e022ca1133e15fd84b01c3558466e65114d59",
+      "label": "wheel_lock_verification",
+      "observed_sha256": "f0667af956a9242a1f5317210c5e022ca1133e15fd84b01c3558466e65114d59",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/wheel_lock_verification.json",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "39e028da524990cdef7ee38efcd1646cffa38305d871ac843afe4221d10a7c03",
+      "label": "clean_bootstrap_evidence",
+      "observed_sha256": "39e028da524990cdef7ee38efcd1646cffa38305d871ac843afe4221d10a7c03",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/clean_bootstrap_manifest.json",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "4f75e002f3bd5698b53dd3594ac5c76701bd8420b39e2fdb72b1600e80bb3d5b",
+      "label": "harness_manifest_file",
+      "observed_sha256": "4f75e002f3bd5698b53dd3594ac5c76701bd8420b39e2fdb72b1600e80bb3d5b",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/harness_manifest.json",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "6ebd6a8e438340a686c6345a01d84680b9130a0c82208d9cf68c5cb18afa71f9",
+      "label": "environment_record",
+      "observed_sha256": "6ebd6a8e438340a686c6345a01d84680b9130a0c82208d9cf68c5cb18afa71f9",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/environment_record.json",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "1da3ed6685e434cdc6dceae707d255fb5f2110ff4d05bb1c69615f0b792662f1",
+      "label": "clean_room_contract",
+      "observed_sha256": "1da3ed6685e434cdc6dceae707d255fb5f2110ff4d05bb1c69615f0b792662f1",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_CORRECTIVE_003_CLEAN_ROOM_CONTRACT.md",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "9b8a6cc5641710bef88943279eedc3c8c88959bece0f7a47d4bba08ead470dab",
+      "label": "resident_run_contract",
+      "observed_sha256": "9b8a6cc5641710bef88943279eedc3c8c88959bece0f7a47d4bba08ead470dab",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "93833b83548dd5b448d049ffe725bf1ac268a8a2946e9ad17268a53123d2cbc4",
+      "label": "corrective_probe_freeze",
+      "observed_sha256": "93833b83548dd5b448d049ffe725bf1ac268a8a2946e9ad17268a53123d2cbc4",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001/CORRECTIVE_PROBE_FREEZE.v6.json",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "3498aa4599a1446807808f28bcbc0edc496be09f828b9920b3ac1e77a1429531",
+      "label": "targeted_baseline_red",
+      "observed_sha256": "3498aa4599a1446807808f28bcbc0edc496be09f828b9920b3ac1e77a1429531",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001/BASELINE_RED_RUN.v6.json",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "6b9793ebf63b50a468607e1f7f381594b4a9ca0031e897b15e5526b87a7c441a",
+      "label": "targeted_candidate_green",
+      "observed_sha256": "6b9793ebf63b50a468607e1f7f381594b4a9ca0031e897b15e5526b87a7c441a",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/corrective_candidate_green.json",
+      "result": "PASS"
+    },
+    {
+      "execution_total": 24,
+      "gate_result_sha256": "50b798551a00888a0c0c17b67d6c46bf24ddbadb6be16cf5becca9a9b4188671",
+      "label": "gate_a_enumeration_execution_and_result",
+      "result": "PASS",
+      "test_count": 24,
+      "test_ids_count": 24
+    },
+    {
+      "execution_total": 7,
+      "gate_result_sha256": "dd4c09b52e7d64768fe7637130386ce83f4a840c91d5629b7e3af00a4a49150a",
+      "label": "gate_b_enumeration_execution_and_result",
+      "result": "PASS",
+      "test_count": 7,
+      "test_ids_count": 7
+    },
+    {
+      "execution_total": 2,
+      "gate_result_sha256": "71dfc76042e694ffb29d0d5928ba8f6fa79c70253e2f818a88bf464632b59864",
+      "label": "gate_c_enumeration_execution_and_result",
+      "result": "PASS",
+      "test_count": 2,
+      "test_ids_count": 2
+    },
+    {
+      "execution_total": 5,
+      "gate_result_sha256": "affafd93cb6c227ceb2bd73eccd635353e088d9230ee7609943992879b974aaf",
+      "label": "gate_d_enumeration_execution_and_result",
+      "result": "PASS",
+      "test_count": 5,
+      "test_ids_count": 5
+    }
+  ],
+  "result": "PASS",
+  "scanned_file_count": 5,
+  "scanned_files": [
+    {
+      "file": "RESIDENT_SAFE_LAUNCH_PACKET.json",
+      "findings": [],
+      "mode": "packet-structure+values",
+      "result": "PASS",
+      "sha256": "c1ddfa6b2fe89be2a2b9533f2483251f7423eb961755c7777bbab044da8a6f12"
+    },
+    {
+      "file": "harness/aios_exchange/**",
+      "findings": [],
+      "mode": "gate D code-only scan (frozen)",
+      "result": "PASS",
+      "scanner": "harness/operator_tools/no_semantic_scan.py",
+      "sha256": "d5f15f1e7de26981ecae7935bdc400239363aad46af6fe4c4b8671ae6754ef72"
+    },
+    {
+      "file": "bootstrap/bootstrap_runtime.sh",
+      "findings": [],
+      "mode": "raw marker scan",
+      "negated_matches": [
+        {
+          "category": "evaluator_language",
+          "line": 11,
+          "match": "evaluator expectation",
+          "negated": true,
+          "pattern": "evaluator (answer|expectation|semantic|rubric)"
+        }
+      ],
+      "result": "PASS",
+      "sha256": "09c655d35a0c1b9be28a210e9ac2d681e964628eb24ce34b5db0ca894772e3b0"
+    },
+    {
+      "file": "bootstrap/PYTHON_WHEEL_LOCK.json",
+      "findings": [],
+      "mode": "raw marker scan + pre-download trust-root pin",
+      "result": "PASS",
+      "sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe"
+    },
+    {
+      "file": "bootstrap/wheel_lock.py",
+      "findings": [],
+      "mode": "raw marker scan + artifact-lock verifier",
+      "result": "PASS",
+      "sha256": "565c7e1e560f0e5394caf85ff1e16f61b53468884aea561de3cbfc61a863e765"
+    }
+  ],
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003"
+}

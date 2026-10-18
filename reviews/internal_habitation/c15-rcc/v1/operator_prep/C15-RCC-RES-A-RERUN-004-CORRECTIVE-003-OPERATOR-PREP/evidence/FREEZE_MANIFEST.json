@@ -1,0 +1,73 @@
+{
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "generated_utc": "2026-09-28T20:34:06.398662+00:00",
+  "operator_prep_exact_head": "99af8e268a1f9e8944b163d8087005e0e3698620",
+  "python": "3.11.2",
+  "harness_manifest_sha256": "d5f15f1e7de26981ecae7935bdc400239363aad46af6fe4c4b8671ae6754ef72",
+  "harness_file_count": 26,
+  "bootstrap_sha256": "09c655d35a0c1b9be28a210e9ac2d681e964628eb24ce34b5db0ca894772e3b0",
+  "wheel_lock_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+  "wheel_lock_verification_sha256": "f0667af956a9242a1f5317210c5e022ca1133e15fd84b01c3558466e65114d59",
+  "clean_bootstrap_evidence_sha256": "39e028da524990cdef7ee38efcd1646cffa38305d871ac843afe4221d10a7c03",
+  "corrective_candidate_green_sha256": "6b9793ebf63b50a468607e1f7f381594b4a9ca0031e897b15e5526b87a7c441a",
+  "gate_results": {
+    "A": {
+      "status": "PASS",
+      "result_sha256": "50b798551a00888a0c0c17b67d6c46bf24ddbadb6be16cf5becca9a9b4188671",
+      "test_count": 24,
+      "test_ids_count": 24,
+      "execution_total": 24
+    },
+    "B": {
+      "status": "PASS",
+      "result_sha256": "dd4c09b52e7d64768fe7637130386ce83f4a840c91d5629b7e3af00a4a49150a",
+      "test_count": 7,
+      "test_ids_count": 7,
+      "execution_total": 7
+    },
+    "C": {
+      "status": "PASS",
+      "result_sha256": "71dfc76042e694ffb29d0d5928ba8f6fa79c70253e2f818a88bf464632b59864",
+      "test_count": 2,
+      "test_ids_count": 2,
+      "execution_total": 2
+    },
+    "D": {
+      "status": "PASS",
+      "result_sha256": "affafd93cb6c227ceb2bd73eccd635353e088d9230ee7609943992879b974aaf",
+      "test_count": 5,
+      "test_ids_count": 5,
+      "execution_total": 5
+    }
+  },
+  "gate_summary": {
+    "A": {
+      "status": "PASS",
+      "result_file": "gate_a_result.json",
+      "result_sha256": "50b798551a00888a0c0c17b67d6c46bf24ddbadb6be16cf5becca9a9b4188671"
+    },
+    "B": {
+      "status": "PASS",
+      "result_file": "gate_b_result.json",
+      "result_sha256": "dd4c09b52e7d64768fe7637130386ce83f4a840c91d5629b7e3af00a4a49150a"
+    },
+    "C": {
+      "status": "PASS",
+      "result_file": "gate_c_result.json",
+      "result_sha256": "71dfc76042e694ffb29d0d5928ba8f6fa79c70253e2f818a88bf464632b59864"
+    },
+    "D": {
+      "status": "PASS",
+      "result_file": "gate_d_result.json",
+      "result_sha256": "affafd93cb6c227ceb2bd73eccd635353e088d9230ee7609943992879b974aaf"
+    }
+  },
+  "gate_summary_status": "PASS",
+  "launch_packet_present": true,
+  "launch_packet_sha256": "c1ddfa6b2fe89be2a2b9533f2483251f7423eb961755c7777bbab044da8a6f12",
+  "packet_audit_present": true,
+  "packet_audit_sha256": "1aeec08b120ef8d6564cf348c9992afad2e3a0f0b961a02c265b3945cf86d5d2",
+  "frozen_after_gates": true,
+  "freeze_coverage": "SHA256SUMS enumerates every package file including this freeze manifest, except SHA256SUMS itself",
+  "mutation_policy": "after this freeze the bootstrap, harness, tests, gate raw outputs, environment record, manifest and packet are immutable; any change requires a new operator-prep window"
+}
