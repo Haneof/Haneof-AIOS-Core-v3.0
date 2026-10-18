@@ -1,0 +1,8 @@
+PASS  F1-manifest-tamper-detection: recomputed=34b3d8adfad376a9 matches pin=True; single-byte mutation changes digest=True
+PASS  F2-core-tree-substitution: frozen=a9618abe0b3d historical=fe77f8a0706a (distinct)
+PASS  F3-tests-tree-substitution: frozen=92fcbcc58768 historical=815a3a460f14 (distinct)
+PASS  F4-stale-RC-SHA-substitution: packet pins historical RC separately from frozen software; historical RC is ancestor=True
+PASS  F5-merge-ref-identity-mismatch: tree==candidate=True; parents==[frozen,head]=True; src/aios_core==a9618abe=True; tests==92fcbcc5=True; delta==declared packet (24 files)=True; src/tests/pyproject delta=none
+PASS  F6-open-PR-contamination-false-negative: src-touching open PRs=[110, 111, 113, 126] (packet-adjudicated set expected [110, 111, 113, 126]); #126 stale-branch blobs are historical main versions=True; #113/#111/#110 symbols+test modules in frozen main=True
+
+6/6 freeze-integrity probes PASS
