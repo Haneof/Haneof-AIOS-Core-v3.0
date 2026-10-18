@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ResidentExchangeLedgerRecord",
+  "type": "object",
+  "required": [
+    "sequence",
+    "event",
+    "request_id",
+    "request_sha256",
+    "wall_clock_iso",
+    "prev_record_hash",
+    "record_hash"
+  ],
+  "properties": {
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Strictly monotonic 1-based sequence incrementing by 1 for each line."
+    },
+    "event": {
+      "type": "string",
+      "enum": [
+        "request_published",
+        "response_published",
+        "response_consumed"
+      ],
+      "description": "Exchange lifecycle event identity."
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Globally unique decision request identifier echoing Core attempt/round."
+    },
+    "request_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 digest of request file bytes."
+    },
+    "response_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 digest of response file bytes; null for request_published."
+    },
+    "wall_clock_iso": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Contemporaneous UTC ISO-8601 wall-clock timestamp at record append."
+    },
+    "prev_record_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 of previous line's canonical payload; '0'*64 for line 1."
+    },
+    "record_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 over canonical JSON of this record's fields."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional mechanical transport metadata."
+    }
+  },
+  "additionalProperties": false
+}

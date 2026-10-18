@@ -1,0 +1,12 @@
+{
+  "conversation_session_id": "session-user-corr-001",
+  "created_at": "2026-09-28T17:53:29.166316+00:00",
+  "frozen_core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+  "frozen_rc_software": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+  "frozen_tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019",
+  "resident_session_id": "resident-a-rerun-004-corr-001-session",
+  "role": "Real Resident AI \u2014 Fresh Corrective Resident A",
+  "run_id": "c15-rcc-res-a-rerun-004-corrective-001",
+  "subject_id": "user_1",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-001"
+}
