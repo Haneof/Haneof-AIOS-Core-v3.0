@@ -1,0 +1,110 @@
+{
+  "cursor": 9,
+  "occurred_at": "2026-11-04T22:17:00+00:00",
+  "advance": {
+    "from": "2026-11-04T21:42:00+00:00",
+    "to": "2026-11-04T22:17:00+00:00",
+    "task_cycles": [],
+    "periodic_reviews": [],
+    "wake_passes": [
+      {
+        "at": "2026-11-04T22:17:00+00:00",
+        "task_wakes": [],
+        "wake_runs": [
+          {
+            "wake_id": "wake_4cdf3dbd26c0320afc33bb22",
+            "wake_revision": 3,
+            "wake_source": "watch_match",
+            "wake_state": "completed",
+            "delivery_response": "更新：edge-2026.11.4 这次没有推送成功——14:16 registry 上传被拒绝，原因是 checksum mismatch；镜像未发布、tag 未创建、registry 中没有对应 digest。先别通知门店开始测试。我已建立跟进任务（等重新上传结果），并挂了监听：一旦出现新的 release_state 记录，我会立刻核对 tag/digest 并同步给你。",
+            "delivery_suppressed": false,
+            "runtime": {
+              "invoked": true,
+              "response": "更新：edge-2026.11.4 这次没有推送成功——14:16 registry 上传被拒绝，原因是 checksum mismatch；镜像未发布、tag 未创建、registry 中没有对应 digest。先别通知门店开始测试。我已建立跟进任务（等重新上传结果），并挂了监听：一旦出现新的 release_state 记录，我会立刻核对 tag/digest 并同步给你。",
+              "silenced": false,
+              "model_rounds": 5,
+              "termination_reason": "responded",
+              "capabilities": [
+                "inspect_world_object",
+                "create_task",
+                "create_attention_watch",
+                "create_task",
+                "transition_task"
+              ],
+              "model_usage_complete": false
+            }
+          }
+        ]
+      }
+    ],
+    "dimension_summaries": {
+      "at": "2026-11-04T22:17:00+00:00",
+      "invoked": true,
+      "attempted_jobs": 7,
+      "commits": [],
+      "skipped_unchanged": 7,
+      "skipped_empty": 0,
+      "truncated": false
+    },
+    "background_cycles": 0,
+    "world_revision": 53
+  },
+  "user_turn": null,
+  "extra_wake_passes": [],
+  "clock": "2026-11-04T22:17:00+00:00",
+  "next_review_at": "2026-11-05T17:05:00+00:00",
+  "world_revision": 53,
+  "index_watermark": 53,
+  "index_lag": 0,
+  "attention_watch_receipts": [
+    {
+      "note": "cursor_09:pre_advance",
+      "observation_ref": {
+        "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+        "revision": 1
+      },
+      "receipt": {
+        "wake_id": "wake_4cdf3dbd26c0320afc33bb22",
+        "revision": 1,
+        "state": "new",
+        "world_revision": 46,
+        "merged": false,
+        "suppressed": false
+      }
+    }
+  ],
+  "pending_wakes_after_step": [],
+  "handshake_log": [
+    {
+      "request_id": "req-0026-model_directive-47f20c62",
+      "kind": "model_directive",
+      "request_sha256": "sha256:6da17365fd65a1f3b51d8d981ced7a324fa2f0b31493836694fc85068425fe64",
+      "response_sha256": "sha256:7c947212ff2d32554d2b05b63f031238efd39c214b5cb32f618d6cb0e3a11e35"
+    },
+    {
+      "request_id": "req-0027-model_directive-e371ef76",
+      "kind": "model_directive",
+      "request_sha256": "sha256:c1091e9c3eae316f6301ec64e2fab3f4fdc4c67c1ed45e39b52a1ef72c7de7c9",
+      "response_sha256": "sha256:89ddab65316090ad88dd7aaae1feaebb61431401eecd9fbd6d9ff1bf7e64b92d"
+    },
+    {
+      "request_id": "req-0028-model_directive-5b54225f",
+      "kind": "model_directive",
+      "request_sha256": "sha256:96c03343e1479c1e62b7d20b400900c3f0204bf037a14a5bec1d24804ff94a53",
+      "response_sha256": "sha256:2331ec92a01fe845e805a2d55df47e481db24811953c149d681f22f5c4ea1960"
+    },
+    {
+      "request_id": "req-0029-model_directive-08b03f26",
+      "kind": "model_directive",
+      "request_sha256": "sha256:4e7764f2d59f151dfc790b562d160573996bd6e2ff2473a06b3b2be6f8b0a896",
+      "response_sha256": "sha256:aed220010ed9e7dff590411faba1d360ccce806bc6966deeb1d8a752166cb310"
+    },
+    {
+      "request_id": "req-0030-model_directive-161668ec",
+      "kind": "model_directive",
+      "request_sha256": "sha256:dd88e3cca4f001b44d01fd8c284f947a2526804b066a1368c52638c698440dc6",
+      "response_sha256": "sha256:3439916bae3ef79e246eff28bfff071d951b03ffda57665901c3d185d544e534"
+    }
+  ],
+  "completed_at": "2026-09-28T16:55:55.321840+00:00"
+}

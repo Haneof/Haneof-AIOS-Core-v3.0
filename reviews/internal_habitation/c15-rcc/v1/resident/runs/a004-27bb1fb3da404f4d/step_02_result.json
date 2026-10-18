@@ -1,0 +1,32 @@
+{
+  "cursor": 2,
+  "occurred_at": "2026-11-02T17:14:00+00:00",
+  "advance": {
+    "from": "2026-11-02T17:05:00+00:00",
+    "to": "2026-11-02T17:14:00+00:00",
+    "task_cycles": [],
+    "periodic_reviews": [],
+    "wake_passes": [],
+    "dimension_summaries": {
+      "at": "2026-11-02T17:14:00+00:00",
+      "invoked": true,
+      "attempted_jobs": 0,
+      "commits": [],
+      "skipped_unchanged": 0,
+      "skipped_empty": 0,
+      "truncated": false
+    },
+    "background_cycles": 0,
+    "world_revision": 4
+  },
+  "user_turn": null,
+  "extra_wake_passes": [],
+  "clock": "2026-11-02T17:14:00+00:00",
+  "next_review_at": "2026-11-03T17:05:00+00:00",
+  "world_revision": 4,
+  "index_watermark": 4,
+  "index_lag": 0,
+  "pending_wakes_after_step": [],
+  "handshake_log": [],
+  "completed_at": "2026-09-28T16:41:54.869087+00:00"
+}

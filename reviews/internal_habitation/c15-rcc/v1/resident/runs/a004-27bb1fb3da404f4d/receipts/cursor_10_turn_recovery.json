@@ -1,0 +1,16 @@
+{
+  "execution_id": "turnexec_fdfd32c93cf643efa33acbe6ae561af7",
+  "state": "completed",
+  "recovery_disposition": "completed",
+  "assistant_ref": "object_id='obs_conv_ai_0b440b106fa95aedec9a9f64' revision=1",
+  "model_attempts": [
+    "attempt_id='bgattempt_2ca286655baffe95e8cf9935aeab6d16' subject_id='user_1' work_kind='user_turn' work_id='turnexec_fdfd32c93cf643efa33acbe6ae561af7' wake_reason='user_interaction' model_round_index=0 admission_world_revision=54 state='metered' admitted_at=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=datetime.timezone.utc) updated_at=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=datetime.timezone.utc) provider=None model=None provider_request_id=None response_fingerprint='d8e13d4905db3f244f7a5c614de6497e8c089c80e12dae84ddd2cf3ac979250a' meter_record_id='meter_fb1c2d51b925b500552811cd96dc3256' failure_kind=None failure_detail=None reconciliation_evidence=None",
+    "attempt_id='bgattempt_4933387f54a0962be4a9936c30e37b13' subject_id='user_1' work_kind='user_turn' work_id='turnexec_fdfd32c93cf643efa33acbe6ae561af7' wake_reason='user_interaction' model_round_index=1 admission_world_revision=55 state='in_doubt' admitted_at=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=datetime.timezone.utc) updated_at=datetime.datetime(2026, 11, 4, 22, 24, tzinfo=datetime.timezone.utc) provider=None model=None provider_request_id=None response_fingerprint=None meter_record_id=None failure_kind='JSONDecodeError' failure_detail='Expecting value: line 1 column 1 (char 0)' reconciliation_evidence=None"
+  ],
+  "retry_authorized": false,
+  "retry_count": 0,
+  "reconciliation_evidence": "Cursor-10 turn 6 (a004-conversation-fef437192f974e55b376a3bbf3e7f0d5) model round 0 returned and was applied (claim clm_e2d2b8bdbe0a23130e3ad85b committed, attempt bgattempt_2ca286655baffe95e8cf9935aeab6d16 state=metered). Round 1 (bgattempt_4933387f54a0962be4a9936c30e37b13) was marked in_doubt after the resident harness raised JSONDecodeError while reading the local handshake response file mid-write (provider=None, provider_request_id=None, response_fingerprint=None, meter=None). The resident session's exact reply bytes were durably preserved outside Core (decision_responses/req-0032-model_directive-9002a5bb.json sha256=b43589c2c13b3c30686e121b9f3c049b5ad9ff4fe50804a779db00b1797c37a1; reply text sha256=eb7cd7c20aa662715d15d7977d72fad653dbbfe74055e5a88e224705b3c78e3a) and are committed here as the turn's durable assistant output; the turn execution is reconciled to completed without reinvoking the model, per the supported durable-assistant-output recovery path.",
+  "assistant_reply_sha256": "eb7cd7c20aa662715d15d7977d72fad653dbbfe74055e5a88e224705b3c78e3a",
+  "response_file_sha256": "b43589c2c13b3c30686e121b9f3c049b5ad9ff4fe50804a779db00b1797c37a1",
+  "assistant_observation_id": "obs_conv_ai_0b440b106fa95aedec9a9f64"
+}

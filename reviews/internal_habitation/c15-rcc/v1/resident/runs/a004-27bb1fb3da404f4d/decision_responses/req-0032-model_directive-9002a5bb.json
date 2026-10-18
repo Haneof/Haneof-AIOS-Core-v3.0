@@ -1,0 +1,6 @@
+{
+  "request_id": "req-0032-model_directive-9002a5bb",
+  "directive": {
+    "response": "收到，这条我记为长期规则：以后『准备提交、已排队』和『确实完成』分开表述；没有完成记录时按『未确认完成』处理。当前 edge-2026.11.4 按此规则仍属未确认完成（上传被 checksum mismatch 拒绝，无 tag/digest）；我会等新的 release_state 记录出现时核对后再向你确认，先不要让门店开始测试。"
+  }
+}

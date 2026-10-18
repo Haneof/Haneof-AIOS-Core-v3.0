@@ -1,0 +1,60 @@
+{
+  "cursor": 5,
+  "occurred_at": "2026-11-02T20:52:00+00:00",
+  "advance": {
+    "from": "2026-11-02T20:40:00+00:00",
+    "to": "2026-11-02T20:52:00+00:00",
+    "task_cycles": [],
+    "periodic_reviews": [],
+    "wake_passes": [],
+    "dimension_summaries": {
+      "at": "2026-11-02T20:52:00+00:00",
+      "invoked": true,
+      "attempted_jobs": 0,
+      "commits": [],
+      "skipped_unchanged": 0,
+      "skipped_empty": 0,
+      "truncated": false
+    },
+    "background_cycles": 0,
+    "world_revision": 9
+  },
+  "user_turn": {
+    "session_id": "a004-conversation-fef437192f974e55b376a3bbf3e7f0d5",
+    "turn_index": 3,
+    "runtime": {
+      "invoked": true,
+      "response": "好，就按这个节奏固定下来：低风险实现我直接做完、给你结果和关键风险；影响生产、删除数据或产生费用的决定攒到一起，集中一次列给你确认。",
+      "silenced": false,
+      "model_rounds": 2,
+      "termination_reason": "responded",
+      "capabilities": [
+        "record_communication_experience"
+      ],
+      "model_usage_complete": false
+    },
+    "world_revision": 11
+  },
+  "extra_wake_passes": [],
+  "clock": "2026-11-02T20:52:00+00:00",
+  "next_review_at": "2026-11-03T17:05:00+00:00",
+  "world_revision": 11,
+  "index_watermark": 11,
+  "index_lag": 0,
+  "pending_wakes_after_step": [],
+  "handshake_log": [
+    {
+      "request_id": "req-0006-model_directive-41d2c262",
+      "kind": "model_directive",
+      "request_sha256": "sha256:6dc66f88ccbbbdff2318796b9c0baf15b082c1a193f21ccd1d02f63360c6da31",
+      "response_sha256": "sha256:27c7a8e158bf1178fbe8810aaeb4d07cfaba68f7e7bbcda91ffab96675bcf70d"
+    },
+    {
+      "request_id": "req-0007-model_directive-88b1fa9b",
+      "kind": "model_directive",
+      "request_sha256": "sha256:0a41026b7c60075ff06a03b4f720ec94e3357bbff27dfebc6e74cca7683d3cd6",
+      "response_sha256": "sha256:41667666530bec55f033ddf2cc2f36c47915ee2e83f11e2a53aad411ef92eff7"
+    }
+  ],
+  "completed_at": "2026-09-28T16:45:23.338848+00:00"
+}

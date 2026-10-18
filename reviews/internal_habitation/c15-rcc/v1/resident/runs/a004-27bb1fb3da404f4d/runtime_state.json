@@ -1,0 +1,10 @@
+{
+  "clock": "2026-11-06T19:10:00+00:00",
+  "next_review_at": "2026-11-07T17:05:00+00:00",
+  "last_cursor": 13,
+  "session_turns": {
+    "a004-conversation-fef437192f974e55b376a3bbf3e7f0d5": 7
+  },
+  "world_revision_at_init": 0,
+  "watch_watermark": 86
+}

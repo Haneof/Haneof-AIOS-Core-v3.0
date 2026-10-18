@@ -1,0 +1,19 @@
+{
+  "request_id": "req-0036-model_directive-44771227",
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "transition_task",
+        "arguments": {
+          "task_ref": {"object_id": "task_4377152685579d5c34ed2549", "revision": 3},
+          "new_state": "running",
+          "reason": "开始执行发布确认：核对 tag/digest 记录并完成通知用户与门店的收尾动作。",
+          "evidence_refs": [
+            {"object_id": "obs_c14_fixture_291beec37165eb34a35f8f85", "revision": 1}
+          ],
+          "next_step": "核对 PUBLISHED 记录（tag/digest）→ 通知用户与门店 → 关闭跟进。"
+        }
+      }
+    ]
+  }
+}

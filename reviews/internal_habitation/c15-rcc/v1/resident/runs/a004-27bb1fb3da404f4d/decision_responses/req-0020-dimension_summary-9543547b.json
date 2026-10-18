@@ -1,0 +1,4 @@
+{
+  "request_id": "req-0020-dimension_summary-9543547b",
+  "text": "2026-11-03 dim:ai_user_understanding：新增删除授权边界 claim（clm_c46c3c4aceac5be2f639ee67，confidence 0.95）——删除 production 旧索引前必须提交具体对象、影响范围与回滚方案并获用户明确确认，模糊随口表述不构成删除授权。证据集 coverage 2/2（用户删除边界消息 + 两周约定首条消息），无反证。当日该维度仅此一条认知新增，此前约定 claim（rev 2）维持不变。"
+}
