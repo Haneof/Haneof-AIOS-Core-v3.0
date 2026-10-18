@@ -1,0 +1,33 @@
+{
+  "kind": "capability_calls",
+  "capability_calls": [
+    {
+      "name": "transition_task",
+      "call_id": "a003-dec00018-c1",
+      "arguments": {
+        "task_ref": {
+          "object_id": "task_835d0a7919485a65096f04ba",
+          "revision": 3
+        },
+        "new_state": "waiting_user",
+        "reason": "周期审查发现 task next_step 过时：两项 staging 工作已合入完成（CI 48/48、smoke 通过），协作期继续但当前在等待用户释放下一批工作项；running→ready 被状态机拒绝，waiting_user 是当前真实状态",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_conv_user_f7b830f25b3697bd8bca5e04",
+            "revision": 1
+          }
+        ],
+        "next_step": "已交付并验证：测试索引冲突解除、日志保留调整完成（CI 48/48、staging smoke 通过、无 production 变更）。现等待用户释放下一批工作项；继续按协议汇报结果与关键风险，生产删除/影响生产/费用事项一次性集中决策"
+      }
+    }
+  ],
+  "provenance": {
+    "provider": "arena-agent-mode",
+    "model": "resident-a-fresh-instance",
+    "request_id": "a003run-01c3a44b-dec00018"
+  }
+}

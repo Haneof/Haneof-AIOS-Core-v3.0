@@ -1,0 +1,5 @@
+BRIDGE_DECISION_REQUEST /home/user/a003_run/decisions/pending/dec-00023.json
+BRIDGE_DECISION_ACCEPTED dec-00023 kind=capability_calls
+BRIDGE_DECISION_REQUEST /home/user/a003_run/decisions/pending/dec-00024.json
+BRIDGE_DECISION_ACCEPTED dec-00024 kind=response
+{"assistant_observation_id": "obs_conv_ai_4d32ee643638327289979988", "idempotent_replay": false, "model_rounds": 2, "response": "规则收到并已固化：『准备提交/已排队』与『确实完成』从现在起严格分开表述，没有完成记录一律按未确认完成处理。另外有一个你后台可能还没看到的记录要同步给你：14:16 registry 实际拒绝了一次上传尝试，原因是 checksum mismatch——所以 edge-2026.11.4 目前不仅是 tag 没出来，而是根本没有发布成功（registry 中没有对应 digest）。在 checksum 问题解决并重新上传成功之前，请先不要通知门店开始测。我这边会盯着下一条发布状态记录。", "silenced": false, "status": "turn_completed", "summary_commits": 0, "summary_error": null, "termination_reason": "responded", "user_observation_id": "obs_conv_user_454b687321cebbc7608323de", "world_revision": 35}

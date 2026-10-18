@@ -1,0 +1,18 @@
+{
+ "stage": "attempt_reconciled_not_submitted",
+ "state": "started",
+ "attempts": [
+  {
+   "attempt_id": "bgattempt_e70cedf7b64cf6f18d78253ac8382df0",
+   "state": "not_submitted",
+   "recovery_disposition": "safe_to_retry"
+  }
+ ]
+}
+{
+ "stage": "retry_authorized",
+ "state": "started",
+ "retry_authorized": true,
+ "retry_count": 1,
+ "reconciliation_evidence": "Second retry authorized after attempt reconciliation to not_submitted. Bridge defect fixed and unit-verified (counter increments, decision roundtrip mechanics). Runtime inputs unchanged (subject user_1, session resident-a003-0f5ffeff-3d67-4e06-be86-aa83bbea6ad0, turn 1, canonical text, occurred_at 2026-11-02T17:05:00Z); canonical USER observation obs_conv_user_4c8e9b2b461d49d54a6b9b2c@1 unchanged. Resident authorizes one mechanical retry."
+}
