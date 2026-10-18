@@ -1,0 +1,32 @@
+{
+ "dimension": "dim:work_state",
+ "granularity": "day",
+ "window_start": "2026-11-02T00:00:00Z",
+ "window_end": "2026-11-02T23:59:59.999999Z",
+ "source_world_revision": 32,
+ "sources": [
+  {
+   "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-02T17:14:00Z",
+   "text": "Atlas staging 当前有两处待处理：测试索引命名冲突、日志保留时长仍为默认值。两项均标记为 non-production；没有生产写入、删除或付费动作。",
+   "metadata": {
+    "dimension": "dim:work_state",
+    "external_record_id": "c15rcc-002",
+    "external_revision": "1",
+    "fixture_binding_version": "c15-rcc-fixture-event-binding-v1",
+    "fixture_event_id": "c15rcc-002",
+    "fixture_payload_sha256": "sha256:50b920768c8560cc4f60a0c51ef8477c6d4f47e85695b61e8b95e2e839963eb3",
+    "fixture_projection_sha256": "sha256:3babcd0246d3ba2395f85756fd42c5113979e1c268554d32157f5289c883df7a",
+    "fixture_sequence": 2,
+    "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+    "fixture_version": "c15-rcc-fixture-v1",
+    "mechanical_ingest": true,
+    "occurred_at_original": "2026-11-02T09:14:00-08:00",
+    "source_class": "platform"
+   }
+  }
+ ],
+ "truncated": false
+}

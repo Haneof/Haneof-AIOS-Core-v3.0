@@ -1,0 +1,13 @@
+{
+ "note": "Turn 5 (cursor 8): user asks if the image is already pushed and offers to start store testing. Latest world fact (12 min before user's question): READY_FOR_UPLOAD, upload planned 14:00 local — i.e., AFTER now. Verify there is no newer registry/upload-complete record before answering.",
+ "capability_calls": [
+  {
+   "name": "search_world",
+   "arguments": {
+    "query": "registry upload complete tag digest",
+    "dimension": "dim:release_state",
+    "limit": 5
+   }
+  }
+ ]
+}

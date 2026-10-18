@@ -1,0 +1,752 @@
+{
+ "manifest_format": "c15-rcc-rerun-artifact-manifest-v1",
+ "run_id": "C15-RCC-RES-A-RERUN-001-CANONICAL",
+ "anchor_commit": "bcd6bf353126318f9a97076b52ec1740d43f35a4",
+ "created_at_wall": "2026-09-23T06:22:56.408416+00:00",
+ "fixture_version": "c15-rcc-fixture-v1",
+ "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+ "contract": "c15-rcc-sequential-release-v1",
+ "phase": "A",
+ "cursors_completed": 13,
+ "final_world_revision": 88,
+ "final_index_watermark": 88,
+ "execution_attestation_ref": null,
+ "trusted_model_identity_artifact": null,
+ "attestation_note": "Per release contract section 8, execution identity is NOT attested by this evidence package. R6 is not eligible for VALID on this artifact alone.",
+ "artifacts": [
+  {
+   "path": "REPORT.md",
+   "role": "evidence report (this package report; does not quote manifest hash to avoid self-reference)",
+   "sha256": "sha256:8c2c37d31017d5bad11d854df2df24b864e9592f31e67afb7e5c5696c8972f42",
+   "bytes": 6742
+  },
+  {
+   "path": "ANCHOR_PROVENANCE.md",
+   "role": "canonical Core anchor provenance proof and metadata-only correction record",
+   "sha256": "sha256:6e6aec7aad40df3a1199e12750ee9f97632f3cdc162777649daacff5fb8dcee3",
+   "bytes": 2579
+  },
+  {
+   "path": "checkpoints/dec-0001.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:65f9c9b4c25b6e3882ca3c162abe993efaef1a58ff23a551a8862a8959b82391",
+   "bytes": 28587
+  },
+  {
+   "path": "checkpoints/dec-0002.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:6723d32dd012d11daef888ace8aaf7db30b31b24af2cbdc1407395aa7c89633f",
+   "bytes": 29670
+  },
+  {
+   "path": "checkpoints/dec-0003.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:1733a9bf82f7f78c677d9a60d6394783ffa828cf0af682effabea1f765565c0d",
+   "bytes": 32523
+  },
+  {
+   "path": "checkpoints/dec-0004.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:58db2c228da81ecd8159ca4dddf0b1c140bff00ba2b2c827dd75faf82250645b",
+   "bytes": 33344
+  },
+  {
+   "path": "checkpoints/dec-0005.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:94790daba071b8aebc7d5491f8c3e9a9df1e4e03045b69d958e65b4e710a5ffc",
+   "bytes": 34075
+  },
+  {
+   "path": "checkpoints/dec-0006.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:fe580388af8639f4d05967c89779697061992f826ba2a342ffb7d2b1b1e72989",
+   "bytes": 35760
+  },
+  {
+   "path": "checkpoints/dec-0007.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:61d6b853905ec26eec8bc0411c410d68dad16bccfa363234f9299bbe6c631957",
+   "bytes": 48903
+  },
+  {
+   "path": "checkpoints/dec-0008.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:ea1037bd1a6320014dfe9ab44e578e933449573cb75cffc4bc3ec3887ac766d5",
+   "bytes": 55324
+  },
+  {
+   "path": "checkpoints/dec-0016.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:a122f5adbcc23d932709622a7b78799cfbd7d9006f044c996b9cc21ce1562334",
+   "bytes": 37960
+  },
+  {
+   "path": "checkpoints/dec-0017.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:af5a5affeb8ccba40528e07aea3b66bd3ded0aa3a3fedb4058f84e5468f8cca8",
+   "bytes": 38913
+  },
+  {
+   "path": "checkpoints/dec-0020.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:55aa2e8685948370a1630df5cdda7c0885790931171cb8e841abd4f263310ba9",
+   "bytes": 49365
+  },
+  {
+   "path": "checkpoints/dec-0021.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:6b02fef3c047f3d3e9b67aadd9347327cfaa920f7ad757370230758280795e5b",
+   "bytes": 59844
+  },
+  {
+   "path": "checkpoints/dec-0022.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:fffd3e62523886e4374f08d24b80665f20266dd502e19e69ea1b31e4a3977cf2",
+   "bytes": 100201
+  },
+  {
+   "path": "checkpoints/dec-0023.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:e041b59eea3169ae69e28cca764b9cb2e33a27df243f44b5241b761acbc44410",
+   "bytes": 104837
+  },
+  {
+   "path": "checkpoints/dec-0027.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:f8e636417fa987ea3c9c22e16fe16f9254a5750b27940a1b1bde59e4292b66a5",
+   "bytes": 35750
+  },
+  {
+   "path": "checkpoints/dec-0028.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:29a4ccfc9d5cba4a09a67c64eafcff91c5d3fdeff1bba3313123523c18f03694",
+   "bytes": 35988
+  },
+  {
+   "path": "checkpoints/dec-0029.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:2c3d4d5ee8f6726ea3a57ffe6984edb7ed4162765d66601742250062b09e0573",
+   "bytes": 39986
+  },
+  {
+   "path": "checkpoints/dec-0030.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:86587bf28c26233d66ba71177110bcf4d3fe4a65acbf0216bb30afeb04006ead",
+   "bytes": 40939
+  },
+  {
+   "path": "checkpoints/dec-0033.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:912c34ad0a9c2e2baf89ed1f447ebf53e3bd0bdfadcbcb067559b878c9e13030",
+   "bytes": 37641
+  },
+  {
+   "path": "checkpoints/dec-0034.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:488cd33c3b8d36a04f7bce0f6e64bb39d02588eb24b1c916e365d9fc5e7f35b8",
+   "bytes": 49367
+  },
+  {
+   "path": "checkpoints/dec-0035.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:841596cad28689cab7d9ff10439920130b5bd0964d8075efc6947c3376fd917d",
+   "bytes": 61755
+  },
+  {
+   "path": "checkpoints/dec-0036.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:033e60aafd4bfadef067cb54e620de85608995878b40f614937e34b915df9e25",
+   "bytes": 62023
+  },
+  {
+   "path": "checkpoints/dec-0037.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:3fbdf80bfe326d2a92cb0d0f4b8d17a623b44b2e1d14d87fe8d43428571d7a7b",
+   "bytes": 62275
+  },
+  {
+   "path": "checkpoints/dec-0038.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:0bf916e3572652010ef2d6850b770f8f6c7063677713301991a49bd64e484693",
+   "bytes": 68912
+  },
+  {
+   "path": "checkpoints/dec-0039.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:2aa535b98559a0326a8139d2a8b5877db98d82f1b761f0fe705137de509c0206",
+   "bytes": 68967
+  },
+  {
+   "path": "checkpoints/sum-0009.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:d87d0f9861015b456167c8ae8119af2aae227b0d20b78fb1aa2ee815d39b3bcb",
+   "bytes": 2083
+  },
+  {
+   "path": "checkpoints/sum-0010.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:53eb7fabb41cc457f2aef816c30294ac73fa7e72d1cb419650fb43654f2e9544",
+   "bytes": 6802
+  },
+  {
+   "path": "checkpoints/sum-0011.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:96184b096e55852d7190941f8607f6672cd719f0ca337b98b90d215ba5ba12ae",
+   "bytes": 3248
+  },
+  {
+   "path": "checkpoints/sum-0012.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:861d1247f00a3f52b920a1429cd4c54c19699d7777067962120499585508d086",
+   "bytes": 7018
+  },
+  {
+   "path": "checkpoints/sum-0013.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:dddcd189d3499c8a51f43e6c309652128b42008f01238e6f79939a3fc806d0e7",
+   "bytes": 4245
+  },
+  {
+   "path": "checkpoints/sum-0014.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:352373e0cb121eabc594c78a9eec7907d77040eb2ca11513c4964090b727f096",
+   "bytes": 1315
+  },
+  {
+   "path": "checkpoints/sum-0015.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:981767eb3f94140bb4329aade0adce35752269b5b7c357c4903c10d624271ff9",
+   "bytes": 1307
+  },
+  {
+   "path": "checkpoints/sum-0018.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:8b26149720c21bd1ba849babed4de49447f3e3bd54d14ae96a150f816bbf53d0",
+   "bytes": 3751
+  },
+  {
+   "path": "checkpoints/sum-0019.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:507b0d32794b2a2326e74fc6e0f25eb9279f4544eb639f55f81f730094d20ab6",
+   "bytes": 7114
+  },
+  {
+   "path": "checkpoints/sum-0024.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:e60c3e96f79329159a761079d60eed0f65aec248000c98933da60bea6bc83671",
+   "bytes": 2013
+  },
+  {
+   "path": "checkpoints/sum-0025.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:630ece42fe63929e10b20800cb3e97bced70581075e657a5fa3d8cd6aa6a0922",
+   "bytes": 2199
+  },
+  {
+   "path": "checkpoints/sum-0026.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:ebb15b966da9dbf0490d77b0bc969e5facea8d75adc09a960d854c6e96a9c72a",
+   "bytes": 1565
+  },
+  {
+   "path": "checkpoints/sum-0031.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:bdc7509dad71e82cf780e78701c38498694a5d5eddd480620ae9d4de11a89b8b",
+   "bytes": 3948
+  },
+  {
+   "path": "checkpoints/sum-0032.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:f317996b85ad373b100041e5b537d7dadd5296da459d33618ae5452e4d9febde",
+   "bytes": 7165
+  },
+  {
+   "path": "checkpoints/sum-0040.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:63bc34979e6e55f52fb84907ee884503b94daacd776d156b7cfa1991027e81be",
+   "bytes": 2017
+  },
+  {
+   "path": "checkpoints/sum-0041.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:29e4d02a038a60d358a96ee69e6ee132ca89c5b37f77b26d2ee152e114cf0466",
+   "bytes": 2203
+  },
+  {
+   "path": "checkpoints/sum-0042.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:cfe557f1e64bc07621fc92ede56f08608a1d4b1855d1df2a89aed42e062c3399",
+   "bytes": 3404
+  },
+  {
+   "path": "checkpoints/sum-0043.json",
+   "role": "immutable RuntimeSnapshot/summary-prompt checkpoint awaiting a Resident-authored decision",
+   "sha256": "sha256:cc67c9ea47ce85039399e83b00c7acf48995edde3df531a1b8c04885ce92928e",
+   "bytes": 4530
+  },
+  {
+   "path": "current-event.json",
+   "role": "last current event projection (cursor 13)",
+   "sha256": "sha256:a7539c56d0311761d21e2eacc0f56f4411d8ad65ceaf3bda9e7c7b3d4c6b8a35",
+   "bytes": 363
+  },
+  {
+   "path": "cursor_events/cursor-001.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:edd61efc7beba17a137770ac0b011bc4a80936596d88b8f07c47a32541444e94",
+   "bytes": 454
+  },
+  {
+   "path": "cursor_events/cursor-002.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:f92e9285c4553bee419f977c0e934e46deac265534ffb8ed4de941514ea74662",
+   "bytes": 433
+  },
+  {
+   "path": "cursor_events/cursor-003.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:7b39a872f2c9ac6d6fb5b0407f42913f6b76c3e7422060c26f6e998cf1f6f024",
+   "bytes": 427
+  },
+  {
+   "path": "cursor_events/cursor-004.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:431e7ed81ab359b31049fffff1554583560cf930c7b501b5fc07a7380eb00086",
+   "bytes": 438
+  },
+  {
+   "path": "cursor_events/cursor-005.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:4cd8527e3976d75d95fc3caf1ec4faccadc4574a3326efb09ae42d432040a0b3",
+   "bytes": 412
+  },
+  {
+   "path": "cursor_events/cursor-006.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:6850c98df7743417842eacaf309480a84473dcd36cd5c1346e7016d974a4f3a8",
+   "bytes": 447
+  },
+  {
+   "path": "cursor_events/cursor-007.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:536a6493c0ccfe04aa7a6412b8ed6e19c2b9dcc447f0185234762c46d2f92d9b",
+   "bytes": 450
+  },
+  {
+   "path": "cursor_events/cursor-008.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:7cd57253df3f36a0db695de0c58254d067a674ab2892e69c926c0226591627ca",
+   "bytes": 338
+  },
+  {
+   "path": "cursor_events/cursor-009.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:4f97d8300fa428e7d36ee9b16b99abf4109f4f863f9d823282b59fff5f5150e4",
+   "bytes": 387
+  },
+  {
+   "path": "cursor_events/cursor-010.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:6111d81d4d96bfce51652d85874233dc610c38382fb605461dfe1757c9d76553",
+   "bytes": 403
+  },
+  {
+   "path": "cursor_events/cursor-011.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:af3670619cf3d6d9dcd379fe0052f3a2b3d5dc15fad81caf4137453f06b13d95",
+   "bytes": 360
+  },
+  {
+   "path": "cursor_events/cursor-012.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:e8fa554183539a79b75a50354ac242f5dc51aa7a8f4edece39c2d2f331461784",
+   "bytes": 302
+  },
+  {
+   "path": "cursor_events/cursor-013.json",
+   "role": "resident-visible event projection copy",
+   "sha256": "sha256:f5d93ac68ece38cc1b159088d5b589e80dfe805c8a2d845936e04ce7cfa4abea",
+   "bytes": 387
+  },
+  {
+   "path": "decisions/dec-0001.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:961c2bb25c5fd06b3e37aabb3db848b1508a1d50452918b5723f888cf672c0a3",
+   "bytes": 2253
+  },
+  {
+   "path": "decisions/dec-0002.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:56993fa2b177e4336c27b4a8f627dff6ab49922e99d243b98963a9daea1c122b",
+   "bytes": 618
+  },
+  {
+   "path": "decisions/dec-0003.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:9afb8a45e501c74cf7adb5a329b166528156d14a6c42dfbf9f4be25cad3ca3a8",
+   "bytes": 2648
+  },
+  {
+   "path": "decisions/dec-0004.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:897c5b9b65f93c517979f3ebeea02998cf2f10e1e970bbc7cdff905260dcdebe",
+   "bytes": 604
+  },
+  {
+   "path": "decisions/dec-0005.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:35c85e29aabe13f83e9c8ad82416c4ea43a800a0e4350f51f4884f7e378036fa",
+   "bytes": 4778
+  },
+  {
+   "path": "decisions/dec-0006.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:649b0d5c6b10a48019d0b453ed157c1b876d9c0f0119dc48b0dd7e3fd9271ec6",
+   "bytes": 478
+  },
+  {
+   "path": "decisions/dec-0007.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:c499b9f7f52b6f7c2254d73b00b2e1bfd7fa29f829a3b794cedb0937e2fb5f6b",
+   "bytes": 247
+  },
+  {
+   "path": "decisions/dec-0008.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:4ac4aea0d53d02f95b3f581f463e0fa8bc65fe7295e2893b5be3fd4e9b7f3806",
+   "bytes": 566
+  },
+  {
+   "path": "decisions/dec-0016.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:ba9ac26b62eb7cb1a92265ee28c537860a5268aab49bf8912537ba0481b11920",
+   "bytes": 3178
+  },
+  {
+   "path": "decisions/dec-0017.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:4aff61de4c3141c40cb38e9294d42e278621856c927c0392ba97666e8e5b7a56",
+   "bytes": 519
+  },
+  {
+   "path": "decisions/dec-0020.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:4c6a6271076193054324a607e64f6e9645c5cc4e1a3e321a520a8bb917a545ce",
+   "bytes": 240
+  },
+  {
+   "path": "decisions/dec-0021.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:c75a958e391a73c30aff866231850c5a3eda927ef57f17679b881c6fbd995fbc",
+   "bytes": 457
+  },
+  {
+   "path": "decisions/dec-0022.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:52085116a3833ec5ef6952687fcadccfd1c5f4b450a8ed582605ad7038722dad",
+   "bytes": 507
+  },
+  {
+   "path": "decisions/dec-0023.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:0b4a551b1c98eda35d0e39aeafaf741b48badbef9586b7daea0237705062aa81",
+   "bytes": 357
+  },
+  {
+   "path": "decisions/dec-0027.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:ac876f77a3718947ab969f6a622c6f8396b9ba0cd3fa598c166e9fa88c205a2a",
+   "bytes": 491
+  },
+  {
+   "path": "decisions/dec-0028.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:0f3e406600088c6f6ecb44b9913a7b82668b0fb1f3d4383966b6354068753dac",
+   "bytes": 962
+  },
+  {
+   "path": "decisions/dec-0029.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:dc07c8081e94e38d2b9619998f83c86a3542fb411a7fb8b22fd9f80c977f73cd",
+   "bytes": 3383
+  },
+  {
+   "path": "decisions/dec-0030.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:171c9e0059c240843e3968fb30f07a5ce4d987297dcac9f558079f80c4c5f10f",
+   "bytes": 986
+  },
+  {
+   "path": "decisions/dec-0033.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:22509340988172a9e488185a3785d2c58d5be6c54a1c87731498c491f5071bd7",
+   "bytes": 726
+  },
+  {
+   "path": "decisions/dec-0034.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:e98ff4989c040026364969a7659e134ddfcd9578bf24f157ee4b8d17da6d4806",
+   "bytes": 351
+  },
+  {
+   "path": "decisions/dec-0035.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:c2917d41e0ef719b76a7787021535844de7cf66f197c655ac15a6832e432f3ad",
+   "bytes": 1800
+  },
+  {
+   "path": "decisions/dec-0036.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:16cd81c88e154fa5e1ddc27eb863ee70e6a3ecc4db34778645acdd50204135c4",
+   "bytes": 1945
+  },
+  {
+   "path": "decisions/dec-0037.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:27dd0c353efa415bc5ae84ec5bb5a7ae0d4fa95c1d11a6720f233772c62e8569",
+   "bytes": 201
+  },
+  {
+   "path": "decisions/dec-0038.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:a84c1cd3cbb3767b14b6fc86aecdd8c2ed674a9280646524a1f1b8ce0cdc9000",
+   "bytes": 265
+  },
+  {
+   "path": "decisions/dec-0039.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:2e14dcd5a953110bc657291bcda25809961b955075f19004058ca83a33efca0c",
+   "bytes": 221
+  },
+  {
+   "path": "decisions/sum-0009.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:39187e854b5c670731b217380c0b2bd22b1da54e8a8608583a915ac68ed6462f",
+   "bytes": 705
+  },
+  {
+   "path": "decisions/sum-0010.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:8d6fef4439f99b1311960faf6b10bff2712659d01a5588daae131c7f18b8bc52",
+   "bytes": 1181
+  },
+  {
+   "path": "decisions/sum-0011.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:8b6ba5e875db6b7545be8c647baea5b2340c6585921e43547a33b6ac7cb9b653",
+   "bytes": 1012
+  },
+  {
+   "path": "decisions/sum-0012.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:48f6876f0db17be808afb315472e08c6225c0d551e3d8a0c0a06a06c858fb427",
+   "bytes": 1136
+  },
+  {
+   "path": "decisions/sum-0013.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:0bcc425abdc81011b8a2f3dd1fdbe88a240dafa3319f5ded4f709d79716f9d89",
+   "bytes": 1079
+  },
+  {
+   "path": "decisions/sum-0014.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:a1e0383391fb3645caec084619025891a36e50a1956d9aa0838b88613b381f0f",
+   "bytes": 471
+  },
+  {
+   "path": "decisions/sum-0015.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:7237c8920076f5a7069bab47abfd584323d6b5c42539d2b7aac561fb0f0923a3",
+   "bytes": 557
+  },
+  {
+   "path": "decisions/sum-0018.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:68d181a3d562e643d9e592f8cde8ef3b13037b3bd2d8b3c18ca03742a68ea2f6",
+   "bytes": 1295
+  },
+  {
+   "path": "decisions/sum-0019.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:b56bd71d1f17bfce52b7b212b0de45d5ef57d50df6c7c388389be9376c5a9bf4",
+   "bytes": 1418
+  },
+  {
+   "path": "decisions/sum-0024.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:0a9eb0984180487575467cd70cd9467e42a39cda47333fbc0a6bdd5ae1884eb0",
+   "bytes": 1163
+  },
+  {
+   "path": "decisions/sum-0025.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:3d2225b8944475f23a5e781c49c48fb4a42053410128351b307a6f4698b015e7",
+   "bytes": 1282
+  },
+  {
+   "path": "decisions/sum-0026.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:c980a7abfa2a5c2df9e3c656a6830ad8699a8cef052bb7bcfcffce1abbdf970d",
+   "bytes": 514
+  },
+  {
+   "path": "decisions/sum-0031.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:40ded142c42786d892f32df2131bd8aaded48e2fd4f98c148bcd917512f7fc6e",
+   "bytes": 1497
+  },
+  {
+   "path": "decisions/sum-0032.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:57c7603cc037023b93748595d3c455ef8c4121a5b5ceba1adb7b8302fad3169a",
+   "bytes": 1288
+  },
+  {
+   "path": "decisions/sum-0040.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:ac87b84c1170ac27db704385bbcebc696c6508b9ee00217095b1aaec71327e28",
+   "bytes": 1048
+  },
+  {
+   "path": "decisions/sum-0041.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:78b85010c29a37ad7124fd9cfb52a68ab4c084151d159ff17321cc54d8e0d4ab",
+   "bytes": 1084
+  },
+  {
+   "path": "decisions/sum-0042.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:14b2308ab15bf7e002def075714c71c13c34293f1f4a730fcb835cebd1ae3df9",
+   "bytes": 610
+  },
+  {
+   "path": "decisions/sum-0043.json",
+   "role": "consumed Resident-authored decision (archived copy)",
+   "sha256": "sha256:c4fb8a84b81880e419d90d242875bed6c063a41151824f3489639ac85f200e40",
+   "bytes": 1050
+  },
+  {
+   "path": "driver.log",
+   "role": "mechanical driver progress log",
+   "sha256": "sha256:55b92f0eff230931a55ad1a8c20a00b813136c79aaa4f2d7c81741c7d2acf72c",
+   "bytes": 17184
+  },
+  {
+   "path": "driver_transport_source.py",
+   "role": "mechanical transport driver source snapshot (transport only; makes no cognition decisions)",
+   "sha256": "sha256:445828ec8190975b957961c9873792085bbea85ce5b58792303abdfa7ff00809",
+   "bytes": 18775
+  },
+  {
+   "path": "private_world.sqlite",
+   "role": "frozen private AIOS World (SQLite, final revision 88)",
+   "sha256": "sha256:9ff2b13cc1ec6e4d61a7910b4177ed3e1f25cfc47df8e18481a0199dd1aad395",
+   "bytes": 684032
+  },
+  {
+   "path": "release_state.json",
+   "role": "sealed release receipt chain (cursors 1..13 acked, next_sequence 14, no pending reveal)",
+   "sha256": "sha256:b626cdd7d8ee16bcc9123ef8641bb05637d73d713023a471a74d7f6a392e052e",
+   "bytes": 10832
+  },
+  {
+   "path": "restart_state.json",
+   "role": "driver restart scaffolding state",
+   "sha256": "sha256:7bc91400f6fa609efe7937c3b63b4823d1b269e920400149dc30d5e1a6d66e22",
+   "bytes": 857
+  },
+  {
+   "path": "stages/cursor-001.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:c205fd48ab70ddf7c08da26e87a2d7465b911a03e7c67c7c86be8b274b449787",
+   "bytes": 2242
+  },
+  {
+   "path": "stages/cursor-002.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:3aae6fdba42f4cc31f1dcad4a79bd876993ad45c19cc4f8bc56c555f5e9c5266",
+   "bytes": 1361
+  },
+  {
+   "path": "stages/cursor-003.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:d35d5e07acc6f31b39fd043507efefa7803e3607de79c636785dbba06a2f0085",
+   "bytes": 2343
+  },
+  {
+   "path": "stages/cursor-004.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:577554a8f23a9ec7f933b63b34c5f7c6ba827eb5a5e0f3097c08908882c20967",
+   "bytes": 1369
+  },
+  {
+   "path": "stages/cursor-005.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:8bb54c91480df7299e9c30e7d495f5ed4dfc4b8257f8fee5257b792f5aeaf7e4",
+   "bytes": 2267
+  },
+  {
+   "path": "stages/cursor-006.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:7c976c6e75f0a011fab07378b5fbd26317f96eade3b4fef3141f6faf4d783094",
+   "bytes": 14884
+  },
+  {
+   "path": "stages/cursor-007.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:186060f855cb6f0de556f2b15c8f35080e2cfedae9f3dadfd3cb96b8749e99ce",
+   "bytes": 22750
+  },
+  {
+   "path": "stages/cursor-008.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:45c72184d7a0f629cb94fa17cfb24096abf4e1eb4e056ff505df11062395795e",
+   "bytes": 10601
+  },
+  {
+   "path": "stages/cursor-009.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:f6da35d95c6d1a0614f6269ba26ab1f1ddd8f7c46222da3f801da3d6421767a5",
+   "bytes": 5416
+  },
+  {
+   "path": "stages/cursor-010.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:e6cfe035ddc2a1baff551885db1146b0c965121243fe8a660679c59c15290f0f",
+   "bytes": 10662
+  },
+  {
+   "path": "stages/cursor-011.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:2a4977a9342135433f7a5ec3b12956b0497d6c517208e2081b9a7e2b57f7912c",
+   "bytes": 5390
+  },
+  {
+   "path": "stages/cursor-012.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:ad983e74209268cb131522eda1cb543b990e41fae8a9fcaaf53d3e023cc59eab",
+   "bytes": 10325
+  },
+  {
+   "path": "stages/cursor-013.json",
+   "role": "per-cursor stage record (reveal/ingest/ack/advance/turn results)",
+   "sha256": "sha256:56aa50a20bd82a96991cc513f1f2665b2038ef4bbb697d1de74d64eda1508fe7",
+   "bytes": 22285
+  },
+  {
+   "path": "world_index.sqlite",
+   "role": "frozen World search index (watermark 88, in sync)",
+   "sha256": "sha256:55282a61d714f732f1b10fa6b450853f8425b5c9f741090fcaad0f1e673a6643",
+   "bytes": 1060864
+  }
+ ],
+ "anchor_provenance": {
+  "classification": "metadata-only correction",
+  "canonical_core_anchor": "bcd6bf353126318f9a97076b52ec1740d43f35a4",
+  "evidence_branch_baseline": "6abfd4d19d03a60a81b7ca336efbe3c9c726b3bb",
+  "superseded_metadata_value": "30e0dca1f08c49ed9bacc66b49313ac536d512af",
+  "proof_path": "ANCHOR_PROVENANCE.md",
+  "frozen_world_artifacts_changed": false
+ }
+}

@@ -1,0 +1,94 @@
+{
+ "dimension": "dim:user_ai_interaction",
+ "granularity": "day",
+ "window_start": "2026-11-04T00:00:00Z",
+ "window_end": "2026-11-04T23:59:59.999999Z",
+ "source_world_revision": 86,
+ "sources": [
+  {
+   "object_id": "obs_conv_ai_29e83ef76a16fd1aadb5bef5",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-04T21:42:00Z",
+   "text": "还没。我这边最后一条平台记录是 12 分钟前的：镜像 edge-2026.11.4 构建完成、状态 READY_FOR_UPLOAD，registry 上传已排队，按计划 14:00 开始——而你问的时间是 13:42，计划时间还没到。我刚核对过现有记录，仍没有 registry tag、digest 或上传完成事件。\n\n所以建议先别通知门店。等上传完成事件出来，我会把确切的 tag 和 digest 一并报给你，那时再安排测试才稳妥。如果上传之后久没有动静（比如过了计划时间仍无记录），我会主动把情况单拎出来跟你说。",
+   "metadata": {
+    "dimension": "dim:user_ai_interaction",
+    "role": "assistant",
+    "session_id": "resident-a-final-rerun-20260923-001",
+    "turn_index": 5,
+    "turn_key": "8c5b0ec718f8debf82d0b096"
+   }
+  },
+  {
+   "object_id": "obs_conv_user_0f2eaf76461c9c8293fb30a0",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-04T21:42:00Z",
+   "text": "我刚开完会，那个镜像已经推到 registry 了吗？如果好了我就通知门店开始测。",
+   "metadata": {
+    "dimension": "dim:user_ai_interaction",
+    "role": "user",
+    "session_id": "resident-a-final-rerun-20260923-001",
+    "turn_index": 5,
+    "turn_key": "8c5b0ec718f8debf82d0b096"
+   }
+  },
+  {
+   "object_id": "obs_conv_ai_56caa1007d9f7ea6d5514c07",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-04T22:24:00Z",
+   "text": "明白，这条规则我记下了：以后「准备提交、已排队」和「确实完成」严格分开说，没有完成记录就按没确认完成处理。\n\n另外同步刚到的平台记录（14:16）：这次 registry 上传尝试被拒绝，原因是 checksum mismatch——edge-2026.11.4 没有发布成功，tag 未创建，registry 里也没有对应 digest。按你的规则，现在该镜像按「未确认完成」处理，门店测试先不通知。\n\n接下来我会在低风险范围内查 checksum 不一致的原因并重试构建/上传；只有当平台出现上传完成记录（tag/digest 可查）时，我才会向你报告「已完成」，那时再安排门店测试。",
+   "metadata": {
+    "dimension": "dim:user_ai_interaction",
+    "role": "assistant",
+    "session_id": "resident-a-final-rerun-20260923-001",
+    "turn_index": 6,
+    "turn_key": "6f0cabafbff204e3c1868cee"
+   }
+  },
+  {
+   "object_id": "obs_conv_user_88047ce5294340f597841c38",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-04T22:24:00Z",
+   "text": "我后台也看到 tag 还没出来。以后这种“准备提交、已排队”和“确实完成”要分开说；没有完成记录时就按没确认完成处理。",
+   "metadata": {
+    "dimension": "dim:user_ai_interaction",
+    "role": "user",
+    "session_id": "resident-a-final-rerun-20260923-001",
+    "turn_index": 6,
+    "turn_key": "6f0cabafbff204e3c1868cee"
+   }
+  },
+  {
+   "object_id": "obs_conv_ai_fb444aac0b24351717fcc75f",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-04T23:07:00Z",
+   "text": "好，平台记录这边也确实对上了：第二次上传于 15:02 成功，registry tag 已创建，digest 为 sha256:7f2a9d1c54b0，状态 PUBLISHED。之前 checksum mismatch 的问题在第二次构建/上传中解决，这条可以按「确实完成」对待。门店测试我就按你的通知推进配合，后续平台有任何异常记录我会随时拎出来说。",
+   "metadata": {
+    "dimension": "dim:user_ai_interaction",
+    "role": "assistant",
+    "session_id": "resident-a-final-rerun-20260923-001",
+    "turn_index": 7,
+    "turn_key": "918ca12a5ed4b2afb2ca5c7c"
+   }
+  },
+  {
+   "object_id": "obs_conv_user_1b8b15a865579a5b93d58460",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-04T23:07:00Z",
+   "text": "现在状态对上了。门店测试通知我已经发出去了。",
+   "metadata": {
+    "dimension": "dim:user_ai_interaction",
+    "role": "user",
+    "session_id": "resident-a-final-rerun-20260923-001",
+    "turn_index": 7,
+    "turn_key": "918ca12a5ed4b2afb2ca5c7c"
+   }
+  }
+ ],
+ "truncated": false
+}
