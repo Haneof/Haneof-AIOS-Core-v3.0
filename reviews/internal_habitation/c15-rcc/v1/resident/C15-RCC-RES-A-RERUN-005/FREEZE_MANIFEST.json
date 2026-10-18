@@ -1,0 +1,247 @@
+{
+  "task_id": "C15-RCC-RES-A-RERUN-005",
+  "phase": "A",
+  "frozen_at": "2026-10-18T13:40:41.386820+00:00",
+  "run_identity": {
+    "run_id": "c15-rcc-res-a-rerun-005-8e605da939b0",
+    "task_id": "C15-RCC-RES-A-RERUN-005",
+    "resident_process_id": "eb935e2d-575c-44dc-bf48-5f8907390d9e",
+    "resident_session_id": "resident-a-005-d49cb630c1014fac",
+    "conversation_session_id": "sess-resident-a-005-75029e633ec54fd0",
+    "subject_id": "user_1",
+    "minted_utc": "2026-10-18T13:40:10.034967+00:00",
+    "freshness": "NEW: minted for Window 71 RERUN-005 only; no prior run state reused"
+  },
+  "final_world_revision": 38,
+  "total_exchanges": 21,
+  "exchange_integrity": {
+    "ok": true,
+    "problems": [],
+    "chain": {
+      "ok": true,
+      "records": 63,
+      "head_sha256": "dbe64f18d943d20595e8f16bc1c035818778f36b3c2d487902f92d10c4ae49f3",
+      "error": null,
+      "first_bad_seq": null
+    },
+    "requests": {
+      "req-0001-model_directive-9c0844bc": {
+        "first_seq": 1,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "6e766c2b694eb4f6cc005e8aae1f0928856d4c1c624814a8db9eaf4fd48dcccf",
+        "response_sha256": "4c632f708d65621a221d784ff7bc6e3de2a6b2ec54489ff8bd38b143b856c5e2"
+      },
+      "req-0002-model_directive-91f42681": {
+        "first_seq": 4,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "e442abae3f4e03d0ae61e5e560108ae24eb8606139c90027c74b11921900889d",
+        "response_sha256": "ca34767fa49abce6bda846d91d6f76d2b812010dd777da52238c65579471f05d"
+      },
+      "req-0003-model_directive-c6106d4e": {
+        "first_seq": 7,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "529aecd82bd30e9587d97da36298991bb720e833800f164fefbd572453e76ab1",
+        "response_sha256": "f0023f6d9ad7b586148beff610b2d4fcc2abadd12e6fc6c705a97f71d8ebe9ff"
+      },
+      "req-0004-model_directive-51b8724c": {
+        "first_seq": 10,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "31f850b5b070ce031b9f202b8d600cc1fb11c48010db600a868dcc83b48fb363",
+        "response_sha256": "ca3feb555d2da0e7c7fc6dcd21e093be93f43bc3b50b3b4b31b8e9c713e339db"
+      },
+      "req-0005-model_directive-8c3218b0": {
+        "first_seq": 13,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "82c8885136bfb1c51165ee0129c02e3590b74acf6987fcc95d960cc516decc98",
+        "response_sha256": "78feb7f7c62a101aa39ee9e1bee4777391a13b3986a8e4aa1551490eca8fffc0"
+      },
+      "req-0006-model_directive-acb523ed": {
+        "first_seq": 16,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "cb1413aa783c0f038d4094843f3c7f862d147522891d495ff954499fb1472317",
+        "response_sha256": "b8ba4284717b651c71e60e28afa66d1f48dabdee4106ba2a3c33c1eaf7349756"
+      },
+      "req-0007-model_directive-1dffd4d3": {
+        "first_seq": 19,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "91e4d925770753476b1971a0f0b8a0fdf69a1f6c2f93acc7399ba8244b3b4315",
+        "response_sha256": "5b326440c95ccf4538a2f378fa2449b500ac7cdbb6bb1eedcbca6dfa44d6b06c"
+      },
+      "req-0008-model_directive-9b590556": {
+        "first_seq": 22,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "3b210374f5e46996150fd23b42a601041ec56bb08fc790daf2f142a1d96a44a0",
+        "response_sha256": "42ac36aa16a468399d22db4301540698a7602f1b6fa7180aec71f954cbfb7dd5"
+      },
+      "req-0009-model_directive-503c10d8": {
+        "first_seq": 25,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "da145eb7da31ad0496b92dde5ce527cd8a6c78c4545d4235c5c55c2b7e61131b",
+        "response_sha256": "c49603a605cff6d4cbd315c2a2fc40d68ca3ed9ddf1f60045f40e2aab721131a"
+      },
+      "req-0010-model_directive-f9904187": {
+        "first_seq": 28,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "f406978c6566b13398dc0fdf4fdbd83effcb288735e69d04eb133c1ada95f9a6",
+        "response_sha256": "054b8f72fbb264ae11dfdf8b1ce7ee9b086c4038709c57384bb8003f3b53a726"
+      },
+      "req-0011-model_directive-8011f99b": {
+        "first_seq": 31,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "b570ab3eb418377c295730b7c9b94c95437be1d1904e65e63390e7473e242b3d",
+        "response_sha256": "995f785aece99af9995531cce0f595d0fcb707d5e3a664511faf7f613fdf37c1"
+      },
+      "req-0012-model_directive-ac8b88ac": {
+        "first_seq": 34,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "b50a7819f8f13f55270ba9edb74115264d99470e47933c704e96d00df17ff29c",
+        "response_sha256": "cf80582296d65244d13444aaadb191e384c9e0e5d9d792f4fa5740ee63d47f92"
+      },
+      "req-0013-model_directive-3954e0db": {
+        "first_seq": 37,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "fd0bcd003895145ef0614ce87411d3800daffcebba99445410e40b35880e3995",
+        "response_sha256": "a3df10b786df9de4379fffbab1b0a166fbffcb27b5952008aa7cad274c9c5333"
+      },
+      "req-0014-model_directive-772d0cb8": {
+        "first_seq": 40,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "ba1ae74119f9735d50e6e7c40b31f6dd2647d2e2d6b34d5c4e8fc9f890fff823",
+        "response_sha256": "319a255c5f83b63ac05a3da460a50f5d517a456e05107ca9698d75d534be272c"
+      },
+      "req-0015-model_directive-07a6ddd0": {
+        "first_seq": 43,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "b84584fd61cb50bc95bb33d3efa5c94da39cfc948b99179cc69fcc706f80e188",
+        "response_sha256": "ee643effac96d191cd6c2c5127e09b35782c7f332d5d02be1793f1a44cf45146"
+      },
+      "req-0016-model_directive-2b328006": {
+        "first_seq": 46,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "30fbf9f08dc2df1bc89859be4810b034ecfadd95257ac857fa5b5a757596c0e5",
+        "response_sha256": "9bda1fd14523a4ea73c9826742fa5f40cc31bdba75f53c87a06735803e9de811"
+      },
+      "req-0017-model_directive-cb21129a": {
+        "first_seq": 49,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "772dacfc46401f05aaaec1e5b23c3db7b6de553216ecbb657209b2cd4154f323",
+        "response_sha256": "5a38f4fd59769a8d8eec78ed77639aa03f886013f0aebd8a5ea049091ca96700"
+      },
+      "req-0018-model_directive-927f5e4d": {
+        "first_seq": 52,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "894bfc45287f7c2c5503b73cd85a0b837997cc1d62fe9a1eb8b91afc382de3d6",
+        "response_sha256": "471131aafc8f1d2089e3992c1221eb26f804ad0903d4d314110a565afaef0bd2"
+      },
+      "req-0019-model_directive-5a35c0ef": {
+        "first_seq": 55,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "8b950c94d9fa256ec9d6b5146259a6524decca8a7fd7e00036ed580943156d8e",
+        "response_sha256": "4675cd624a2cc0cc08725ad2cccd513dac0368f91046cf7689f2e188db06669b"
+      },
+      "req-0020-model_directive-dcf2b65f": {
+        "first_seq": 58,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "0a04dc162400e94b6984aa014f86651a75e774a9d372b7b48bd52e914ec2cdec",
+        "response_sha256": "76da5f1efaf9c3e293dc60834d998eef370fba5b872e4461ecbe9973426f5b34"
+      },
+      "req-0021-model_directive-becdda65": {
+        "first_seq": 61,
+        "events": [
+          "request_published",
+          "response_published",
+          "response_consumed"
+        ],
+        "request_sha256": "7a73aa8bd8f913bf1c70b8fc8fb18f51f4b5c18dcc8733f68f94286528db5f5f",
+        "response_sha256": "16aa730314a54d18326b3ae050c074d8ae439bfb9f0dde7a4fea898d37f343f7"
+      }
+    },
+    "exchange_root": "/workspaces/window71-resident-a-rerun005/run/exchange"
+  },
+  "release_final": {
+    "cursor_14_revealed": false,
+    "last_acked_sequence": 13,
+    "next_sequence": 14,
+    "pending_reveal": null
+  }
+}

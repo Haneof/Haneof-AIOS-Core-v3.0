@@ -1,0 +1,1 @@
+{"authored_by":"EXTERNAL_CURRENT_RESIDENT_SESSION","directive":{"capability_calls":[],"response":"明白，这条我按硬性边界处理：production 旧索引的删除，我会先把具体对象、影响范围和回滚办法列给你，得到你明确确认前绝不动手；口头或随口说的'顺手清掉'都不作为执行依据。","silence":false},"request_id":"req-0009-model_directive-503c10d8","request_sha256":"da145eb7da31ad0496b92dde5ce527cd8a6c78c4545d4235c5c55c2b7e61131b","response_version":1}
