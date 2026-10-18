@@ -1,0 +1,1 @@
+{"capability_calls": [{"name": "search_timeline", "arguments": {"window_start": "2026-01-01T00:00:00+00:00", "window_end": "2026-10-23T23:59:59+00:00", "object_types": ["claim"], "limit": 20}}]}

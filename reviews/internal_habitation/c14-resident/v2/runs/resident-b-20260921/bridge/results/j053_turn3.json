@@ -1,0 +1,67 @@
+{
+  "status": "ok",
+  "result": {
+    "runtime": {
+      "response": "有道理——先叫齐人把火一起压住，比一个人来回扑腾快得多。今天也是这么走的：08:40 拉起协同，09:18 就稳住了，前后 38 分钟，10:30 的分析一点没耽误。我把这条记下来了：遇到线上故障，先把协同拉起来，稳住之后马上回自己的分析。",
+      "silenced": false,
+      "termination_reason": "responded",
+      "model_rounds": 3,
+      "capability_history": [
+        {
+          "name": "commit_ai_world_claim",
+          "ok": false,
+          "data": null,
+          "error_code": "CAPABILITY_EXECUTION_ERROR",
+          "error_message": "ValidationError: 1 validation error for AIWorldClaimRequest\nclaim_type\n  Input should be 'fact', 'opinion', 'belief', 'desire', 'intention', 'plan', 'prediction', 'promise', 'preference', 'inference' or 'hypothesis' [type=enum, input_value='user_stated_preference', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/enum",
+          "call_id": "io47-0"
+        },
+        {
+          "name": "commit_ai_world_claim",
+          "ok": true,
+          "data": {
+            "domain": "user_understanding",
+            "dimension": "dim:ai_user_understanding",
+            "subject_id": "user_1",
+            "claim": {
+              "claim_id": "clm_42e66b47b667be52da20ae8a",
+              "evidence_set_id": "evs_b5c274c8e052bfdfecbb6a06",
+              "dependency_ids": [
+                "dep_a5f0107369b598259eed779f",
+                "dep_4b89bcadea7d95cc1a5ed98c",
+                "dep_fdba8da16fb4460717d0a60a",
+                "dep_faa2d2c5ba149026c550ed6d"
+              ],
+              "world_revision": 261,
+              "reused_existing": false
+            }
+          },
+          "error_code": null,
+          "error_message": null,
+          "call_id": "io48-0"
+        }
+      ],
+      "model_input_tokens": null,
+      "model_output_tokens": null,
+      "model_total_tokens": null,
+      "model_usage_complete": false
+    },
+    "recommendation": {
+      "current_topic": "用户说：“这种线上故障先把人叫齐就行，稳住以后再回自己的分析。”",
+      "topic_gate_open": true,
+      "card_count": 5,
+      "reason": "topic_matched_history"
+    },
+    "conversation_commit": {
+      "world_revision": 262,
+      "user_observation_id": "obs_conv_user_29525f7972266b81f43cf289",
+      "assistant_observation_id": "obs_conv_ai_69957acfbbcdba0995a132de",
+      "idempotent_replay": false,
+      "user_world_revision": 260,
+      "assistant_world_revision": 262
+    },
+    "continuity_summary_commits": [],
+    "continuity_summary_error": null,
+    "world_revision": 262,
+    "index_watermark": 262
+  }
+}

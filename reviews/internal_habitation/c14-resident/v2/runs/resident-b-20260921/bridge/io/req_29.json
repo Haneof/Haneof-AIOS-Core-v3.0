@@ -1,0 +1,54 @@
+{
+  "io_id": 29,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j028_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-29T08:07:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:work",
+    "granularity": "week",
+    "window_start": "2026-10-19T00:00:00Z",
+    "window_end": "2026-10-25T23:59:59.999999Z",
+    "source_world_revision": 216,
+    "sources": [
+      {
+        "object_id": "sum_5d71422c6b7fcb34f30c815b",
+        "revision": 1,
+        "object_type": "summary",
+        "occurred_at": "2026-10-23T00:00:00Z",
+        "text": "2026-10-23 工作维度当日小结：任务跟踪器显示“发布说明”首轮起草预计 90–120 分钟；有两处视觉层级问题需与设计师确认，但不阻塞正文起草。当日无其他工作跟踪记录。",
+        "metadata": {
+          "dimension": "dim:work",
+          "summary_kind": "single_dimension_temporal"
+        }
+      },
+      {
+        "object_id": "obs_c14_fixture_b52acdba6fd407971c7887b7",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-23T15:06:00Z",
+        "text": "“发布说明”首轮起草预计 90–120 分钟；有两处视觉层级问题需要与设计师确认，但不阻塞正文起草。",
+        "metadata": {
+          "dimension": "dim:work",
+          "external_record_id": "c14resv2-028",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-028",
+          "fixture_payload_sha256": "sha256:f1d1f0e4c49c2765bcb44bf3e4edb6337766fe73b9f795192140f2fac1c237bb",
+          "fixture_projection_sha256": "sha256:1b6f38d96a9a113ebbce6db1a5cda14e6918310c6fe58c40adfb2b7f69ab41f4",
+          "fixture_sequence": 28,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-23T08:06:00-07:00",
+          "source_class": "platform"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

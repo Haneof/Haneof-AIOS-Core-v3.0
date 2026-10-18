@@ -1,0 +1,43 @@
+{
+  "io_id": 42,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j046_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-31T08:37:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:work",
+    "granularity": "day",
+    "window_start": "2026-10-29T00:00:00Z",
+    "window_end": "2026-10-29T23:59:59.999999Z",
+    "source_world_revision": 248,
+    "sources": [
+      {
+        "object_id": "obs_c14_fixture_3257a682fdb79b091e7d1027",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-29T15:07:00Z",
+        "text": "“发布说明”状态变更为进行中；开始时间 08:05。",
+        "metadata": {
+          "dimension": "dim:work",
+          "external_record_id": "c14resv2-030",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-030",
+          "fixture_payload_sha256": "sha256:004f45d259d28fa9272b22296ed151a9586097f2090321d9ea76ea6055abff23",
+          "fixture_projection_sha256": "sha256:fd973d44ef33ac91f89be942f670420b2a4f638021d2ad861500e4cbffde74cb",
+          "fixture_sequence": 30,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-29T08:07:00-07:00",
+          "source_class": "platform"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

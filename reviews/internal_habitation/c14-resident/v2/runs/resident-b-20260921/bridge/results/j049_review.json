@@ -1,0 +1,198 @@
+{
+  "status": "ok",
+  "result": {
+    "review": {
+      "review_id": "wake_review_9644da0473404c75680e390d",
+      "wake_ref": {
+        "object_id": "wake_review_9644da0473404c75680e390d",
+        "revision": 2
+      },
+      "window_start": "2026-10-29T15:08:00+00:00",
+      "window_end": "2026-10-31T15:38:00+00:00",
+      "anchor_count": 15,
+      "instruction": "Review the supplied world anchors and decide whether any previous AI understanding, strategy, calibration, self-understanding, goal handling, operation method, or due CognitivePolicy should be revised, confirmed, or rolled back. Use existing search/inspect tools when needed. Do not invent user growth, causal meaning, success, failure, or policy changes that are not supported by world evidence. Mechanical Wake outcomes may be used to review Resident-authored attention watches, but model silence or suppressed delivery is not itself evidence of user preference or real-world success."
+    },
+    "runtime": {
+      "response": null,
+      "silenced": true,
+      "termination_reason": "silence",
+      "model_rounds": 2,
+      "capability_history": [
+        {
+          "name": "read_periodic_review_anchors",
+          "ok": true,
+          "data": [
+            {
+              "object_ref": {
+                "object_id": "clm_79df61916b8bb4c10cb3faa3",
+                "revision": 4
+              },
+              "object_type": "claim",
+              "recorded_at": "2026-10-29T19:14:00Z",
+              "excerpt": "写作块交付与日程保护程度相关（截至 10-29 的 4 次写作块观察 + 1 次相邻观察）：未被会议插入的写作块——10-01“架构备忘录起草”08:00–10:20、10-08“设计评审稿”08:15–10:35——都在计划区间内完成（10:16 / 10:31 提交），且整块处于专注模式（主动解锁 3 / 2 次，静音通知 26 / 29 条）；被会议插入的一次——10-05“定价说明起草”08:30–10:45 期间加入 09:05 stand-up 与 09:50 供应商电话、剩余写作被重排到 13:40–15:00——到 15:00 仅完成约 65%，余量顺延至次日上午，且用户续写时需约十余分钟重新定位上午引用的材料。10-08 用户自述“上午人有点困，不过那份稿子没拖到下午”——在睡眠仅 5小时48分的情况下仍按计划交付，提示精力/疲劳并非主要区分因素。相邻观察（10-21）：上午客户共创工作坊（08:30–10:00）后，10:20–11:50 的“方案修改”块未被会议插入，于 11:41 在计划区间内完成并提交；该块属修改类文档工作而非起草类写作块，且当日无专注模式数据，故仅作弱支持、不计入主证据。新增直接观察（10-29，按“打断前置 + 保护写作块”安排的写作日）：发布说明 08:05 开始起草，09:00–09:30 设计师沟通置于写作之前，上午其余时间无会议"
+            },
+            {
+              "object_ref": {
+                "object_id": "obs_c14_fixture_a2532add6d81bd551775e8d3",
+                "revision": 1
+              },
+              "object_type": "observation",
+              "recorded_at": "2026-10-29T19:14:00Z",
+              "excerpt": "“发布说明”第一版于 12:08 完成并进入评审准备；核心结构无需重写。"
+            },
+            {
+              "object_ref": {
+                "object_id": "sum_9e81acf33a4abc28c291e3af",
+                "revision": 7
+              },
+              "object_type": "summary",
+              "recorded_at": "2026-10-29T19:14:00Z",
+              "excerpt": "2026-10-09 工作产出维度当日小结：当天窗口含一条 AI 认知记录（非现实观测）——hypothesis 级 Claim「写作块交付与日程保护程度相关」当日建立，依据 10-01/10-05/10-08 三次写作块观察（两次受保护块在计划区间内交付；一次被会议插入的块到 15:00 仅完成约 65% 并顺延）构成的 9 项证据集。该 Claim 当前为第 4 版：10-11 因 10-09 会话观测（用户自述困倦但仍按计划交付）修订；10-23 并入 10-21“方案修改”块相邻弱支持观察；10-29 并入同日发布说明写作日的直接观察（12:08 提前交付），置信度上调至 0.6。"
+            },
+            {
+              "object_ref": {
+                "object_id": "sum_dfa35021e2aa10da82941c27",
+                "revision": 5
+              },
+              "object_type": "summary",
+              "recorded_at": "2026-10-29T19:14:00Z",
+              "excerpt": "2026-10-05–10-11 当周工作产出小结：现实记录两条——10-05“定价说明”到 15:00 完成约 65%、余量移到次日上午；10-08“设计评审稿”于 10:31 完成、三个待决问题已在文档中给出处理方案。AI 认知记录（非现实观测）：本 Resident 于 10-09 建立 hypothesis 级 Claim「写作块交付与日程保护程度相关」（9 项证据集），10-11 修订为 rev 2（证据集扩为 10 项）；该 Claim 当前为 rev 4（10-23 并入 10-21 相邻弱支持观察；10-29 并入发布说明写作日直接观察，置信度 0.6）。"
+            },
+            {
+              "object_ref": {
+                "object_id": "task_5029111ade74171bc3758e98",
+                "revision": 4
+              },
+              "object_type": "task",
+              "recorded_at": "2026-10-29T19:14:00Z",
+              "excerpt": "completed: 周四发布说明第一版（13:30 前） | next=周四 9:00–9:30 设计师沟通；9:40–13:30 发布说明保护写作块；13:30 前出第一版；14:30 评审"
+            },
+            {
+              "object_ref": {
+                "object_id": "wake_bundle_55ad51af39f63e6846adb5c7",
+                "revision": 3
+              },
+              "object_type": "wake",
+              "recorded_at": "2026-10-29T19:15:00Z",
+              "excerpt": "attention=background | source=attention_bundle | state=completed | priority=50 | hits=2 | termination=silence | rounds=1 | delivery=False | step0=background | capabilities=[]"
+            },
+            {
+              "object_ref": {
+                "object_id": "obs_conv_ai_317d3ffead372f9e92101083",
+                "revision": 1
+              },
+              "object_type": "observation",
+              "recorded_at": "2026-10-29T19:26:00Z",
+              "excerpt": "是啊，你说到点子上了——“不两头切”正是关键。之前 10-05 那次被 stand-up 和供应商电话切碎的写作，到 15:00 只完成约 65%，续写时光重新找材料就花了十几分钟；今天 9:00 先把设计师那边定掉，之后一整块不受打扰，12:08 出第一版就是顺理成章的事。\n\n这种“打断前置 + 整块写作”的排法，以后写作日都可以照用。14:30 评审加油！"
+            },
+            {
+              "object_ref": {
+                "object_id": "obs_conv_user_dea25617f685204d460139b9",
+                "revision": 1
+              },
+              "object_type": "observation",
+              "recorded_at": "2026-10-29T19:26:00Z",
+              "excerpt": "用户说：“今天这个安排没让我一直在两头切，第一版也按计划出来了。”"
+            },
+            {
+              "object_ref": {
+                "object_id": "obs_c14_fixture_6edc33829384066e33f98fdd",
+                "revision": 1
+              },
+              "object_type": "observation",
+              "recorded_at": "2026-10-29T19:32:00Z",
+              "excerpt": "与设计师同步后，两处视觉层级问题当天确认；未要求重写正文核心结构。"
+            },
+            {
+              "object_ref": {
+                "object_id": "obs_c14_fixture_3eb25da1e72cb9fb2600dc2a",
+                "revision": 1
+              },
+              "object_type": "observation",
+              "recorded_at": "2026-10-31T15:37:00Z",
+              "excerpt": "08:40 临时加入线上故障协同；原定 10:30 开始的个人分析任务保留。"
+            },
+            {
+              "object_ref": {
+                "object_id": "sum_4c33d11f67590c18bffa7a79",
+                "revision": 1
+              },
+              "object_type": "summary",
+              "recorded_at": "2026-10-31T15:37:00Z",
+              "excerpt": "2026-10-29 用户-AI 交互当日小结：一次会话轮（session resb-20260921-282770 turn 2）。用户反馈当天安排“没让我一直在两头切”、第一版按计划出来；AI 确认“不两头切”即关键，并以 10-05 被打断写作（65% 顺延、找回材料成本）作对照，建议写作日沿用“打断前置+整块写作”排法。"
+            },
+            {
+              "object_ref": {
+                "object_id": "sum_6db50c7cf19ef06066b6bff5",
+                "revision": 1
+              },
+              "object_type": "summary",
+              "recorded_at": "2026-10-31T15:37:00Z",
+              "excerpt": "2026-10-29 协作结果维度当日小结：当天一条记录——与设计师同步后，两处视觉层级问题当天确认；未要求重写正文核心结构。当日无其他协作结果记录。"
+            },
+            {
+              "object_ref": {
+                "object_id": "sum_d31221c3021602984c7b32ed",
+                "revision": 1
+              },
+              "object_type": "summary",
+              "recorded_at": "2026-10-31T15:37:00Z",
+              "excerpt": "2026-10-29 工作维度当日小结：任务跟踪器显示“发布说明”当天变更为进行中，开始时间 08:05。当日无其他工作跟踪记录。"
+            },
+            {
+              "object_ref": {
+                "object_id": "sum_d8725f038ac989dbd1d43480",
+                "revision": 1
+              },
+              "object_type": "summary",
+              "recorded_at": "2026-10-31T15:37:00Z",
+              "excerpt": "2026-10-29 工作产出维度当日小结：现实记录一条——“发布说明”第一版于 12:08 完成并进入评审准备，核心结构无需重写（早于 13:30 要求）。AI 认知记录（非现实观测）：本 Resident 当天将既有 hypothesis 级 Claim「写作块交付与日程保护程度相关」修订为 rev 4（并入当日直接观察：08:05 开始、09:00 设计师沟通前置、上午无会议插入、12:08 提前交付），置信度 0.5→0.6。"
+            },
+            {
+              "object_ref": {
+                "object_id": "wake_bundle_893374463c8ad52df4581db5",
+                "revision": 3
+              },
+              "object_type": "wake",
+              "recorded_at": "2026-10-31T15:38:00Z",
+              "excerpt": "attention=background | source=attention_bundle | state=completed | priority=50 | hits=4 | termination=silence | rounds=1 | delivery=False | step0=background | capabilities=[]"
+            }
+          ],
+          "error_code": null,
+          "error_message": null,
+          "call_id": "io45-0"
+        }
+      ],
+      "model_input_tokens": null,
+      "model_output_tokens": null,
+      "model_total_tokens": null,
+      "model_usage_complete": false
+    },
+    "wake": {
+      "wake_id": "wake_review_9644da0473404c75680e390d",
+      "revision": 3,
+      "state": "completed",
+      "world_revision": 258
+    },
+    "budget": {
+      "applies": false,
+      "available": true,
+      "world_revision": 256,
+      "window_start": null,
+      "window_end": null,
+      "policy_refs": [],
+      "used_wakes": 0,
+      "used_model_calls": 0,
+      "used_tokens": 0,
+      "token_usage_available": false,
+      "max_wakes": null,
+      "max_model_calls": null,
+      "model_round_limit": null,
+      "reserved_model_calls": 0,
+      "reasons": [],
+      "on_exceed": []
+    },
+    "world_revision": 258,
+    "index_watermark": 258
+  }
+}

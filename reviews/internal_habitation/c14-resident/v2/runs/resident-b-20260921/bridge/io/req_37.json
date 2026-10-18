@@ -1,0 +1,153 @@
+{
+  "io_id": 37,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j035_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-29T12:14:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:work_outcome",
+    "granularity": "week",
+    "window_start": "2026-10-05T00:00:00Z",
+    "window_end": "2026-10-11T23:59:59.999999Z",
+    "source_world_revision": 235,
+    "sources": [
+      {
+        "object_id": "sum_612659baec6788b7aef2647d",
+        "revision": 1,
+        "object_type": "summary",
+        "occurred_at": "2026-10-05T00:00:00Z",
+        "text": "2026-10-05 工作产出：“定价说明”到 15:00 完成约 65%；剩余部分移到次日上午继续。",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "summary_kind": "single_dimension_temporal"
+        }
+      },
+      {
+        "object_id": "obs_c14_fixture_35f8ca5c3abafa4ba5c8650a",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-05T22:12:00Z",
+        "text": "“定价说明”到 15:00 完成约 65%；剩余部分移到次日上午继续。",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "external_record_id": "c14resv2-007",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-007",
+          "fixture_payload_sha256": "sha256:32f094bff092fbb61d30c09a4d0f078d7a1efdf7939c8dc1a91590f2e72bf926",
+          "fixture_projection_sha256": "sha256:f4abbf49e37c209b749403008004e87e0533728999c8b0970836609499ae3167",
+          "fixture_sequence": 7,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-05T15:12:00-07:00",
+          "source_class": "platform"
+        }
+      },
+      {
+        "object_id": "sum_4c759aebb39172f506fd747e",
+        "revision": 1,
+        "object_type": "summary",
+        "occurred_at": "2026-10-08T00:00:00Z",
+        "text": "2026-10-08 工作产出：“设计评审稿”于 10:31 完成；三个待决问题已在文档中给出处理方案。",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "summary_kind": "single_dimension_temporal"
+        }
+      },
+      {
+        "object_id": "obs_c14_fixture_96ba14d7f113e478b8a8bae8",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-08T17:43:00Z",
+        "text": "“设计评审稿”于 10:31 完成；三个待决问题已在文档中给出处理方案。",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "external_record_id": "c14resv2-012",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-012",
+          "fixture_payload_sha256": "sha256:36585d0b5f6776a3dbae97ac7854e326525180fd2049a9cfead651ac889e5a8f",
+          "fixture_projection_sha256": "sha256:7c3e55c755618d76abe0abe5d1579ca02b3e7fe5a9248e1c3eaeb4e3d214bf75",
+          "fixture_sequence": 12,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-08T10:43:00-07:00",
+          "source_class": "platform"
+        }
+      },
+      {
+        "object_id": "sum_9e81acf33a4abc28c291e3af",
+        "revision": 7,
+        "object_type": "summary",
+        "occurred_at": "2026-10-09T00:00:00Z",
+        "text": "2026-10-09 工作产出维度当日小结：当天窗口含一条 AI 认知记录（非现实观测）——hypothesis 级 Claim「写作块交付与日程保护程度相关」当日建立，依据 10-01/10-05/10-08 三次写作块观察（两次受保护块在计划区间内交付；一次被会议插入的块到 15:00 仅完成约 65% 并顺延）构成的 9 项证据集。该 Claim 当前为第 4 版：10-11 因 10-09 会话观测（用户自述困倦但仍按计划交付）修订；10-23 并入 10-21“方案修改”块相邻弱支持观察；10-29 并入同日发布说明写作日的直接观察（12:08 提前交付），置信度上调至 0.6。",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "summary_kind": "single_dimension_temporal"
+        }
+      },
+      {
+        "object_id": "clm_79df61916b8bb4c10cb3faa3",
+        "revision": 4,
+        "object_type": "claim",
+        "occurred_at": "2026-10-09T01:11:01Z",
+        "text": "写作块交付与日程保护程度相关（截至 10-29 的 4 次写作块观察 + 1 次相邻观察）：未被会议插入的写作块——10-01“架构备忘录起草”08:00–10:20、10-08“设计评审稿”08:15–10:35——都在计划区间内完成（10:16 / 10:31 提交），且整块处于专注模式（主动解锁 3 / 2 次，静音通知 26 / 29 条）；被会议插入的一次——10-05“定价说明起草”08:30–10:45 期间加入 09:05 stand-up 与 09:50 供应商电话、剩余写作被重排到 13:40–15:00——到 15:00 仅完成约 65%，余量顺延至次日上午，且用户续写时需约十余分钟重新定位上午引用的材料。10-08 用户自述“上午人有点困，不过那份稿子没拖到下午”——在睡眠仅 5小时48分的情况下仍按计划交付，提示精力/疲劳并非主要区分因素。相邻观察（10-21）：上午客户共创工作坊（08:30–10:00）后，10:20–11:50 的“方案修改”块未被会议插入，于 11:41 在计划区间内完成并提交；该块属修改类文档工作而非起草类写作块，且当日无专注模式数据，故仅作弱支持、不计入主证据。新增直接观察（10-29，按“打断前置 + 保护写作块”安排的写作日）：发布说明 08:05 开始起草，09:00–09:30 设计师沟通置于写作之前，上午其余时间无会议插入（日历确认 08:00–14:00 无其他固定会议）；第一版于 12:08 完成并进入评审准备，早于 13:30 的要求 82 分钟，核心结构无需重写。假设：日程保护是该用户写作类工作块按时交付的关键条件之一。",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "revision_evidence_set_ref": {
+            "object_id": "evs_revision_0e05b5ab8b79d4c807e198b8",
+            "revision": 1
+          },
+          "revision_mode": "revise",
+          "revision_reason": "10-29 新增一次直接写作块观察：按“打断前置+保护写作块”安排的发布说明日在 12:08（早于 13:30 deadline 82 分钟）交付第一版，核心结构无需重写。这是第 4 次方向一致的直接观察，假设置信度由 0.5 上调至 0.6。",
+          "supersedes_revision": 3,
+          "writeback_kind": "revisable_cognition"
+        }
+      },
+      {
+        "object_id": "evs_fc254abd76b116a56bb77c04",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-10-09T01:11:01Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 9, \"missing_description\": [], \"observed_count\": 9}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-09T01:11:01Z\", \"world_revision\": 80}, \"learned_at\": \"2026-10-09T01:11:01Z\", \"member_refs\": [{\"object_id\": \"obs_c14_fixture_0ca259ffc10ff4a9218561d0\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_3195efa3abad26d259380073\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_35f8ca5c3abafa4ba5c8650a\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_522a6cbeb84ced83b62def58\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_660bfde404b5e63e3c52db43\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_6e081d5c46196e1781165d5c\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_7422eaba53dc07eb87572e67\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_8a41a59c20d2aac5789bf0f1\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_96ba14d7f113e478b8a8bae8\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:work_outcome\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_fc254abd76b116a56bb77c04\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-09T01:11:01Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_c14_fixture_0ca259ffc10ff4a9218561d0\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_3195efa3abad26d259380073\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_35f8ca5c3abafa4ba5c8650a\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_522a6cbeb84ced83b62def58\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_660bfde404b5e63e3c52db43\", \"revision\": 1}, {\"object_id",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "writeback_kind": "cognition_evidence"
+        }
+      },
+      {
+        "object_id": "sum_a2ec590b3d03001a606c1d72",
+        "revision": 1,
+        "object_type": "summary",
+        "occurred_at": "2026-10-11T00:00:00Z",
+        "text": "2026-10-11 工作产出（AI 认知记录，非现实观测）：本窗口只含本 Resident 对既有 hypothesis 级 Claim「写作块交付与日程保护程度相关」的修订（rev 2，证据集扩为 10 条观测，其中新增 10-09 会话自述）；窗口内无新的现实工作产出观测。",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "summary_kind": "single_dimension_temporal"
+        }
+      },
+      {
+        "object_id": "evs_revision_c35b94500be71d9af1b5a6d0",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-10-11T12:44:01Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 10, \"missing_description\": [], \"observed_count\": 10}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-11T12:44:01Z\", \"world_revision\": 89}, \"learned_at\": \"2026-10-11T12:44:01Z\", \"member_refs\": [{\"object_id\": \"obs_c14_fixture_3195efa3abad26d259380073\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_7422eaba53dc07eb87572e67\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_660bfde404b5e63e3c52db43\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_8a41a59c20d2aac5789bf0f1\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_35f8ca5c3abafa4ba5c8650a\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_0ca259ffc10ff4a9218561d0\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_6e081d5c46196e1781165d5c\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_522a6cbeb84ced83b62def58\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_96ba14d7f113e478b8a8bae8\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_f3557413048807b17b9487bc\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:work_outcome\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_79df61916b8bb4c10cb3faa3\", \"revision\": 1}}, \"object_id\": \"evs_revision_c35b94500be71d9af1b5a6d0\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_79df61916b8bb4c10cb3faa3@1\", \"recorded_at\": \"2026-10-11T12:44:01Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_c14_fixture_3195efa3abad26d259380073\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_7422eaba53dc07eb87572e67\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_660bfde404b5e63e3c52db43\", \"revision\": 1}, {\"object_id\"",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_79df61916b8bb4c10cb3faa3",
+            "revision": 1
+          }
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

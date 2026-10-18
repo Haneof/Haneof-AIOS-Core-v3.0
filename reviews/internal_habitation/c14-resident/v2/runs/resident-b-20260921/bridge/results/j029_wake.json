@@ -1,0 +1,40 @@
+{
+  "status": "ok",
+  "result": {
+    "dispatched": true,
+    "wake_ref": {
+      "object_id": "wake_bundle_09c6a8306d8ca735efd6a667",
+      "revision": 3
+    },
+    "step0": {
+      "state": "background",
+      "model_allowed": true,
+      "action_allowed": true,
+      "delivery_allowed": false,
+      "reasons": [
+        "background_attention_no_user_interrupt"
+      ]
+    },
+    "wake": {
+      "wake_id": "wake_bundle_09c6a8306d8ca735efd6a667",
+      "revision": 3,
+      "state": "completed",
+      "world_revision": 223
+    },
+    "delivery_response": null,
+    "delivery_suppressed": false,
+    "runtime": {
+      "response": null,
+      "silenced": true,
+      "termination_reason": "silence",
+      "model_rounds": 1,
+      "capability_history": [],
+      "model_input_tokens": null,
+      "model_output_tokens": null,
+      "model_total_tokens": null,
+      "model_usage_complete": false
+    },
+    "world_revision": 223,
+    "index_watermark": 223
+  }
+}
