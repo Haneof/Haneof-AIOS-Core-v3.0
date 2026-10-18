@@ -1,0 +1,4 @@
+{
+  "silence": true,
+  "rationale": "已提交 1 条 hypothesis 级 Claim（clm_79df61916b8bb4c10cb3faa3，9 条 REALITY 观测为证据，confidence 0.5）。后台 wake 无需用户交付，按沉默终止；后续若有反例（如被打断但仍按时交付）将修订或撤回该假设。"
+}

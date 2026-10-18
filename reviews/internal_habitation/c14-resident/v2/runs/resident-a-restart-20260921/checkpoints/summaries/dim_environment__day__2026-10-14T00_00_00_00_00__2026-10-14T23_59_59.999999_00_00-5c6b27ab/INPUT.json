@@ -1,0 +1,33 @@
+{
+  "dimension": "dim:environment",
+  "granularity": "day",
+  "source_world_revision": 124,
+  "sources": [
+    {
+      "metadata": {
+        "dimension": "dim:environment",
+        "external_record_id": "c14resv2-017",
+        "external_revision": "1",
+        "fixture_binding_version": "c14-fixture-event-binding-v1",
+        "fixture_event_id": "c14resv2-017",
+        "fixture_payload_sha256": "sha256:5648f4f359910a46a3585ac096c0c6d9cab1e5cb443f9c7976b6e3b13b2dc7f3",
+        "fixture_projection_sha256": "sha256:aecf626d0f9aaf20d81c048f481d4c16bd26fd0de353060093c3f99b494043ef",
+        "fixture_sequence": 17,
+        "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+        "fixture_version": "c14-resident-fixture-v2",
+        "mechanical_ingest": true,
+        "occurred_at_original": "2026-10-14T06:01:00-07:00",
+        "source_class": "platform"
+      },
+      "object_id": "obs_c14_fixture_fe7df97629543fca38e221c4",
+      "object_type": "observation",
+      "occurred_at": "2026-10-14T13:01:00Z",
+      "revision": 1,
+      "text": "物业通知：06:00–06:30 检查厨房供水阀门，要求住户在家配合。"
+    }
+  ],
+  "summary_key": "dim:environment__day__2026-10-14T00:00:00+00:00__2026-10-14T23:59:59.999999+00:00",
+  "truncated": false,
+  "window_end": "2026-10-14T23:59:59.999999+00:00",
+  "window_start": "2026-10-14T00:00:00+00:00"
+}

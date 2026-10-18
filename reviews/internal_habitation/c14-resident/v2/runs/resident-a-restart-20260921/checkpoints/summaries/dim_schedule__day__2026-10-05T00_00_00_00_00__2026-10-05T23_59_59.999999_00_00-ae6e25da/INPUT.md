@@ -1,0 +1,19 @@
+# DimensionSummaryInput — dim:schedule__day__2026-10-05T00:00:00+00:00__2026-10-05T23:59:59.999999+00:00
+
+- dimension: dim:schedule
+- granularity: day
+- window: 2026-10-05T00:00:00+00:00 .. 2026-10-05T23:59:59.999999+00:00
+- source_world_revision: 49
+- source_count: 1
+- truncated: False
+
+## sources (exact pinned material)
+
+### 1. obs_c14_fixture_8a41a59c20d2aac5789bf0f1@1 (observation)
+
+- occurred_at: 2026-10-05T15:18:00Z
+- metadata: {"dimension": "dim:schedule", "external_record_id": "c14resv2-006", "external_revision": "1", "fixture_binding_version": "c14-fixture-event-binding-v1", "fixture_event_id": "c14resv2-006", "fixture_payload_sha256": "sha256:8f73ed3cb4d9302603a182834ae5b1b778e9fde747b3285083339dc15d207001", "fixture_projection_sha256": "sha256:4bf31ba2a198ecc9f20cf236c3c5562e92acef7b618d8a795137e17c017460aa", "fixture_sequence": 6, "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253", "fixture_version": "c14-resident-fixture-v2", "mechanical_ingest": true, "occurred_at_original": "2026-10-05T08:18:00-07:00", "source_class": "platform"}
+
+```text
+原定 08:30–10:45 的“定价说明起草”中间新增 09:05 stand-up 和 09:50 供应商电话；剩余写作时间分到 13:40–15:00。
+```

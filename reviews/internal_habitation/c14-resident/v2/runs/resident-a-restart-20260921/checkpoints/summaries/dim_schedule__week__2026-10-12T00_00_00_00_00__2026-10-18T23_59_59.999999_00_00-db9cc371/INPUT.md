@@ -1,0 +1,28 @@
+# DimensionSummaryInput — dim:schedule__week__2026-10-12T00:00:00+00:00__2026-10-18T23:59:59.999999+00:00
+
+- dimension: dim:schedule
+- granularity: week
+- window: 2026-10-12T00:00:00+00:00 .. 2026-10-18T23:59:59.999999+00:00
+- source_world_revision: 142
+- source_count: 2
+- truncated: False
+
+## sources (exact pinned material)
+
+### 1. sum_9a272f5377d1c884c824ed3d@1 (summary)
+
+- occurred_at: 2026-10-17T00:00:00Z
+- metadata: {"dimension": "dim:schedule", "summary_kind": "single_dimension_temporal"}
+
+```text
+2026-10-17 日程：当天 07:00 有一场与伦敦团队的视频会议。
+```
+
+### 2. obs_c14_fixture_548acbc204287fcdb2c3a036@1 (observation)
+
+- occurred_at: 2026-10-17T13:09:00Z
+- metadata: {"dimension": "dim:schedule", "external_record_id": "c14resv2-019", "external_revision": "1", "fixture_binding_version": "c14-fixture-event-binding-v1", "fixture_event_id": "c14resv2-019", "fixture_payload_sha256": "sha256:3b68ff8d36a937e2007dc4e8b194015718de13a5ba820ca967dec43ff458dc5e", "fixture_projection_sha256": "sha256:daa55e3229df745f1d4b6fec102db9f2c943ca873b6fa9abcc258c607b306f9c", "fixture_sequence": 19, "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253", "fixture_version": "c14-resident-fixture-v2", "mechanical_ingest": true, "occurred_at_original": "2026-10-17T06:09:00-07:00", "source_class": "platform"}
+
+```text
+今天 07:00 有一场与伦敦团队的视频会议。
+```

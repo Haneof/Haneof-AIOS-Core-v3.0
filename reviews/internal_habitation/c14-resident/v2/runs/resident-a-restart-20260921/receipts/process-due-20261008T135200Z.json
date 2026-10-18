@@ -1,0 +1,32 @@
+{
+  "background_now": "2026-10-08T13:53:01+00:00",
+  "dispatches": [
+    {
+      "capability_calls": [],
+      "delivery_suppressed": false,
+      "dispatched_wake_ref": "wake_400ea8877e999e1c3902995d@3",
+      "model_rounds": 1,
+      "response": null,
+      "silenced": true,
+      "step0_state": "background",
+      "termination_reason": "silence",
+      "unit": "wake-cognitive_derivation-wake_400ea8877e999e1c3902995d-rev1",
+      "wake_state": "completed"
+    }
+  ],
+  "index_watermark": 66,
+  "now": "2026-10-08T13:52:00+00:00",
+  "periodic_review": {
+    "anchors": 10,
+    "review_id": "wake_review_e1002d5562f2ae6d74007e1e",
+    "wake_state": "completed"
+  },
+  "status": "processed",
+  "summary_commits": [
+    {
+      "object_id": "sum_1e132e64b28b81ce5c303291",
+      "revision": 1
+    }
+  ],
+  "world_revision": 66
+}

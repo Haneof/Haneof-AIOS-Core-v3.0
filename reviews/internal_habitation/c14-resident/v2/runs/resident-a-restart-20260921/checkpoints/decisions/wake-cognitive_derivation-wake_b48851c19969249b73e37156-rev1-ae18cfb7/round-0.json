@@ -1,0 +1,8 @@
+{
+  "capability_calls": [
+    {"name": "read_ai_world", "arguments": {"limit": 50}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:sleep", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-18T00:00:00Z", "limit": 20}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:environment", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-18T00:00:00Z", "limit": 20}}
+  ],
+  "rationale": "2 成员 bundle（10-14 的 sleep 与 environment 日摘要，均 REALITY）。摘要只是导航锚点：先读既有 AI 世界认知，再取睡眠全序列（含刚入库的 10-17 观测）与环境维度记录，判断睡眠线是否已到可闭合门槛、环境通知是否含持久信息。"
+}

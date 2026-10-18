@@ -1,0 +1,14 @@
+{
+  "background_now": "2026-10-01T14:13:01+00:00",
+  "dispatches": [],
+  "index_watermark": 4,
+  "now": "2026-10-01T14:12:00+00:00",
+  "periodic_review": {
+    "anchors": 1,
+    "review_id": "wake_review_13b06fe40c7f02ff9937095e",
+    "wake_state": "completed"
+  },
+  "status": "processed",
+  "summary_commits": [],
+  "world_revision": 4
+}

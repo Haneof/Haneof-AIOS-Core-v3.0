@@ -1,0 +1,210 @@
+{
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": [],
+      "error_code": null,
+      "error_message": null,
+      "name": "read_ai_world",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": {
+        "created_by": "c14_fixture_ingest:c14-mechanical-ingest-adapter-v1",
+        "data_quality": {
+          "fixture_release": true
+        },
+        "learned_at": "2026-10-01T14:12:00Z",
+        "metadata": {
+          "dimension": "dim:sleep",
+          "external_record_id": "c14resv2-001",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-001",
+          "fixture_payload_sha256": "sha256:8f0368bff1263924e037ce3d9814f95ad1543e054bb1916fe97fa893dc1119f3",
+          "fixture_projection_sha256": "sha256:0ae667657344eadd1a0d4b67a1d1262bf48c7398a5f560f3096d925f2e7b7882",
+          "fixture_sequence": 1,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-01T07:12:00-07:00",
+          "source_class": "sensor"
+        },
+        "modality": "structured_text",
+        "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+        "object_type": "observation",
+        "occurred": {
+          "end": "2026-10-01T14:12:00Z",
+          "precision": "second",
+          "start": "2026-10-01T14:12:00Z",
+          "timezone_name": "UTC",
+          "unknown": false
+        },
+        "raw_locator": "fixture://c14-resident-fixture-v2/c14resv2-001",
+        "recorded_at": "2026-10-01T14:12:00Z",
+        "revision": 1,
+        "source_kind": "wearable",
+        "source_refs": [],
+        "status": "active",
+        "subject_id": "user_1",
+        "unit": null,
+        "value": "昨晚睡眠 7小时44分；睡眠评分 84/100；07:08 醒来。"
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "retrieve_original_observation",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": {
+        "created_by": "c14_fixture_ingest:c14-mechanical-ingest-adapter-v1",
+        "data_quality": {
+          "fixture_release": true
+        },
+        "learned_at": "2026-10-01T14:48:00Z",
+        "metadata": {
+          "dimension": "dim:schedule",
+          "external_record_id": "c14resv2-002",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-002",
+          "fixture_payload_sha256": "sha256:a31fee3926214921eaa8cf30b569af4069ba5cbc6c101fe44c1331396e771d9b",
+          "fixture_projection_sha256": "sha256:e56b094f127ccd0b1efdc5c38d64fdae63ce33ff37939857b221e48e8847ea8d",
+          "fixture_sequence": 2,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-01T07:48:00-07:00",
+          "source_class": "platform"
+        },
+        "modality": "structured_text",
+        "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+        "object_type": "observation",
+        "occurred": {
+          "end": "2026-10-01T14:48:00Z",
+          "precision": "second",
+          "start": "2026-10-01T14:48:00Z",
+          "timezone_name": "UTC",
+          "unknown": false
+        },
+        "raw_locator": "fixture://c14-resident-fixture-v2/c14resv2-002",
+        "recorded_at": "2026-10-01T14:48:00Z",
+        "revision": 1,
+        "source_kind": "calendar",
+        "source_refs": [],
+        "status": "active",
+        "subject_id": "user_1",
+        "unit": null,
+        "value": "今天 08:00–10:20 安排“架构备忘录起草”；第一场会议在 10:45。"
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "retrieve_original_observation",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": {
+        "created_by": "c14_fixture_ingest:c14-mechanical-ingest-adapter-v1",
+        "data_quality": {
+          "fixture_release": true
+        },
+        "learned_at": "2026-10-01T17:22:00Z",
+        "metadata": {
+          "dimension": "dim:device_activity",
+          "external_record_id": "c14resv2-003",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-003",
+          "fixture_payload_sha256": "sha256:126fe73f4b938a5b2037a2f979696ade07f4e36844523929589ecb6d72039331",
+          "fixture_projection_sha256": "sha256:ec6908844a7dd48ebc2aab20ba112205518ec1552bfc807885095828c9b5cdd1",
+          "fixture_sequence": 3,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-01T10:22:00-07:00",
+          "source_class": "platform"
+        },
+        "modality": "structured_text",
+        "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+        "object_type": "observation",
+        "occurred": {
+          "end": "2026-10-01T17:22:00Z",
+          "precision": "second",
+          "start": "2026-10-01T17:22:00Z",
+          "timezone_name": "UTC",
+          "unknown": false
+        },
+        "raw_locator": "fixture://c14-resident-fixture-v2/c14resv2-003",
+        "recorded_at": "2026-10-01T17:22:00Z",
+        "revision": 1,
+        "source_kind": "device",
+        "source_refs": [],
+        "status": "active",
+        "subject_id": "user_1",
+        "unit": null,
+        "value": "08:02–10:18 开启专注模式；期间主动解锁 3 次，26 条通知被静音。"
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "retrieve_original_observation",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": {
+        "created_by": "c14_fixture_ingest:c14-mechanical-ingest-adapter-v1",
+        "data_quality": {
+          "fixture_release": true
+        },
+        "learned_at": "2026-10-01T17:28:00Z",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "external_record_id": "c14resv2-004",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-004",
+          "fixture_payload_sha256": "sha256:2f24bfb773de2ac7b74b85ba16b7eafc22f7370ed0601268cf35d5d9c611a5c5",
+          "fixture_projection_sha256": "sha256:1a8d5ee753df815c12755164ff6403a6983d3719a45a71ed525b9af2f1831581",
+          "fixture_sequence": 4,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-01T10:28:00-07:00",
+          "source_class": "platform"
+        },
+        "modality": "structured_text",
+        "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+        "object_type": "observation",
+        "occurred": {
+          "end": "2026-10-01T17:28:00Z",
+          "precision": "second",
+          "start": "2026-10-01T17:28:00Z",
+          "timezone_name": "UTC",
+          "unknown": false
+        },
+        "raw_locator": "fixture://c14-resident-fixture-v2/c14resv2-004",
+        "recorded_at": "2026-10-01T17:28:00Z",
+        "revision": 1,
+        "source_kind": "task_tracker",
+        "source_refs": [],
+        "status": "active",
+        "subject_id": "user_1",
+        "unit": null,
+        "value": "“架构备忘录”第一版于 10:16 提交；原计划工作块结束时间为 10:20。"
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "retrieve_original_observation",
+      "ok": true
+    }
+  ],
+  "directive": {
+    "rationale": "盘查结果：AI-world 现有认知为空；16 个摘要成员全部闭合到同一天的 4 条 REALITY 观测（睡眠 7h44m/84、08:00–10:20 备忘录工作块、08:02–10:18 专注模式 3 次解锁/26 条静音、初稿 10:16 提交）。单日 4 条观测之间的一致性是案例级事实，已作为 Observation/Summary 持久存在，不构成对持久、可修订一般性认知的证据；无基线、无反证、无跨日材料。故本轮不创建/不修订/不废止认知，保持沉默，待多日证据累积再评。",
+    "silence": true
+  },
+  "round_index": 1,
+  "unit_key": "wake-cognitive_derivation-wake_1cf110c3441735516a8f1266-rev1"
+}

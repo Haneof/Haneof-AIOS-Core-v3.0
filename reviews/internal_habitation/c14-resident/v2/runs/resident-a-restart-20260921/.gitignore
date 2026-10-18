@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+world/*.db-wal
+world/*.db-shm

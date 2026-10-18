@@ -1,0 +1,208 @@
+{
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": [
+        {
+          "excerpt": "今天 08:00–10:20 安排“架构备忘录起草”；第一场会议在 10:45。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-01T14:48:00Z"
+        },
+        {
+          "excerpt": "08:02–10:18 开启专注模式；期间主动解锁 3 次，26 条通知被静音。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-01T17:22:00Z"
+        },
+        {
+          "excerpt": "“架构备忘录”第一版于 10:16 提交；原计划工作块结束时间为 10:20。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-01T17:28:00Z"
+        },
+        {
+          "excerpt": "昨晚睡眠 7小时39分；睡眠评分 82/100；07:01 醒来。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_27ab6246ef0865debe1b49af",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-10-01 工作产出：“架构备忘录”第一版于 10:16 提交；原计划工作块结束时间为 10:20。",
+          "object_ref": {
+            "object_id": "sum_03a94f689d069e0bbb5c1eb4",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-09-28–10-04 当周日程：本周仅 10-01 有一条日程记录——08:00–10:20 为“架构备忘录起草”工作块，当天第一场会议在 10:45。",
+          "object_ref": {
+            "object_id": "sum_468fbdd51f43bbb37ed8a3ad",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-Q3（07-01–09-30）设备活动：本季度窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一记录为 10-01 的 08:02–10:18 专注模式（主动解锁 3 次、26 条通知被静音）。",
+          "object_ref": {
+            "object_id": "sum_505a097545911c054e48720a",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-10-01 设备活动：08:02–10:18 处于专注模式；该时段内主动解锁设备 3 次，26 条通知被静音。",
+          "object_ref": {
+            "object_id": "sum_53d509d86786bde8d0e84da3",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-09 设备活动：本月窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一记录为 10-01 的 08:02–10:18 专注模式，期间主动解锁设备 3 次、26 条通知被静音。",
+          "object_ref": {
+            "object_id": "sum_621dbad73aff86b121ff5f4d",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-09 工作产出：本月窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一记录为 10-01 的“架构备忘录”第一版 10:16 提交、原计划工作块结束时间 10:20。",
+          "object_ref": {
+            "object_id": "sum_66e44044c780170d4b893177",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-Q3（07-01–09-30）睡眠：本季度窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一睡眠记录为 10-01 的 7小时44分、评分 84/100、07:08 醒来。",
+          "object_ref": {
+            "object_id": "sum_739da506a4c4d81ac3de0421",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-09-28–10-04 当周睡眠：本周仅 10-01 有一条睡眠记录——睡眠 7小时44分，评分 84/100，07:08 醒来。",
+          "object_ref": {
+            "object_id": "sum_7f9c1dda2a76a9f3e2a5f087",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-Q3（07-01–09-30）日程：本季度窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一日程记录为 10-01 的 08:00–10:20“架构备忘录起草”工作块、首场会议 10:45。",
+          "object_ref": {
+            "object_id": "sum_97e12742d2d5a6bb6fced32b",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-09-28–10-04 当周工作产出：本周仅 10-01 有一条记录——“架构备忘录”第一版于 10:16 提交，原计划工作块结束时间为 10:20。",
+          "object_ref": {
+            "object_id": "sum_a5cfe5e5f052c7b9969486ad",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-09 日程：本月窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一日程记录为 10-01 的 08:00–10:20“架构备忘录起草”工作块，当天首场会议 10:45。",
+          "object_ref": {
+            "object_id": "sum_c4e7d293d66b59d87731d65d",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-Q3（07-01–09-30）工作产出：本季度窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一记录为 10-01 的“架构备忘录”第一版 10:16 提交、原计划工作块结束 10:20。",
+          "object_ref": {
+            "object_id": "sum_dec542116cba49b459db613c",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-10-01 睡眠：昨夜睡眠 7小时44分；睡眠评分 84/100；07:08 醒来。",
+          "object_ref": {
+            "object_id": "sum_e4577fa411beaabd5bb78300",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-10-01 日程：08:00–10:20 为“架构备忘录起草”工作块；当天第一场会议安排在 10:45。",
+          "object_ref": {
+            "object_id": "sum_eceb678add8634ee26b63e49",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-09 睡眠：本月窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一睡眠记录为 10-01 的睡眠 7小时44分、评分 84/100、07:08 醒来。",
+          "object_ref": {
+            "object_id": "sum_f222693ff55566369177b6e8",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "2026-09-28–10-04 当周设备活动：本周仅 10-01 有一条记录——08:02–10:18 处于专注模式，期间主动解锁设备 3 次、26 条通知被静音。",
+          "object_ref": {
+            "object_id": "sum_fa279a5040c9a67efcae4f10",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-05T14:06:00Z"
+        },
+        {
+          "excerpt": "attention=background | source=attention_bundle | state=completed | priority=50 | hits=16 | termination=silence | rounds=2 | delivery=False | step0=background | capabilities=['read_ai_world', 'retrieve_original_observation', 'retrieve_original_observation', 'retrieve_original_observation', 'retrieve_original_observation']",
+          "object_ref": {
+            "object_id": "wake_bundle_b730ca1a7fefcee2ec36e955",
+            "revision": 3
+          },
+          "object_type": "wake",
+          "recorded_at": "2026-10-05T14:07:01Z"
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "read_periodic_review_anchors",
+      "ok": true
+    }
+  ],
+  "directive": {
+    "rationale": "21 个锚点=4 条观测（10-01 三条 + 10-05 睡眠）+ 16 条我自撰的单日滚存摘要 + 1 条 C14 bundle wake（已完成、silence、2 轮）。现有 AI-world 认知为空，无可修订/回滚对象。10-05 新增第二晚睡眠样本（7h39m/82，07:01 醒）与 10-01（7h44m/84，07:08 醒）相似，但仅 n=2、相隔 4 天且中间无数据，仍不构成持久认知的充分证据。无证据支持的操作经验可记录。故保持沉默。",
+    "silence": true
+  },
+  "round_index": 1,
+  "unit_key": "periodic-review-20261005T140701Z"
+}

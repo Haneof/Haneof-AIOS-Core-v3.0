@@ -1,0 +1,374 @@
+{
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": [],
+      "error_code": null,
+      "error_message": null,
+      "name": "read_ai_world",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": [
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "2026-10-09 工作产出（AI 认知记录，非现实观测）：本窗口仅含本 Resident 于 10-09T01:11Z 写入的一条 hypothesis 级 Claim「写作块交付与日程保护程度相关（截至 10-08 的 3 次观察）」及其证据集（9 条观测）；窗口内无新的现实工作产出观测。",
+          "object_id": "sum_9e81acf33a4abc28c291e3af",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 3
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "写作块交付与日程保护程度相关（截至 10-09 的 3 次观察）：未被会议插入的写作块——10-01“架构备忘录起草”08:00–10:20、10-08“设计评审稿”08:15–10:35——都在计划区间内完成（10:16 / 10:31 提交），且整块处于专注模式（主动解锁 3 / 2 次，静音通知 26 / 29 条）；被会议插入的一次——10-05“定价说明起草”08:30–10:45 期间",
+          "object_id": "clm_79df61916b8bb4c10cb3faa3",
+          "object_type": "claim",
+          "retrieval_score": 0,
+          "revision": 2
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "",
+          "object_id": "evs_fc254abd76b116a56bb77c04",
+          "object_type": "evidence_set",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "",
+          "object_id": "evs_revision_c35b94500be71d9af1b5a6d0",
+          "object_type": "evidence_set",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "“定价说明”到 15:00 完成约 65%；剩余部分移到次日上午继续。",
+          "object_id": "obs_c14_fixture_35f8ca5c3abafa4ba5c8650a",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "“架构备忘录”第一版于 10:16 提交；原计划工作块结束时间为 10:20。",
+          "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "“设计评审稿”于 10:31 完成；三个待决问题已在文档中给出处理方案。",
+          "object_id": "obs_c14_fixture_96ba14d7f113e478b8a8bae8",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "2026-10-01 工作产出：“架构备忘录”第一版于 10:16 提交；原计划工作块结束时间为 10:20。",
+          "object_id": "sum_03a94f689d069e0bbb5c1eb4",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "2026-10-08 工作产出：“设计评审稿”于 10:31 完成；三个待决问题已在文档中给出处理方案。",
+          "object_id": "sum_4c759aebb39172f506fd747e",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "2026-10-05 工作产出：“定价说明”到 15:00 完成约 65%；剩余部分移到次日上午继续。",
+          "object_id": "sum_612659baec6788b7aef2647d",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "2026-10-11 工作产出（AI 认知记录，非现实观测）：本窗口只含本 Resident 对既有 hypothesis 级 Claim「写作块交付与日程保护程度相关」的修订（rev 2，证据集扩为 10 条观测，其中新增 10-09 会话自述）；窗口内无新的现实工作产出观测。",
+          "object_id": "sum_a2ec590b3d03001a606c1d72",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "2026-09-28–10-04 当周工作产出：本周仅 10-01 有一条记录——“架构备忘录”第一版于 10:16 提交，原计划工作块结束时间为 10:20。",
+          "object_id": "sum_a5cfe5e5f052c7b9969486ad",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "2026-10-05–10-11 当周工作产出：两条现实记录——10-05“定价说明”到 15:00 完成约 65%、余量移到次日上午；10-08“设计评审稿”于 10:31 完成、三个待决问题已在文档中给出处理方案。本周另含 AI 认知记录（非现实观测）：我 10-09 写入的 hypothesis 级 Claim「写作块交付与日程保护程度相关」及其 10-11 的 rev 2 修订（证据集扩至",
+          "object_id": "sum_dfa35021e2aa10da82941c27",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "search_timeline",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": [
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "今天 08:30–10:00 是客户共创工作坊；10:20–11:50 安排“方案修改”。",
+          "object_id": "obs_c14_fixture_2ef7e5aea9885147e524e1c8",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "今天 08:00–10:20 安排“架构备忘录起草”；第一场会议在 10:45。",
+          "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "今天 07:00 有一场与伦敦团队的视频会议。",
+          "object_id": "obs_c14_fixture_548acbc204287fcdb2c3a036",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "今天 08:15–10:35 安排“设计评审稿”；11:20 前没有会议。",
+          "object_id": "obs_c14_fixture_6e081d5c46196e1781165d5c",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "原定 08:30–10:45 的“定价说明起草”中间新增 09:05 stand-up 和 09:50 供应商电话；剩余写作时间分到 13:40–15:00。",
+          "object_id": "obs_c14_fixture_8a41a59c20d2aac5789bf0f1",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "今天 06:25 航班；日历标记 05:52 出门。",
+          "object_id": "obs_c14_fixture_979fd7bab5a31f3239b61e0b",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "今天 11:30 前没有日历安排。",
+          "object_id": "obs_c14_fixture_e72bc48cd34bac898ca91029",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "2026-09-28–10-04 当周日程：本周仅 10-01 有一条日程记录——08:00–10:20 为“架构备忘录起草”工作块，当天第一场会议在 10:45。",
+          "object_id": "sum_468fbdd51f43bbb37ed8a3ad",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "2026-10-05 日程：原定 08:30–10:45 的“定价说明起草”被 09:05 stand-up 与 09:50 供应商电话打断；剩余写作时间被重排到 13:40–15:00。",
+          "object_id": "sum_4aa1c0fba96ed70142807f77",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "2026-10-19 日程：当天 11:30 前没有日历安排。",
+          "object_id": "sum_7ae8788a8e00c3bdfb1f9e02",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "2026-10-11 日程：当天 06:25 有航班；日历把 05:52 标记为出门时间。",
+          "object_id": "sum_92ec74771acfa333332bf060",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "2026-10-17 日程：当天 07:00 有一场与伦敦团队的视频会议。",
+          "object_id": "sum_9a272f5377d1c884c824ed3d",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "2026-10-08 日程：08:15–10:35 安排“设计评审稿”；11:20 前没有会议。",
+          "object_id": "sum_9d7d45f32dfdab461b21eabe",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "2026-10-12–10-18 当周日程：本周仅 10-17 有一条记录——当天 07:00 有一场与伦敦团队的视频会议。",
+          "object_id": "sum_bcfc4a4255b8958d2004111d",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "2026-10-05–10-11 当周日程：三条记录——10-05 原定 08:30–10:45 的“定价说明起草”被 09:05 stand-up 与 09:50 供应商电话打断，剩余写作重排到 13:40–15:00；10-08 安排 08:15–10:35“设计评审稿”，11:20 前没有会议；10-11 为出行日，06:25 航班、日历标记 05:52 出门。",
+          "object_id": "sum_dd848bc286b3bd6c365f15b5",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "2026-10-01 日程：08:00–10:20 为“架构备忘录起草”工作块；当天第一场会议安排在 10:45。",
+          "object_id": "sum_eceb678add8634ee26b63e49",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "search_timeline",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": [
+        {
+          "dimension": "dim:device_activity",
+          "excerpt": "08:13–10:34 开启专注模式；期间主动解锁 2 次，29 条通知被静音。",
+          "object_id": "obs_c14_fixture_522a6cbeb84ced83b62def58",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:device_activity",
+          "excerpt": "08:02–10:18 开启专注模式；期间主动解锁 3 次，26 条通知被静音。",
+          "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:device_activity",
+          "excerpt": "2026-10-05–10-11 当周设备活动：本周仅 10-08 有一条记录——08:13–10:34 处于专注模式，期间主动解锁 2 次、29 条通知被静音。",
+          "object_id": "sum_4e6bac8888303d595a2e4369",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:device_activity",
+          "excerpt": "2026-10-01 设备活动：08:02–10:18 处于专注模式；该时段内主动解锁设备 3 次，26 条通知被静音。",
+          "object_id": "sum_53d509d86786bde8d0e84da3",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:device_activity",
+          "excerpt": "2026-10-08 设备活动：08:13–10:34 处于专注模式；期间主动解锁 2 次，29 条通知被静音。",
+          "object_id": "sum_5d6e8d21ef5837c282e05308",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:device_activity",
+          "excerpt": "2026-09-28–10-04 当周设备活动：本周仅 10-01 有一条记录——08:02–10:18 处于专注模式，期间主动解锁设备 3 次、26 条通知被静音。",
+          "object_id": "sum_fa279a5040c9a67efcae4f10",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "search_timeline",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": [
+        {
+          "dimension": "dim:conversation",
+          "excerpt": "用户说：“下午接着写时，我先花了十来分钟重新找上午引用的那几张表。”",
+          "object_id": "obs_c14_fixture_0ca259ffc10ff4a9218561d0",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:conversation",
+          "excerpt": "用户说：“今天上午人有点困，不过那份稿子没拖到下午。”",
+          "object_id": "obs_c14_fixture_f3557413048807b17b9487bc",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:conversation",
+          "excerpt": "2026-10-06 会话：用户自述“下午接着写时，我先花了十来分钟重新找上午引用的那几张表”。",
+          "object_id": "sum_1e132e64b28b81ce5c303291",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:conversation",
+          "excerpt": "2026-10-05–10-11 当周会话：两次用户自述——10-06“下午接着写时，我先花了十来分钟重新找上午引用的那几张表”；10-09“今天上午人有点困，不过那份稿子没拖到下午”。",
+          "object_id": "sum_4be1eaf3e66c653974bfcad5",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:conversation",
+          "excerpt": "2026-10-09 会话：用户自述“今天上午人有点困，不过那份稿子没拖到下午”。",
+          "object_id": "sum_eb6c6e069e53ce16d9e3c4d4",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "search_timeline",
+      "ok": true
+    }
+  ],
+  "directive": {
+    "rationale": "2 成员（10-19 日程/睡眠日摘要）只是导航锚点。跨维检索确认：本 run 的持久认知已有 1 条 Claim——clm_79df61916b8bb4c10cb3faa3 rev2「写作块交付与日程保护程度相关（截至 10-09 的 3 次观察）」，证据集 evs_revision_c35b94500be71d9af1b5a6d0@1（10 条观测），其现实证据仍是 10-01 架构备忘录（08:00–10:20 受保护块，10:16 提交）、10-05 定价说明（块被 09:05/09:50 会议插入，15:00 仅 65% 并顺延）、10-08 设计评审稿（08:15–10:35 受保护块，10:31 完成；当天用户困倦仍按时）。自 rev2 以来新增的观测（10-11 出行、10-14 物业通知、10-17 伦敦会议、10-19 上午无安排、10-21 工作坊+方案修改）都**不是**新的“写作块—交付/顺延”结果案例，因此既无新增支持、也没有反例（没有出现“被插入仍按时”或“受保护仍顺延”），不满足修订/撤回条件，也不另立新 Claim。睡眠线仍无稳定模式（7 个样本跨度 5h48–8h09），环境/日程为单次事务。read_ai_world 为空。观察项记录在案：10-21 的“工作坊 08:30–10:00 + 方案修改 10:20–11:50”是一个可能检验该 Claim 的新结构，待其工作产出观测出现后再判断。本轮保持沉默。",
+    "silence": true
+  },
+  "round_index": 1,
+  "unit_key": "wake-cognitive_derivation-wake_41f660b597ba3dd50a781ad7-rev1"
+}

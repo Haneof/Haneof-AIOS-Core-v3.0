@@ -1,0 +1,37 @@
+{
+  "background_now": "2026-10-14T12:58:01+00:00",
+  "dispatches": [
+    {
+      "capability_calls": [
+        {"error_code": null, "name": "read_ai_world", "ok": true},
+        {"error_code": null, "name": "search_timeline", "ok": true},
+        {"error_code": null, "name": "search_timeline", "ok": true},
+        {"error_code": null, "name": "search_timeline", "ok": true}
+      ],
+      "delivery_suppressed": false,
+      "dispatched_wake_ref": "wake_bundle_95f22e790bc266e0a4a5f5ee@3",
+      "model_rounds": 2,
+      "response": null,
+      "silenced": true,
+      "step0_state": "background",
+      "termination_reason": "silence",
+      "unit": "wake-cognitive_derivation-wake_0bb994195dc853d0785b73e0-rev1",
+      "wake_state": "completed"
+    }
+  ],
+  "index_watermark": 122,
+  "now": "2026-10-14T12:57:00+00:00",
+  "periodic_review": {"anchors": 13, "review_id": "wake_review_97aa729687fb559c4534fcb6", "wake_state": "completed"},
+  "status": "processed",
+  "summary_commits": [
+    {"object_id": "sum_92ec74771acfa333332bf060", "revision": 1},
+    {"object_id": "sum_873a0367c5fc243cc0805516", "revision": 1},
+    {"object_id": "sum_a2ec590b3d03001a606c1d72", "revision": 1},
+    {"object_id": "sum_4be1eaf3e66c653974bfcad5", "revision": 1},
+    {"object_id": "sum_4e6bac8888303d595a2e4369", "revision": 1},
+    {"object_id": "sum_dd848bc286b3bd6c365f15b5", "revision": 1},
+    {"object_id": "sum_bd425210f7a8c2f7e5842e39", "revision": 1},
+    {"object_id": "sum_dfa35021e2aa10da82941c27", "revision": 1}
+  ],
+  "world_revision": 122
+}

@@ -1,0 +1,9 @@
+{
+  "capability_calls": [
+    {"name": "read_ai_world", "arguments": {"limit": 50}},
+    {"name": "inspect_world_object", "arguments": {"object_id": "sum_9e81acf33a4abc28c291e3af", "revision": 3}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:work_outcome", "window_start": "2026-10-09T00:00:00Z", "window_end": "2026-10-10T00:00:00Z", "limit": 20}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:conversation", "window_start": "2026-10-09T00:00:00Z", "window_end": "2026-10-10T00:00:00Z", "limit": 20}}
+  ],
+  "rationale": "本轮 wake 由 10-09 日 work_outcome 摘要被重写（rev3，因我 10-09 的 claim rev2 改变了该窗口来源）触发。摘要只是导航锚点、非结论：先读既有 AI 世界认知（含 claim rev2 现状），再核该摘要 rev3 的真实内容与窗口内现实观测，判断是否需要形成/修订/撤回认知。"
+}

@@ -1,0 +1,6 @@
+{
+  "capability_calls": [
+    {"name": "read_periodic_review_anchors", "arguments": {"limit": 20}}
+  ],
+  "rationale": "读取本轮 10 条锚点（窗口 10-05T14:07Z→10-08T13:53Z），核对新增证据再决定是否创建/修订认知或操作经验。"
+}

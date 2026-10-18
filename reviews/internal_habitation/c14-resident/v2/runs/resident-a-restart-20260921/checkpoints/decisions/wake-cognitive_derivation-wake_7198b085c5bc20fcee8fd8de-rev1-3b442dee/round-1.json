@@ -1,0 +1,4 @@
+{
+  "silence": true,
+  "rationale": "已把 10-09 会话观测并入 Claim 证据集（rev 2，证据集 evs_revision_c35b94500be71d9af1b5a6d0），依赖该 Claim 的 10-09 摘要被标记 review-required（属预期）。后台 wake 不面向用户交付，沉默终止。"
+}

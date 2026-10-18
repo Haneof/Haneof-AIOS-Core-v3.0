@@ -1,0 +1,28 @@
+# DimensionSummaryInput — dim:work_outcome__week__2026-09-28T00:00:00+00:00__2026-10-04T23:59:59.999999+00:00
+
+- dimension: dim:work_outcome
+- granularity: week
+- window: 2026-09-28T00:00:00+00:00 .. 2026-10-04T23:59:59.999999+00:00
+- source_world_revision: 22
+- source_count: 2
+- truncated: False
+
+## sources (exact pinned material)
+
+### 1. sum_03a94f689d069e0bbb5c1eb4@1 (summary)
+
+- occurred_at: 2026-10-01T00:00:00Z
+- metadata: {"dimension": "dim:work_outcome", "summary_kind": "single_dimension_temporal"}
+
+```text
+2026-10-01 工作产出：“架构备忘录”第一版于 10:16 提交；原计划工作块结束时间为 10:20。
+```
+
+### 2. obs_c14_fixture_660bfde404b5e63e3c52db43@1 (observation)
+
+- occurred_at: 2026-10-01T17:28:00Z
+- metadata: {"dimension": "dim:work_outcome", "external_record_id": "c14resv2-004", "external_revision": "1", "fixture_binding_version": "c14-fixture-event-binding-v1", "fixture_event_id": "c14resv2-004", "fixture_payload_sha256": "sha256:2f24bfb773de2ac7b74b85ba16b7eafc22f7370ed0601268cf35d5d9c611a5c5", "fixture_projection_sha256": "sha256:1a8d5ee753df815c12755164ff6403a6983d3719a45a71ed525b9af2f1831581", "fixture_sequence": 4, "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253", "fixture_version": "c14-resident-fixture-v2", "mechanical_ingest": true, "occurred_at_original": "2026-10-01T10:28:00-07:00", "source_class": "platform"}
+
+```text
+“架构备忘录”第一版于 10:16 提交；原计划工作块结束时间为 10:20。
+```

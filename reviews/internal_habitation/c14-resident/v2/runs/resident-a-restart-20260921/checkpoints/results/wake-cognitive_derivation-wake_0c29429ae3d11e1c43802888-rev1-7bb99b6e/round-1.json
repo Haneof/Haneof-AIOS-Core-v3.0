@@ -1,0 +1,188 @@
+{
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": [],
+      "error_code": null,
+      "error_message": null,
+      "name": "read_ai_world",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": [
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "昨晚睡眠 5小时48分；睡眠评分 60/100；06:46 醒来。",
+          "object_id": "obs_c14_fixture_056dddd04850d813437e8532",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "昨晚睡眠 7小时39分；睡眠评分 82/100；07:01 醒来。",
+          "object_id": "obs_c14_fixture_27ab6246ef0865debe1b49af",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "昨晚 22:57 入睡；05:39 醒来。",
+          "object_id": "obs_c14_fixture_36306372faac84bd3a098bd6",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "昨晚睡眠 8小时09分；08:34 醒来。",
+          "object_id": "obs_c14_fixture_76d93e859e7e0873ed9ba7e4",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "昨晚 23:18 入睡；05:53 醒来。",
+          "object_id": "obs_c14_fixture_8ae7dbd1147c788bb9a61bac",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "昨晚睡眠 7小时44分；睡眠评分 84/100；07:08 醒来。",
+          "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "昨晚 23:37 入睡；06:02 醒来。",
+          "object_id": "obs_c14_fixture_c04f6900b7f114622198c7c5",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "2026-10-05 睡眠：昨夜睡眠 7小时39分；睡眠评分 82/100；07:01 醒来。",
+          "object_id": "sum_19956149ea838d569521c7da",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "2026-09-28–10-04 当周睡眠：本周仅 10-01 有一条睡眠记录——睡眠 7小时44分，评分 84/100，07:08 醒来。",
+          "object_id": "sum_7f9c1dda2a76a9f3e2a5f087",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "2026-10-14 睡眠：昨晚 23:18 入睡、05:53 醒来（约 6小时35分，按时钟推算）；本条记录未给睡眠评分。",
+          "object_id": "sum_82c11dc0bef6a49a1a203a8b",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "2026-10-11 睡眠：昨晚 22:57 入睡、05:39 醒来（约 6小时42分，按时钟推算）；本条记录未给睡眠评分。",
+          "object_id": "sum_873a0367c5fc243cc0805516",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "2026-10-05–10-11 当周睡眠：三条记录——10-05 睡眠 7小时39分、评分 82/100、07:01 醒来；10-08 睡眠 5小时48分、评分 60/100、06:46 醒来；10-11 22:57 入睡、05:39 醒来（约 6小时42分，按时钟推算，本夜未给评分）。",
+          "object_id": "sum_bd425210f7a8c2f7e5842e39",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "2026-10-12–10-18 当周睡眠：两条记录——10-14 23:18 入睡、05:53 醒来（约 6小时35分）；10-17 23:37 入睡、06:02 醒来（约 6小时25分）；两条均未给睡眠评分。",
+          "object_id": "sum_bed2bd8a6bbf115b8c4df6e5",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "2026-10-01 睡眠：昨夜睡眠 7小时44分；睡眠评分 84/100；07:08 醒来。",
+          "object_id": "sum_e4577fa411beaabd5bb78300",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "2026-10-17 睡眠：昨晚 23:37 入睡、06:02 醒来（约 6小时25分，按时钟推算）；本条记录未给睡眠评分。",
+          "object_id": "sum_f025574d517bff770f398109",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:sleep",
+          "excerpt": "2026-10-08 睡眠：昨夜睡眠 5小时48分；睡眠评分 60/100；06:46 醒来。",
+          "object_id": "sum_f25eb0e55e8258fb59baf085",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "search_timeline",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": [
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "今天 07:00 有一场与伦敦团队的视频会议。",
+          "object_id": "obs_c14_fixture_548acbc204287fcdb2c3a036",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "2026-10-17 日程：当天 07:00 有一场与伦敦团队的视频会议。",
+          "object_id": "sum_9a272f5377d1c884c824ed3d",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "2026-10-12–10-18 当周日程：本周仅 10-17 有一条记录——当天 07:00 有一场与伦敦团队的视频会议。",
+          "object_id": "sum_bcfc4a4255b8958d2004111d",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "search_timeline",
+      "ok": true
+    }
+  ],
+  "directive": {
+    "rationale": "5 成员都是 REALITY 日/周摘要（导航锚点），现实内容与我在 S18/S19 已核对的观测相同（10-17 日程 07:00 伦敦视频会议；10-14/10-17 睡眠；10-14 环境通知）。关键新增信息在我跨窗检索里：10-19 睡眠观测（昨晚 8小时09分、08:34 醒来，无评分）——这是全序列 7 个样本中**最长**的一夜，直接反驳了我在 S18 决策中记下的“近三夜 6h25–6h42 窄带/醒来前移”候选假设。睡眠线因此仍无稳定模式：7h44/84、7h39/82、5h48/60、~6h42、~6h35、~6h25、8h09（后四夜无评分），既非“持续缩短”也非“稳定区间”，我不形成 Claim（也不把 8h09 单独解释为恢复或周末效应——没有周末/工作日的可比样本）。environment/schedule 两条只是单次通知与单场会议，无持久意涵。read_ai_world 为空、无既有 AI 世界认知需要修订。故本轮不形成、不修订、不撤回，保持沉默。",
+    "silence": true
+  },
+  "round_index": 1,
+  "unit_key": "wake-cognitive_derivation-wake_0c29429ae3d11e1c43802888-rev1"
+}

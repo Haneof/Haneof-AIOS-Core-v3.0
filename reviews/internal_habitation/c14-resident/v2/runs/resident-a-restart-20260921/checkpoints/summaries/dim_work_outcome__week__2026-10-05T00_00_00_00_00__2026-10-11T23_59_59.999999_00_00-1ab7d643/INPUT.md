@@ -1,0 +1,91 @@
+# DimensionSummaryInput — dim:work_outcome__week__2026-10-05T00:00:00+00:00__2026-10-11T23:59:59.999999+00:00
+
+- dimension: dim:work_outcome
+- granularity: week
+- window: 2026-10-05T00:00:00+00:00 .. 2026-10-11T23:59:59.999999+00:00
+- source_world_revision: 114
+- source_count: 9
+- truncated: False
+
+## sources (exact pinned material)
+
+### 1. sum_612659baec6788b7aef2647d@1 (summary)
+
+- occurred_at: 2026-10-05T00:00:00Z
+- metadata: {"dimension": "dim:work_outcome", "summary_kind": "single_dimension_temporal"}
+
+```text
+2026-10-05 工作产出：“定价说明”到 15:00 完成约 65%；剩余部分移到次日上午继续。
+```
+
+### 2. obs_c14_fixture_35f8ca5c3abafa4ba5c8650a@1 (observation)
+
+- occurred_at: 2026-10-05T22:12:00Z
+- metadata: {"dimension": "dim:work_outcome", "external_record_id": "c14resv2-007", "external_revision": "1", "fixture_binding_version": "c14-fixture-event-binding-v1", "fixture_event_id": "c14resv2-007", "fixture_payload_sha256": "sha256:32f094bff092fbb61d30c09a4d0f078d7a1efdf7939c8dc1a91590f2e72bf926", "fixture_projection_sha256": "sha256:f4abbf49e37c209b749403008004e87e0533728999c8b0970836609499ae3167", "fixture_sequence": 7, "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253", "fixture_version": "c14-resident-fixture-v2", "mechanical_ingest": true, "occurred_at_original": "2026-10-05T15:12:00-07:00", "source_class": "platform"}
+
+```text
+“定价说明”到 15:00 完成约 65%；剩余部分移到次日上午继续。
+```
+
+### 3. sum_4c759aebb39172f506fd747e@1 (summary)
+
+- occurred_at: 2026-10-08T00:00:00Z
+- metadata: {"dimension": "dim:work_outcome", "summary_kind": "single_dimension_temporal"}
+
+```text
+2026-10-08 工作产出：“设计评审稿”于 10:31 完成；三个待决问题已在文档中给出处理方案。
+```
+
+### 4. obs_c14_fixture_96ba14d7f113e478b8a8bae8@1 (observation)
+
+- occurred_at: 2026-10-08T17:43:00Z
+- metadata: {"dimension": "dim:work_outcome", "external_record_id": "c14resv2-012", "external_revision": "1", "fixture_binding_version": "c14-fixture-event-binding-v1", "fixture_event_id": "c14resv2-012", "fixture_payload_sha256": "sha256:36585d0b5f6776a3dbae97ac7854e326525180fd2049a9cfead651ac889e5a8f", "fixture_projection_sha256": "sha256:7c3e55c755618d76abe0abe5d1579ca02b3e7fe5a9248e1c3eaeb4e3d214bf75", "fixture_sequence": 12, "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253", "fixture_version": "c14-resident-fixture-v2", "mechanical_ingest": true, "occurred_at_original": "2026-10-08T10:43:00-07:00", "source_class": "platform"}
+
+```text
+“设计评审稿”于 10:31 完成；三个待决问题已在文档中给出处理方案。
+```
+
+### 5. sum_9e81acf33a4abc28c291e3af@3 (summary)
+
+- occurred_at: 2026-10-09T00:00:00Z
+- metadata: {"dimension": "dim:work_outcome", "summary_kind": "single_dimension_temporal"}
+
+```text
+2026-10-09 工作产出（AI 认知记录，非现实观测）：本窗口仅含本 Resident 于 10-09T01:11Z 写入的一条 hypothesis 级 Claim「写作块交付与日程保护程度相关（截至 10-08 的 3 次观察）」及其证据集（9 条观测）；窗口内无新的现实工作产出观测。
+```
+
+### 6. clm_79df61916b8bb4c10cb3faa3@2 (claim)
+
+- occurred_at: 2026-10-09T01:11:01Z
+- metadata: {"dimension": "dim:work_outcome", "revision_evidence_set_ref": {"object_id": "evs_revision_c35b94500be71d9af1b5a6d0", "revision": 1}, "revision_mode": "revise", "revision_reason": "新增 10-09 会话观测（用户自述“今天上午人有点困，不过那份稿子没拖到下午”）。该观测显示 10-08 在睡眠仅 5h48m、主观困倦的情况下仍按计划交付——区分了“精力/疲劳”与“日程保护”两种解释，支持后者，故扩充证据集并补充该条内容。", "supersedes_revision": 1, "writeback_kind": "revisable_cognition"}
+
+```text
+写作块交付与日程保护程度相关（截至 10-09 的 3 次观察）：未被会议插入的写作块——10-01“架构备忘录起草”08:00–10:20、10-08“设计评审稿”08:15–10:35——都在计划区间内完成（10:16 / 10:31 提交），且整块处于专注模式（主动解锁 3 / 2 次，静音通知 26 / 29 条）；被会议插入的一次——10-05“定价说明起草”08:30–10:45 期间加入 09:05 stand-up 与 09:50 供应商电话、剩余写作被重排到 13:40–15:00——到 15:00 仅完成约 65%，余量顺延至次日上午，且用户续写时需约十余分钟重新定位上午引用的材料。10-08 用户自述“上午人有点困，不过那份稿子没拖到下午”——在睡眠仅 5小时48分的情况下仍按计划交付，提示精力/疲劳并非主要区分因素。假设：日程保护是该用户写作块按时交付的关键条件之一。
+```
+
+### 7. evs_fc254abd76b116a56bb77c04@1 (evidence_set)
+
+- occurred_at: 2026-10-09T01:11:01Z
+- metadata: {"dimension": "dim:work_outcome", "writeback_kind": "cognition_evidence"}
+
+```text
+{"aggregation_method": null, "aggregation_version": null, "context_refs": [], "counter_refs": [], "coverage": {"coverage_ratio": 1.0, "expected_count": 9, "missing_description": [], "observed_count": 9}, "created_by": "cognition_writeback:evidence", "knowledge_window": {"knowledge_cutoff": "2026-10-09T01:11:01Z", "world_revision": 80}, "learned_at": "2026-10-09T01:11:01Z", "member_refs": [{"object_id": "obs_c14_fixture_0ca259ffc10ff4a9218561d0", "revision": 1}, {"object_id": "obs_c14_fixture_3195efa3abad26d259380073", "revision": 1}, {"object_id": "obs_c14_fixture_35f8ca5c3abafa4ba5c8650a", "revision": 1}, {"object_id": "obs_c14_fixture_522a6cbeb84ced83b62def58", "revision": 1}, {"object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43", "revision": 1}, {"object_id": "obs_c14_fixture_6e081d5c46196e1781165d5c", "revision": 1}, {"object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67", "revision": 1}, {"object_id": "obs_c14_fixture_8a41a59c20d2aac5789bf0f1", "revision": 1}, {"object_id": "obs_c14_fixture_96ba14d7f113e478b8a8bae8", "revision": 1}], "metadata": {"dimension": "dim:work_outcome", "writeback_kind": "cognition_evidence"}, "object_id": "evs_fc254abd76b116a56bb77c04", "object_type": "evidence_set", "occurred": {"end": null, "precision": "unknown", "start": null, "timezone_name": null, "unknown": true}, "purpose": "support resident AI cognition writeback", "recorded_at": "2026-10-09T01:11:01Z", "revision": 1, "selection_method": "resident_model_selected_pinned_world_evidence", "selector": null, "source_refs": [], "stale": false, "status": "active", "subject_id": "user_1", "support_refs": [{"object_id": "obs_c14_fixture_0ca259ffc10ff4a9218561d0", "revision": 1}, {"object_id": "obs_c14_fixture_3195efa3abad26d259380073", "revision": 1}, {"object_id": "obs_c14_fixture_35f8ca5c3abafa4ba5c8650a", "revision": 1}, {"object_id": "obs_c14_fixture_522a6cbeb84ced83b62def58", "revision": 1}, {"object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43", "revision": 1}, {"object_id
+```
+
+### 8. sum_a2ec590b3d03001a606c1d72@1 (summary)
+
+- occurred_at: 2026-10-11T00:00:00Z
+- metadata: {"dimension": "dim:work_outcome", "summary_kind": "single_dimension_temporal"}
+
+```text
+2026-10-11 工作产出（AI 认知记录，非现实观测）：本窗口只含本 Resident 对既有 hypothesis 级 Claim「写作块交付与日程保护程度相关」的修订（rev 2，证据集扩为 10 条观测，其中新增 10-09 会话自述）；窗口内无新的现实工作产出观测。
+```
+
+### 9. evs_revision_c35b94500be71d9af1b5a6d0@1 (evidence_set)
+
+- occurred_at: 2026-10-11T12:44:01Z
+- metadata: {"dimension": "dim:work_outcome", "revision_mode": "revise", "target_ref": {"object_id": "clm_79df61916b8bb4c10cb3faa3", "revision": 1}}
+
+```text
+{"aggregation_method": null, "aggregation_version": null, "context_refs": [], "counter_refs": [], "coverage": {"coverage_ratio": 1.0, "expected_count": 10, "missing_description": [], "observed_count": 10}, "created_by": "cognition_revision:evidence", "knowledge_window": {"knowledge_cutoff": "2026-10-11T12:44:01Z", "world_revision": 89}, "learned_at": "2026-10-11T12:44:01Z", "member_refs": [{"object_id": "obs_c14_fixture_3195efa3abad26d259380073", "revision": 1}, {"object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67", "revision": 1}, {"object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43", "revision": 1}, {"object_id": "obs_c14_fixture_8a41a59c20d2aac5789bf0f1", "revision": 1}, {"object_id": "obs_c14_fixture_35f8ca5c3abafa4ba5c8650a", "revision": 1}, {"object_id": "obs_c14_fixture_0ca259ffc10ff4a9218561d0", "revision": 1}, {"object_id": "obs_c14_fixture_6e081d5c46196e1781165d5c", "revision": 1}, {"object_id": "obs_c14_fixture_522a6cbeb84ced83b62def58", "revision": 1}, {"object_id": "obs_c14_fixture_96ba14d7f113e478b8a8bae8", "revision": 1}, {"object_id": "obs_c14_fixture_f3557413048807b17b9487bc", "revision": 1}], "metadata": {"dimension": "dim:work_outcome", "revision_mode": "revise", "target_ref": {"object_id": "clm_79df61916b8bb4c10cb3faa3", "revision": 1}}, "object_id": "evs_revision_c35b94500be71d9af1b5a6d0", "object_type": "evidence_set", "occurred": {"end": null, "precision": "unknown", "start": null, "timezone_name": null, "unknown": true}, "purpose": "revise Claim clm_79df61916b8bb4c10cb3faa3@1", "recorded_at": "2026-10-11T12:44:01Z", "revision": 1, "selection_method": "resident_model_selected_revision_evidence", "selector": null, "source_refs": [], "stale": false, "status": "active", "subject_id": "user_1", "support_refs": [{"object_id": "obs_c14_fixture_3195efa3abad26d259380073", "revision": 1}, {"object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67", "revision": 1}, {"object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43", "revision": 1}, {"object_id"
+```

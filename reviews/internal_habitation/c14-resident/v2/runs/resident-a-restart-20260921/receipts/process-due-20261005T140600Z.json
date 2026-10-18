@@ -1,0 +1,118 @@
+{
+  "background_now": "2026-10-05T14:07:01+00:00",
+  "dispatches": [
+    {
+      "capability_calls": [
+        {
+          "error_code": null,
+          "name": "read_ai_world",
+          "ok": true
+        },
+        {
+          "error_code": null,
+          "name": "retrieve_original_observation",
+          "ok": true
+        },
+        {
+          "error_code": null,
+          "name": "retrieve_original_observation",
+          "ok": true
+        },
+        {
+          "error_code": null,
+          "name": "retrieve_original_observation",
+          "ok": true
+        },
+        {
+          "error_code": null,
+          "name": "retrieve_original_observation",
+          "ok": true
+        }
+      ],
+      "delivery_suppressed": false,
+      "dispatched_wake_ref": "wake_bundle_b730ca1a7fefcee2ec36e955@3",
+      "model_rounds": 2,
+      "response": null,
+      "silenced": true,
+      "step0_state": "background",
+      "termination_reason": "silence",
+      "unit": "wake-cognitive_derivation-wake_1cf110c3441735516a8f1266-rev1",
+      "wake_state": "completed"
+    }
+  ],
+  "index_watermark": 46,
+  "now": "2026-10-05T14:06:00+00:00",
+  "periodic_review": {
+    "anchors": 21,
+    "review_id": "wake_review_6504931e301a63a3e7f5ef9e",
+    "wake_state": "completed"
+  },
+  "status": "processed",
+  "summary_commits": [
+    {
+      "object_id": "sum_53d509d86786bde8d0e84da3",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_eceb678add8634ee26b63e49",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_e4577fa411beaabd5bb78300",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_03a94f689d069e0bbb5c1eb4",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_fa279a5040c9a67efcae4f10",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_468fbdd51f43bbb37ed8a3ad",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_7f9c1dda2a76a9f3e2a5f087",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_a5cfe5e5f052c7b9969486ad",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_621dbad73aff86b121ff5f4d",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_c4e7d293d66b59d87731d65d",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_f222693ff55566369177b6e8",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_66e44044c780170d4b893177",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_505a097545911c054e48720a",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_97e12742d2d5a6bb6fced32b",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_739da506a4c4d81ac3de0421",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_dec542116cba49b459db613c",
+      "revision": 1
+    }
+  ],
+  "world_revision": 46
+}

@@ -1,0 +1,64 @@
+{
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": [
+        {
+          "excerpt": "今天 11:30 前没有日历安排。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_e72bc48cd34bac898ca91029",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-19T15:41:00Z"
+        },
+        {
+          "excerpt": "今天 08:30–10:00 是客户共创工作坊；10:20–11:50 安排“方案修改”。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_2ef7e5aea9885147e524e1c8",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-21T15:04:00Z"
+        },
+        {
+          "excerpt": "2026-10-19 日程：当天 11:30 前没有日历安排。",
+          "object_ref": {
+            "object_id": "sum_7ae8788a8e00c3bdfb1f9e02",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-21T15:04:00Z"
+        },
+        {
+          "excerpt": "2026-10-19 睡眠：昨晚睡眠 8小时09分、08:34 醒来；本条记录未给睡眠评分。",
+          "object_ref": {
+            "object_id": "sum_a052565b0b46fd1f226b2991",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-21T15:04:00Z"
+        },
+        {
+          "excerpt": "attention=background | source=attention_bundle | state=completed | priority=50 | hits=2 | termination=silence | rounds=2 | delivery=False | step0=background | capabilities=['read_ai_world', 'search_timeline', 'search_timeline', 'search_timeline', 'search_timeline']",
+          "object_ref": {
+            "object_id": "wake_bundle_bc4794890a371faf7ee3bad7",
+            "revision": 3
+          },
+          "object_type": "wake",
+          "recorded_at": "2026-10-21T15:05:01Z"
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "read_periodic_review_anchors",
+      "ok": true
+    }
+  ],
+  "directive": {
+    "rationale": "5 锚点复核（窗口 10-19T15:39Z→10-21T15:05Z）：既有认知 1 条 Claim（写作块—日程保护假设 rev2）在本窗口没有出现新的写作块结果案例，也没有反例，故不修订、不确认、不回滚。窗口新增证据只有两条现实观测：10-19 日程（11:30 前无安排）与 10-21 日程（08:30–10:00 客户共创工作坊、10:20–11:50“方案修改”）；后者是**可能**检验 Claim 的新结构（工作坊占用上午前半段，随后有独立的方案修改块），但其工作产出观测尚未出现，现在判断为时过早——等它出现后我会回到 Claim 上下文核对。睡眠线仍无稳定模式；环境与日程无持久意涵。本窗口我没有需要调整方法的失败或代价，不登记操作经验（不无据调用 commit_operation_experience）。保持沉默。",
+    "silence": true
+  },
+  "round_index": 1,
+  "unit_key": "periodic-review-20261021T150501Z"
+}

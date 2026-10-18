@@ -1,0 +1,46 @@
+# DimensionSummaryInput — dim:conversation__week__2026-10-05T00:00:00+00:00__2026-10-11T23:59:59.999999+00:00
+
+- dimension: dim:conversation
+- granularity: week
+- window: 2026-10-05T00:00:00+00:00 .. 2026-10-11T23:59:59.999999+00:00
+- source_world_revision: 106
+- source_count: 4
+- truncated: False
+
+## sources (exact pinned material)
+
+### 1. sum_1e132e64b28b81ce5c303291@1 (summary)
+
+- occurred_at: 2026-10-06T00:00:00Z
+- metadata: {"dimension": "dim:conversation", "summary_kind": "single_dimension_temporal"}
+
+```text
+2026-10-06 会话：用户自述“下午接着写时，我先花了十来分钟重新找上午引用的那几张表”。
+```
+
+### 2. obs_c14_fixture_0ca259ffc10ff4a9218561d0@1 (observation)
+
+- occurred_at: 2026-10-06T01:35:00Z
+- metadata: {"dimension": "dim:conversation", "external_record_id": "c14resv2-008", "external_revision": "1", "fixture_binding_version": "c14-fixture-event-binding-v1", "fixture_event_id": "c14resv2-008", "fixture_payload_sha256": "sha256:06b93c24c10cc1cc54dda6543e3b033ad50f744688cbe881358890a41ec46c72", "fixture_projection_sha256": "sha256:0af914622fc4c140238f9d37857fa60f59d15ef185d88a660e3bded29b9019a3", "fixture_sequence": 8, "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253", "fixture_version": "c14-resident-fixture-v2", "mechanical_ingest": true, "occurred_at_original": "2026-10-05T18:35:00-07:00", "source_class": "user"}
+
+```text
+用户说：“下午接着写时，我先花了十来分钟重新找上午引用的那几张表。”
+```
+
+### 3. sum_eb6c6e069e53ce16d9e3c4d4@1 (summary)
+
+- occurred_at: 2026-10-09T00:00:00Z
+- metadata: {"dimension": "dim:conversation", "summary_kind": "single_dimension_temporal"}
+
+```text
+2026-10-09 会话：用户自述“今天上午人有点困，不过那份稿子没拖到下午”。
+```
+
+### 4. obs_c14_fixture_f3557413048807b17b9487bc@1 (observation)
+
+- occurred_at: 2026-10-09T01:10:00Z
+- metadata: {"dimension": "dim:conversation", "external_record_id": "c14resv2-013", "external_revision": "1", "fixture_binding_version": "c14-fixture-event-binding-v1", "fixture_event_id": "c14resv2-013", "fixture_payload_sha256": "sha256:6dbdef90bc4159e537fd72e19334f12ba219b9384f7148869a57de667b1a624c", "fixture_projection_sha256": "sha256:dd28c10b28921caaeb6ef7467128c33c47015b44e8f1a8ec78e713dfe2cb16a6", "fixture_sequence": 13, "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253", "fixture_version": "c14-resident-fixture-v2", "mechanical_ingest": true, "occurred_at_original": "2026-10-08T18:10:00-07:00", "source_class": "user"}
+
+```text
+用户说：“今天上午人有点困，不过那份稿子没拖到下午。”
+```
