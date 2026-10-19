@@ -1,3 +1,16 @@
+## 2026-10-19 — WINDOW 74 FRESH IA PASS (10/10) / RESIDENT B RERUN-005 PHASE-B ACCEPTED / WINDOW 75 RESIDENT C RELEASED
+
+- PM Acceptance Receipt = `governance/C15_RCC_RES_B_RERUN_005_PHASE_B_ACCEPTANCE_RECEIPT_2026-10-19.md`.
+- Window 74 Independent Acceptance = `ACCEPTANCE_PASS / 10 OF 10 PROBES SATISFIED (100%)` on exact Resident B candidate HEAD `302dab2565f61dd37ca57195bae7ed9337cdfede`, tree `eabffc36f59b0727a20a1b7428ed66a2a1368e0e`, parent `2d92328205e16ec8b5317eaca8f3b666656ad09b` (PR #393 OPEN).
+- Independent acceptance review directory = `reviews/C15_RCC_RES_B_RERUN_005_INDEPENDENT_ACCEPTANCE_2026-10-19/`.
+- Probes P00..P09 all passed: zero code drift on `src/aios_core/**` and `tools/c15_persistence/**`, 82 sealed evidence files verified via Git blob SHA256SUMS, receipts 14..22 recomputed from fixture, cursor 23 never revealed and refused by freeze guard, 4 canonical USER turns ingested idempotently, 0 future cursor leakage in 12 model requests, 36 ledger entries hash-chained, World revision 60 coherent with search watermark 60 (0 lag), 0 dangling refs across 78 objects, fresh run identity verified.
+- **Unique next READY:** `WINDOW 75 — C15-RCC-RES-C-RERUN-005 (Phase-C Fresh Resident C Replacement-Execution Habitation Rerun)`.
+- Resident C inherits the Phase-B private SQLite AIOS World (`world.sqlite`, revision 60) and `release-state.json`.
+- Allowed cursor range = `23..30` sequentially; ACK 30 then freeze and permanently stop.
+- Run contract: `reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_C_RUN_CONTRACT.md`.
+- All downstream stages (Evaluator, Release Gate) remain BLOCKED until Fresh Resident C completes and passes independent acceptance.
+
+
 ## 2026-10-19 — WINDOW 73 RESIDENT B RERUN-005 PHASE-B COMPLETE / PR #393 CREATED / WINDOW 74 FRESH IA RELEASED
 
 - Window 73 Fresh Resident B Habitation candidate = [PR #393](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/393) (`[DO NOT MERGE / REVIEW ONLY] C15-RCC-RES-B-RERUN-005 Phase-B Fresh Resident B Habitation Evidence`).
