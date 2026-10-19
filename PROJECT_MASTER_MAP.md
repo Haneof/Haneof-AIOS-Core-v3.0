@@ -71,14 +71,11 @@
 |---|---|
 | C13 / 历史 T34/T36/T28/T35/T33 修复 | 已有 task-board 完成证据；不因旧 Issue OPEN 重做 |
 | C14 持续认知派生 | 正式收口 PASS |
-| C15 Resident A | historical #117 仅对 old Core 有效；新 RC A-002 已由 #207 独立接受，canonical evidence PR #205 @ `d17ae972...` / World-index `98/98` |
-| C15 旧 B candidate | #121 NOT ACCEPTED；保留 immutable non-canonical evidence |
-| C15 B 恢复链 | RERUN-002 infra-fail preserved；persistence WIP frozen. PR #219 historical exact `3f9ec00d...` = ACCEPTANCE_FAIL / blocker=2；corrective-001 exact `030acbfe...` = ACCEPTANCE_FAIL / fresh blocker=1；corrective-002 tested exact `227327c...` = ACCEPTANCE_PASS / blocker=0 已通过 PR #219 成功集成合入 main（merge SHA `89200c55e63ce2251ecc236e25d16c57d998f93c`；收据 `governance/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_002_INTEGRATION_RECEIPT_2026-09-27.md`）。`CORE-BACKGROUND-RESPONSE-RECOVERY-001 = DONE`；`CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-002 = DONE / ACCEPTED / INTEGRATED`。Current chain: `CORE-RC-REFREEZE-002` (READY) → fresh A-003/IA → resume B persistence/IA → RELEASE-003 → fresh RERUN-003 → B-ACCEPT-003 |
-| C15 C 与终评 | B 接受 + 可信模型身份前置后才可启动 C；R1–R9 全 VALID 才收口 |
-| C16 系统改进反馈 | BLOCKED；Resident proposal 与用户 World 分离，独立复现/工程/Gate/再验证 |
-| Post-C15 issue reconciliation | `POST-C15-ISSUE-RECONCILIATION-001`：C15 CLOSE 后 fresh 对账 #23/#28/#33/#34/#35；已修历史项不得重复施工，只有 current-main 可复现才派生新工程任务 |
-| 广泛 P16 | C15/C16 关闭后恢复有效分段 ledger、年度证据、多 provider/model、独立评估和红队 |
-| P17 / P18 / P19 | 发布 Gate → `P18-REALITY-HELP-INTEGRATION-001` → `P19-HELP-EXPERIENCE-001`，依次后置 |
+| C15-RCC (A/B/C 三阶段共生心智栖居) | **CLOSED / PRODUCTION READY**：Phase A (PR #392)、Phase B (PR #393)、Phase C (PR #394) 全量 10/10 PASS 独立验收通过；综合评估器 9/9 轴 VALID；Gate 0 正式签署 (`governance/C15_RCC_GATE_0_FORMAL_CLOSE_RECEIPT_2026-10-19.md`)；PR #391 已合入 `main` (`2e55834d`) |
+| Post-C15 issue reconciliation | **CLOSED / 100% RECONCILED**：`POST-C15-ISSUE-RECONCILIATION-001` 全量对账完成 (`governance/POST_C15_ISSUE_RECONCILIATION_001_RECEIPT_2026-10-19.md`)；Issue #23/#28/#33/#34/#35 逐项验证并在 GitHub 全部关闭 |
+| C16 系统改进反馈 | **UNBLOCKED / READY**；Resident proposal 与用户 World 分离，独立复现/工程/Gate/再验证 |
+| 广泛 P16 | C15-RCC 已正式收口，放行有效分段 ledger、多 provider/model 长期入住与真实设备集成 |
+| P17 / P18 / P19 | 发布 Gate → `P18-REALITY-HELP-INTEGRATION-001` → `P19-HELP-EXPERIENCE-001`，依次推进 |
 
 合入证据见 `governance/C15_RCC_RES_B_CORRECTIVE_INTEGRATION_RECEIPT_2026-09-24.md`。普通治理集成无需另开 AI 窗口；盲测及明确要求的独立评估仍保留隔离。
 
