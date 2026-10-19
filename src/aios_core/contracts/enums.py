@@ -304,3 +304,13 @@ class NarrativeSegmentStatus(StrEnum):
     SEALED = "sealed"       # 已封存归档
     REVISED = "revised"     # 被修正（新段替代）
     MERGED = "merged"       # 被合并到另一个段
+
+
+class WakePriority(StrEnum):
+    """唤醒与调度优先级（含生命安全急救特权）。"""
+    P0_CRITICAL_SAFETY = "P0_CRITICAL_SAFETY"  # 生命安全急救特权 (0 延迟心智熔断)
+    P1_URGENT_TASK     = "P1_URGENT_TASK"      # 强时效突发任务
+    P1_TIME_CRITICAL   = "P1_TIME_CRITICAL"    # 强时效告警
+    P2_NORMAL_INTERACT = "P2_NORMAL_INTERACT"   # 正常日常交互/微震提示
+    P2_ROUTINE         = "P2_ROUTINE"          # 常规日常交互
+    P3_BACKGROUND_TICK = "P3_BACKGROUND_TICK"  # 后台静默时钟与巡检
