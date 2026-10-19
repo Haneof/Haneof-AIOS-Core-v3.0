@@ -1,0 +1,520 @@
+{
+  "status_before": {
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite",
+    "index_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite.search.sqlite",
+    "world_revision": 60,
+    "index_watermark": 60,
+    "index_lag": 0,
+    "writer_lease_held": true
+  },
+  "status_after": {
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite",
+    "index_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite.search.sqlite",
+    "world_revision": 60,
+    "index_watermark": 60,
+    "index_lag": 0,
+    "writer_lease_held": true
+  },
+  "due_work_result": {
+    "periodic_review": null,
+    "wakes": []
+  },
+  "handoffs": [],
+  "exchange": {
+    "recovery_state": {
+      "classification": "COMPLETE",
+      "semantic_dispatch_occurred": true,
+      "requests": [
+        {
+          "request_id": "req-0001-model_directive-22a9c3fe",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "7857e0d4bac1062b349267aa8785eee1a9b910d202fcac271f283b300746df93",
+          "response_sha256": "442f95dfd2add91e490e05a22e35b63c0bcf3991d8a5183cacfc5eca1ae26414",
+          "events": [
+            {
+              "seq": 1,
+              "event": "request_published"
+            },
+            {
+              "seq": 2,
+              "event": "response_published"
+            },
+            {
+              "seq": 3,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0002-model_directive-fc4de92d",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "0eeced610a3f057f1d2162e596d49d090f4e4df49961860345807d2b92b24d08",
+          "response_sha256": "2d2c55c521ccd637af6ee3b11aa4443e7828a9deb3c786237d190dbf69b9ba1c",
+          "events": [
+            {
+              "seq": 4,
+              "event": "request_published"
+            },
+            {
+              "seq": 5,
+              "event": "response_published"
+            },
+            {
+              "seq": 6,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0003-model_directive-2ae98fc1",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "6f41bd3ee66dc9fbf069fd31fd5a62baf53f974e0906a2cf2a5344a1a650018b",
+          "response_sha256": "3b2a698ed7ae7b618fe4544ef58b18083b96e785c16739d9fa08748d8b91e5c1",
+          "events": [
+            {
+              "seq": 7,
+              "event": "request_published"
+            },
+            {
+              "seq": 8,
+              "event": "response_published"
+            },
+            {
+              "seq": 9,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0004-model_directive-9acb14de",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "c28cc40524e044bd446bc0af567d58f65ef6d8c299d760916deade7e4782d624",
+          "response_sha256": "27eac0adf2a321cd577fe65528522298afe7de2267d9151ef87554dd75984b68",
+          "events": [
+            {
+              "seq": 10,
+              "event": "request_published"
+            },
+            {
+              "seq": 11,
+              "event": "response_published"
+            },
+            {
+              "seq": 12,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0005-model_directive-3b3c5899",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "0b9e5502d2aa485586acd83a4acf48433ef66839d12cef8461fa7f2e76908c6f",
+          "response_sha256": "0e7dfaf9bfe95749636942ca55248f2402f9300d99ecf999f966cd1abc77afe4",
+          "events": [
+            {
+              "seq": 13,
+              "event": "request_published"
+            },
+            {
+              "seq": 14,
+              "event": "response_published"
+            },
+            {
+              "seq": 15,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0006-model_directive-6d1d5a8c",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "278c9ef211a40fb0f3a11e606a1176f34e54ea13ac6f8e4ba8a5dca1658989c0",
+          "response_sha256": "596a2312d602d6fa465f190595535929fbf257454ee4c98892a8df95f2973931",
+          "events": [
+            {
+              "seq": 16,
+              "event": "request_published"
+            },
+            {
+              "seq": 17,
+              "event": "response_published"
+            },
+            {
+              "seq": 18,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0007-model_directive-ae67c25d",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "d798f7fe3d8cb0a14633a4787ac9fc9a9a14b278be5b6ab76aca228cab1c086b",
+          "response_sha256": "23e8bf3e44dba3481b8921f1fa4f8149f0b0bbc5267df0563d026d4599131e67",
+          "events": [
+            {
+              "seq": 19,
+              "event": "request_published"
+            },
+            {
+              "seq": 20,
+              "event": "response_published"
+            },
+            {
+              "seq": 21,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0008-model_directive-33246223",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "35ae59f582f4dc4e055325dadcee11a9f19875889d6e746029167e6310cd3bf1",
+          "response_sha256": "0506aa6fed9e0e43659454145928e06f829741c8206b14dc9f5c1a6f5571b4e8",
+          "events": [
+            {
+              "seq": 22,
+              "event": "request_published"
+            },
+            {
+              "seq": 23,
+              "event": "response_published"
+            },
+            {
+              "seq": 24,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0009-model_directive-6ac18fb5",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "508118cc232cf0eff222137ddd472d748cacfc4c612e62a90fac96058dfcc816",
+          "response_sha256": "12c5af67f184bdcd4561eb7c1bb35089e5ec2c56c32c582d75119e50dd03d3f3",
+          "events": [
+            {
+              "seq": 25,
+              "event": "request_published"
+            },
+            {
+              "seq": 26,
+              "event": "response_published"
+            },
+            {
+              "seq": 27,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0010-model_directive-d1567965",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "017c8a8db0c0e7a5ff8ad60f8db5dde679161ebae4aa5b1607e45fdf13f9cd2b",
+          "response_sha256": "469f023594cf7d0c19304f4917bf4a4fba63fcc481cf7d1977386b69a8ad8f5b",
+          "events": [
+            {
+              "seq": 28,
+              "event": "request_published"
+            },
+            {
+              "seq": 29,
+              "event": "response_published"
+            },
+            {
+              "seq": 30,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0011-model_directive-d84f380a",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "c769489827558c11b71309095ca44d0c9979e90a06b0903b37bfd0af174ea87c",
+          "response_sha256": "d9f2e7f377b7a5174494fc71cb53fff28abeca7a9cc37d3b0bee8930ec9303d5",
+          "events": [
+            {
+              "seq": 31,
+              "event": "request_published"
+            },
+            {
+              "seq": 32,
+              "event": "response_published"
+            },
+            {
+              "seq": 33,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0012-model_directive-77dc8c37",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "77deb02e0d7fa65b125287b64e4345f9c9cc0cc352329036377acf9629d8c8bf",
+          "response_sha256": "d5f08600d7cc0ec02c0ee1a7bfaf141e4e5cb051d5f8c41236a6ea3d7b85e091",
+          "events": [
+            {
+              "seq": 34,
+              "event": "request_published"
+            },
+            {
+              "seq": 35,
+              "event": "response_published"
+            },
+            {
+              "seq": 36,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        }
+      ],
+      "dispatch_boundary_event": "request_published",
+      "dispatch_boundary_rule": "not_submitted reconciliation is allowed only when no request_published record exists; after request publication the exchange fails closed instead of declaring the request unsubmitted",
+      "not_submitted_allowed": false,
+      "open_dispatched": [],
+      "durable_unconsumed": [],
+      "complete": [
+        "req-0001-model_directive-22a9c3fe",
+        "req-0002-model_directive-fc4de92d",
+        "req-0003-model_directive-2ae98fc1",
+        "req-0004-model_directive-9acb14de",
+        "req-0005-model_directive-3b3c5899",
+        "req-0006-model_directive-6d1d5a8c",
+        "req-0007-model_directive-ae67c25d",
+        "req-0008-model_directive-33246223",
+        "req-0009-model_directive-6ac18fb5",
+        "req-0010-model_directive-d1567965",
+        "req-0011-model_directive-d84f380a",
+        "req-0012-model_directive-77dc8c37"
+      ],
+      "ledger": {
+        "ok": true,
+        "records": 36,
+        "head_sha256": "3616af57c4b13563ba203b20c3088b451c33dd83d8014f0a7a71421d5d58f40b",
+        "error": null,
+        "first_bad_seq": null
+      }
+    },
+    "integrity": {
+      "ok": true,
+      "problems": [],
+      "chain": {
+        "ok": true,
+        "records": 36,
+        "head_sha256": "3616af57c4b13563ba203b20c3088b451c33dd83d8014f0a7a71421d5d58f40b",
+        "error": null,
+        "first_bad_seq": null
+      },
+      "requests": {
+        "req-0001-model_directive-22a9c3fe": {
+          "first_seq": 1,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "7857e0d4bac1062b349267aa8785eee1a9b910d202fcac271f283b300746df93",
+          "response_sha256": "442f95dfd2add91e490e05a22e35b63c0bcf3991d8a5183cacfc5eca1ae26414"
+        },
+        "req-0002-model_directive-fc4de92d": {
+          "first_seq": 4,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "0eeced610a3f057f1d2162e596d49d090f4e4df49961860345807d2b92b24d08",
+          "response_sha256": "2d2c55c521ccd637af6ee3b11aa4443e7828a9deb3c786237d190dbf69b9ba1c"
+        },
+        "req-0003-model_directive-2ae98fc1": {
+          "first_seq": 7,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "6f41bd3ee66dc9fbf069fd31fd5a62baf53f974e0906a2cf2a5344a1a650018b",
+          "response_sha256": "3b2a698ed7ae7b618fe4544ef58b18083b96e785c16739d9fa08748d8b91e5c1"
+        },
+        "req-0004-model_directive-9acb14de": {
+          "first_seq": 10,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "c28cc40524e044bd446bc0af567d58f65ef6d8c299d760916deade7e4782d624",
+          "response_sha256": "27eac0adf2a321cd577fe65528522298afe7de2267d9151ef87554dd75984b68"
+        },
+        "req-0005-model_directive-3b3c5899": {
+          "first_seq": 13,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "0b9e5502d2aa485586acd83a4acf48433ef66839d12cef8461fa7f2e76908c6f",
+          "response_sha256": "0e7dfaf9bfe95749636942ca55248f2402f9300d99ecf999f966cd1abc77afe4"
+        },
+        "req-0006-model_directive-6d1d5a8c": {
+          "first_seq": 16,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "278c9ef211a40fb0f3a11e606a1176f34e54ea13ac6f8e4ba8a5dca1658989c0",
+          "response_sha256": "596a2312d602d6fa465f190595535929fbf257454ee4c98892a8df95f2973931"
+        },
+        "req-0007-model_directive-ae67c25d": {
+          "first_seq": 19,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "d798f7fe3d8cb0a14633a4787ac9fc9a9a14b278be5b6ab76aca228cab1c086b",
+          "response_sha256": "23e8bf3e44dba3481b8921f1fa4f8149f0b0bbc5267df0563d026d4599131e67"
+        },
+        "req-0008-model_directive-33246223": {
+          "first_seq": 22,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "35ae59f582f4dc4e055325dadcee11a9f19875889d6e746029167e6310cd3bf1",
+          "response_sha256": "0506aa6fed9e0e43659454145928e06f829741c8206b14dc9f5c1a6f5571b4e8"
+        },
+        "req-0009-model_directive-6ac18fb5": {
+          "first_seq": 25,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "508118cc232cf0eff222137ddd472d748cacfc4c612e62a90fac96058dfcc816",
+          "response_sha256": "12c5af67f184bdcd4561eb7c1bb35089e5ec2c56c32c582d75119e50dd03d3f3"
+        },
+        "req-0010-model_directive-d1567965": {
+          "first_seq": 28,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "017c8a8db0c0e7a5ff8ad60f8db5dde679161ebae4aa5b1607e45fdf13f9cd2b",
+          "response_sha256": "469f023594cf7d0c19304f4917bf4a4fba63fcc481cf7d1977386b69a8ad8f5b"
+        },
+        "req-0011-model_directive-d84f380a": {
+          "first_seq": 31,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "c769489827558c11b71309095ca44d0c9979e90a06b0903b37bfd0af174ea87c",
+          "response_sha256": "d9f2e7f377b7a5174494fc71cb53fff28abeca7a9cc37d3b0bee8930ec9303d5"
+        },
+        "req-0012-model_directive-77dc8c37": {
+          "first_seq": 34,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "77deb02e0d7fa65b125287b64e4345f9c9cc0cc352329036377acf9629d8c8bf",
+          "response_sha256": "d5f08600d7cc0ec02c0ee1a7bfaf141e4e5cb051d5f8c41236a6ea3d7b85e091"
+        }
+      },
+      "exchange_root": "/workspaces/window73-resident-b-rerun005/run/exchange"
+    }
+  },
+  "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION"
+}

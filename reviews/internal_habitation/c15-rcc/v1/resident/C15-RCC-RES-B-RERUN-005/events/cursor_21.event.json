@@ -1,0 +1,1 @@
+{"dimension":"dim:work_outcome","event_id":"c15rcc-021","modality":"structured_text","occurred_at":"2026-11-11T20:16:00-08:00","resident_visible_payload":"19:18 的集成任务因 registry.example.net 503 无法拉取依赖而失败；第三方 20:10 恢复后，20:14 原配置直接重试通过 48/48，无本地代码或配置改动。","sequence":21,"source_class":"PLATFORM","source_kind":"ci_platform"}
