@@ -81,9 +81,11 @@ def _unshare_probe() -> tuple[bool, str]:
 
 UNSHARE_OK, UNSHARE_NOTE = _unshare_probe()
 
-HOST_NAMESPACES = {
-    name: os.readlink(f"/proc/self/ns/{name}") for name in ("pid", "mnt", "uts", "ipc")
-}
+HOST_NAMESPACES = (
+    {name: os.readlink(f"/proc/self/ns/{name}") for name in ("pid", "mnt", "uts", "ipc")}
+    if os.path.exists("/proc/self/ns")
+    else {}
+)
 
 NS_SCRIPT = """
 import json, os, sys

@@ -52,7 +52,8 @@ class Trace:
     traces outside Git. Runtime crash recovery/final freeze are NOT implemented.
     """
     def __init__(self, path: Path, revision: Callable[[], int]):
-        fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o600)
+        o_nofollow = getattr(os, "O_NOFOLLOW", 0)
+        fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY | o_nofollow, 0o600)
         # Unbuffered journal: close after a failure must not flush pending text
         # behind our back. No uncertain tail is retried or repaired.
         self.file = os.fdopen(fd, "wb", buffering=0)

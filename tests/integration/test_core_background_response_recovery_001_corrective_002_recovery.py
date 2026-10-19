@@ -51,6 +51,7 @@ from __future__ import annotations
 import multiprocessing
 import os
 import signal as posix_signal
+import sys
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -284,6 +285,7 @@ def _child_sigkill_after_receipt(db_path: str) -> None:
     runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="multiprocessing fork and SIGKILL are POSIX only")
 def test_actual_sigkill_after_receipt_commit_recovers_without_provider_redispatch(
     tmp_path,
 ):

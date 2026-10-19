@@ -59,6 +59,7 @@ from datetime import timedelta
 from dataclasses import replace
 import hashlib
 import sqlite3
+import sys
 
 import pytest
 
@@ -495,6 +496,7 @@ def _child_kill_after_round_one(db_path, conn_pipe):
         raise
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="multiprocessing fork and SIGKILL are POSIX only")
 def test_real_sigkill_after_later_round_trusted_handoff(tmp_path):
     """Real SIGKILL + genuine external proof recovers exactly once (Route B)."""
 

@@ -28,6 +28,7 @@ import multiprocessing
 import os
 import signal
 import sqlite3
+import sys
 import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -1168,6 +1169,7 @@ def _sigkill_child(db_str: str, pipe) -> None:
     )
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="multiprocessing fork and SIGKILL are POSIX only")
 def test_ca2_004_real_sigkill_leaves_no_live_authority_in_the_fresh_process(tmp_path):
     db = tmp_path / "ca2-sigkill.sqlite"
     SQLiteWorldStore(db)

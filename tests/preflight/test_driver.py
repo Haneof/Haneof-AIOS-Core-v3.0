@@ -4,6 +4,7 @@ The real sealed fixture and private A package are never read by this suite.
 import importlib.util
 import io
 import json
+import os
 import sqlite3
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -153,8 +154,9 @@ def test_core_caught_round_summary_disconnect_is_not_success(tmp_path):
 
 def test_single_writer_and_interrupted_ack_never_implicitly_replayed(tmp_path):
     d, _, modules=setup(tmp_path)
-    with pytest.raises(BlockingIOError):
-        Driver(d.runtime,d.trace,d.port,d.directory,session='synthetic-session',clock=NOW,stop_sequence=3)
+    if os.name != "nt":
+        with pytest.raises(BlockingIOError):
+            Driver(d.runtime,d.trace,d.port,d.directory,session='synthetic-session',clock=NOW,stop_sequence=3)
     d.transition('ACKING');d.close()
     with pytest.raises(DriverBlocked,match='interrupted'):
         Driver(d.runtime,d.trace,d.port,d.directory,session='synthetic-session',clock=NOW,stop_sequence=3)

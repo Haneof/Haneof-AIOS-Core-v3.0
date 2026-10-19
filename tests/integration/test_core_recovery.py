@@ -4,6 +4,7 @@ import hashlib
 import multiprocessing
 import os
 import sqlite3
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -108,6 +109,7 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="multiprocessing fork is POSIX-only")
 def test_r1_wal_process_crash_distinguishes_uncommitted_and_committed(tmp_path):
     uncommitted_path = tmp_path / "uncommitted.sqlite"
     SQLiteWorldStore(uncommitted_path)

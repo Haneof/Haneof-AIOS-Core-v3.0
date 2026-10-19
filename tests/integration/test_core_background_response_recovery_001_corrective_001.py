@@ -20,6 +20,7 @@ from __future__ import annotations
 import multiprocessing
 import os
 import signal as posix_signal
+import sys
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -888,6 +889,7 @@ def _child_capability_then_sigkill(db_path: str) -> None:
     runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="multiprocessing fork and SIGKILL are POSIX only")
 def test_process_sigkill_after_exact_response_staged_recovers_with_zero_provider_calls(
     tmp_path,
 ):
@@ -930,6 +932,7 @@ def test_process_sigkill_after_exact_response_staged_recovers_with_zero_provider
     )
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="multiprocessing fork and SIGKILL are POSIX only")
 def test_process_sigkill_after_capability_side_effect_replays_exactly_once(tmp_path):
     db = tmp_path / "sigkill-capability.db"
     ctx = multiprocessing.get_context("fork")

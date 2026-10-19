@@ -61,7 +61,8 @@ def backup(source: Path, destination: Path):
         sqlite3.connect(destination)
     ) as dst:
         src.backup(dst)
-    with destination.open("rb") as stream:
+    mode = "r+b" if os.name == "nt" else "rb"
+    with destination.open(mode) as stream:
         os.fsync(stream.fileno())
 
 
@@ -128,7 +129,8 @@ def freeze(driver, destination: Path):
                 if path.name.endswith(("-wal", "-shm", "-journal")):
                     raise DriverBlocked("snapshot still has SQLite sidecars")
                 os.chmod(path, 0o600)
-                with path.open("rb") as stream:
+                mode = "r+b" if os.name == "nt" else "rb"
+                with path.open(mode) as stream:
                     os.fsync(stream.fileno())
             manifest = {"format": "c15-synthetic-freeze-v3", "world_revision": revision,
                         "publication": {"id": publication_id, "status": "VALIDATED"},
@@ -142,11 +144,12 @@ def freeze(driver, destination: Path):
             # Window 1: after rename, before receipt - durability not confirmed
             os.rename(stage, destination)
             stage = None
-            fd = os.open(destination.parent, os.O_RDONLY | os.O_DIRECTORY)
-            try:
-                os.fsync(fd)
-            finally:
-                os.close(fd)
+            if os.name != "nt":
+                fd = os.open(destination.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+                try:
+                    os.fsync(fd)
+                finally:
+                    os.close(fd)
             # Window 2: receipt write/replace and its dir fsync - commit point
             manifest_sha = digest(destination / "manifest.json")
             receipt_path = create_receipt(

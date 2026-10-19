@@ -30,11 +30,18 @@ def _unlink_sqlite_family(path: Path) -> None:
     for candidate in (path, Path(str(path) + "-wal"), Path(str(path) + "-shm")):
         try:
             candidate.unlink()
-        except FileNotFoundError:
+        except (FileNotFoundError, PermissionError):
             pass
 
 
 def _fsync_path(path: Path) -> None:
+    if os.name == "nt":
+        try:
+            with path.open("r+b") as handle:
+                os.fsync(handle.fileno())
+        except OSError:
+            pass
+        return
     with path.open("rb") as handle:
         os.fsync(handle.fileno())
     try:
@@ -65,46 +72,50 @@ def _publish_new_file(staged: Path, target: Path) -> None:
     finally:
         try:
             staged.unlink()
-        except FileNotFoundError:
+        except (FileNotFoundError, PermissionError):
             pass
 
 
 def _read_only_world_probe(path: Path) -> dict[str, Any]:
     if not path.exists() or not path.is_file():
         raise RecoveryError(f"World snapshot does not exist: {path}")
+    conn: sqlite3.Connection | None = None
     try:
-        with sqlite3.connect(_readonly_uri(path), uri=True) as conn:
-            conn.execute("PRAGMA query_only = ON")
-            version_row = conn.execute("PRAGMA user_version").fetchone()
-            schema_version = 0 if version_row is None else int(version_row[0])
-            checks = tuple(str(row[0]) for row in conn.execute("PRAGMA quick_check").fetchall())
-            if checks != ("ok",):
-                raise RecoveryError(
-                    "FATAL_INCOMPATIBLE: SQLite quick_check failed: " + ", ".join(checks)
-                )
-            meta_exists = conn.execute(
-                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='world_meta'"
-            ).fetchone()
-            if meta_exists is None:
-                raise RecoveryError("FATAL_INCOMPATIBLE: snapshot is not an AIOS World")
-            revision_row = conn.execute(
-                "SELECT value FROM world_meta WHERE key='world_revision'"
-            ).fetchone()
-            if revision_row is None:
-                raise RecoveryError(
-                    "FATAL_INCOMPATIBLE: World is missing world_revision metadata"
-                )
-            world_revision = int(revision_row[0])
-            table_names = {
-                str(row[0])
-                for row in conn.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table'"
-                ).fetchall()
-            }
+        conn = sqlite3.connect(_readonly_uri(path), uri=True)
+        conn.execute("PRAGMA query_only = ON")
+        version_row = conn.execute("PRAGMA user_version").fetchone()
+        schema_version = 0 if version_row is None else int(version_row[0])
+        checks = tuple(str(row[0]) for row in conn.execute("PRAGMA quick_check").fetchall())
+        if checks != ("ok",):
+            raise RecoveryError(
+                "FATAL_INCOMPATIBLE: SQLite quick_check failed: " + ", ".join(checks)
+            )
+        meta_exists = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='world_meta'"
+        ).fetchone()
+        if meta_exists is None:
+            raise RecoveryError("FATAL_INCOMPATIBLE: snapshot is not an AIOS World")
+        revision_row = conn.execute(
+            "SELECT value FROM world_meta WHERE key='world_revision'"
+        ).fetchone()
+        if revision_row is None:
+            raise RecoveryError(
+                "FATAL_INCOMPATIBLE: World is missing world_revision metadata"
+            )
+        world_revision = int(revision_row[0])
+        table_names = {
+            str(row[0])
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            ).fetchall()
+        }
     except RecoveryError:
         raise
     except (sqlite3.DatabaseError, OSError, TypeError, ValueError) as exc:
         raise RecoveryError(f"FATAL_INCOMPATIBLE: cannot inspect World snapshot: {exc}") from exc
+    finally:
+        if conn is not None:
+            conn.close()
 
     if schema_version > SQLiteWorldStore.CURRENT_SCHEMA_VERSION:
         raise RecoveryError(
@@ -128,31 +139,32 @@ def _read_only_index_probe(path: Path, *, world_revision: int) -> dict[str, Any]
             "index_lag": world_revision,
             "recovery_disposition": "REBUILD_FROM_WORLD",
         }
+    conn: sqlite3.Connection | None = None
     try:
-        with sqlite3.connect(_readonly_uri(path), uri=True) as conn:
-            conn.execute("PRAGMA query_only = ON")
-            checks = tuple(str(row[0]) for row in conn.execute("PRAGMA quick_check").fetchall())
-            if checks != ("ok",):
-                return {
-                    "index_status": "corrupt",
-                    "index_watermark": None,
-                    "index_lag": None,
-                    "recovery_disposition": "REBUILD_FROM_WORLD",
-                }
-            meta_exists = conn.execute(
-                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='search_meta'"
-            ).fetchone()
-            if meta_exists is None:
-                return {
-                    "index_status": "uninitialized",
-                    "index_watermark": None,
-                    "index_lag": world_revision,
-                    "recovery_disposition": "REBUILD_FROM_WORLD",
-                }
-            row = conn.execute(
-                "SELECT value FROM search_meta WHERE key='search_watermark_world_revision'"
-            ).fetchone()
-            watermark = 0 if row is None else int(row[0])
+        conn = sqlite3.connect(_readonly_uri(path), uri=True)
+        conn.execute("PRAGMA query_only = ON")
+        checks = tuple(str(row[0]) for row in conn.execute("PRAGMA quick_check").fetchall())
+        if checks != ("ok",):
+            return {
+                "index_status": "corrupt",
+                "index_watermark": None,
+                "index_lag": None,
+                "recovery_disposition": "REBUILD_FROM_WORLD",
+            }
+        meta_exists = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='search_meta'"
+        ).fetchone()
+        if meta_exists is None:
+            return {
+                "index_status": "uninitialized",
+                "index_watermark": None,
+                "index_lag": world_revision,
+                "recovery_disposition": "REBUILD_FROM_WORLD",
+            }
+        row = conn.execute(
+            "SELECT value FROM search_meta WHERE key='search_watermark_world_revision'"
+        ).fetchone()
+        watermark = 0 if row is None else int(row[0])
     except (sqlite3.DatabaseError, OSError, TypeError, ValueError):
         return {
             "index_status": "unopenable",
@@ -160,6 +172,9 @@ def _read_only_index_probe(path: Path, *, world_revision: int) -> dict[str, Any]
             "index_lag": None,
             "recovery_disposition": "REBUILD_FROM_WORLD",
         }
+    finally:
+        if conn is not None:
+            conn.close()
 
     if watermark > world_revision:
         return {
@@ -224,14 +239,19 @@ def backup_world(config: HeadlessConfig, destination: str | Path) -> dict[str, A
 
         _unlink_sqlite_family(staged)
         try:
-            with sqlite3.connect(
+            source = sqlite3.connect(
                 _readonly_uri(config.world_path),
                 uri=True,
                 timeout=SQLiteWorldStore.SQLITE_BUSY_TIMEOUT_MS / 1000.0,
-            ) as source, sqlite3.connect(str(staged)) as destination_conn:
+            )
+            destination_conn = sqlite3.connect(str(staged))
+            try:
                 source.execute("PRAGMA query_only = ON")
                 source.backup(destination_conn)
                 destination_conn.commit()
+            finally:
+                destination_conn.close()
+                source.close()
 
             probe = _read_only_world_probe(staged)
             if int(probe["world_revision"]) != source_revision:
@@ -277,12 +297,15 @@ def restore_world(config: HeadlessConfig, source_backup: str | Path) -> dict[str
     try:
         _unlink_sqlite_family(staged)
         try:
-            with sqlite3.connect(_readonly_uri(source), uri=True) as source_conn, sqlite3.connect(
-                str(staged)
-            ) as destination_conn:
+            source_conn = sqlite3.connect(_readonly_uri(source), uri=True)
+            destination_conn = sqlite3.connect(str(staged))
+            try:
                 source_conn.execute("PRAGMA query_only = ON")
                 source_conn.backup(destination_conn)
                 destination_conn.commit()
+            finally:
+                destination_conn.close()
+                source_conn.close()
 
             # Any supported legacy upgrade happens only on the staged copy.  The
             # backup itself remains immutable.
@@ -292,14 +315,17 @@ def restore_world(config: HeadlessConfig, source_backup: str | Path) -> dict[str
             restored_revision = int(staged_store.current_world_revision())
             if restored_revision != int(probe["world_revision"]):
                 raise RecoveryError("restored World revision differs from backup")
-            with sqlite3.connect(str(staged)) as checkpoint:
+            checkpoint = sqlite3.connect(str(staged))
+            try:
                 checkpoint.execute("PRAGMA wal_checkpoint(FULL)")
                 checkpoint.commit()
+            finally:
+                checkpoint.close()
             # The staged database is checkpointed; sidecars are mechanical residue.
             for sidecar in (Path(str(staged) + "-wal"), Path(str(staged) + "-shm")):
                 try:
                     sidecar.unlink()
-                except FileNotFoundError:
+                except (FileNotFoundError, PermissionError):
                     pass
             _fsync_path(staged)
             _publish_new_file(staged, target)
@@ -345,8 +371,12 @@ def rebuild_index(config: HeadlessConfig) -> dict[str, Any]:
                 raise RecoveryError(
                     f"rebuilt index watermark {watermark} does not match World {world_revision}"
                 )
-            with sqlite3.connect(str(staged)) as conn:
+            checks = ()
+            conn = sqlite3.connect(str(staged))
+            try:
                 checks = tuple(str(row[0]) for row in conn.execute("PRAGMA quick_check"))
+            finally:
+                conn.close()
             if checks != ("ok",):
                 raise RecoveryError("rebuilt index failed SQLite quick_check")
             _fsync_path(staged)
@@ -354,7 +384,7 @@ def rebuild_index(config: HeadlessConfig) -> dict[str, Any]:
             for sidecar in (Path(str(target) + "-wal"), Path(str(target) + "-shm")):
                 try:
                     sidecar.unlink()
-                except FileNotFoundError:
+                except (FileNotFoundError, PermissionError):
                     pass
             os.replace(staged, target)
             _fsync_path(target)

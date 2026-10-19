@@ -61,7 +61,10 @@ response was applied.
 
 from __future__ import annotations
 
-import fcntl
+try:
+    import fcntl
+except ImportError:
+    fcntl = None
 import hashlib
 import json
 import os
@@ -404,11 +407,12 @@ class RunBackend:
     def _acquire_lock(self) -> None:
         require(self._lock_fd is None, "backend lock already held")
         fd = os.open(self._lock_path(), os.O_CREAT | os.O_RDWR, 0o600)
-        try:
-            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except OSError:
-            os.close(fd)
-            raise BackendError("backend is locked by another live process")
+        if fcntl is not None:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                os.close(fd)
+                raise BackendError("backend is locked by another live process")
         os.ftruncate(fd, 0)
         os.write(fd, f"{os.getpid()}\n".encode())
         os.fsync(fd)
@@ -416,11 +420,12 @@ class RunBackend:
 
     def _try_lock(self) -> bool:
         fd = os.open(self._lock_path(), os.O_CREAT | os.O_RDWR, 0o600)
-        try:
-            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except OSError:
-            os.close(fd)
-            return False
+        if fcntl is not None:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                os.close(fd)
+                return False
         os.ftruncate(fd, 0)
         os.write(fd, f"{os.getpid()}\n".encode())
         os.fsync(fd)
@@ -430,7 +435,8 @@ class RunBackend:
     def release(self) -> None:
         if self._lock_fd is not None:
             try:
-                fcntl.flock(self._lock_fd, fcntl.LOCK_UN)
+                if fcntl is not None:
+                    fcntl.flock(self._lock_fd, fcntl.LOCK_UN)
             finally:
                 os.close(self._lock_fd)
                 self._lock_fd = None

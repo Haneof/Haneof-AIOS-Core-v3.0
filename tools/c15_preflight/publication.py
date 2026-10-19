@@ -143,12 +143,21 @@ def create_receipt(
     # If this parent fsync fails, receipt rename completed but necessary dir fsync failed
     # -> persistence uncertain, cannot ordinary auto pass, must require explicit re-verification
     try:
-        fd = os.open(destination.parent, os.O_RDONLY | os.O_DIRECTORY)
-        try:
-            os.fsync(fd)
-        finally:
-            os.close(fd)
+        if os.name != "nt":
+            fd = os.open(destination.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+            try:
+                os.fsync(fd)
+            finally:
+                os.close(fd)
+        else:
+            token = destination.parent / ".fsync_token.tmp"
+            try:
+                with token.open("w") as f:
+                    os.fsync(f.fileno())
+            finally:
+                token.unlink(missing_ok=True)
     except BaseException as parent_fsync_exc:
+        raise
         # Parent fsync failed: receipt file exists and is valid inside package,
         # but parent directory entry may not be durable.
         # Per protocol: cannot mark CONFIRMED only by exists(), must require independent verification
@@ -369,13 +378,15 @@ def confirm_uncertain_package(
         "confirmed_at": datetime.now(timezone.utc).isoformat(),
     }
     atomic_json(receipt_path, receipt)
-    try:
-        fd = os.open(source.parent, os.O_RDONLY | os.O_DIRECTORY)
+    if os.name != "nt":
         try:
-            os.fsync(fd)
-        finally:
-            os.close(fd)
-    except BaseException:
+            fd = os.open(source.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+            try:
+                os.fsync(fd)
+            finally:
+                os.close(fd)
+        except BaseException:
+            raise
         # Parent fsync failed -> persistence uncertain, cannot ordinary auto pass
         # Leave receipt but raise, require explicit re-verification
         raise

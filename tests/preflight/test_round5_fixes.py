@@ -537,6 +537,7 @@ def test_checkpoint_loss_cannot_bypass_via_accepted_a_import(tmp_path):
 
 # ---- Gap 4: isolation exception classification ----
 
+@pytest.mark.skipif(sys.platform == "win32", reason="Linux user namespace unshare isolation is POSIX only")
 def test_isolation_exception_classification_namespace_permission():
     """Explicit namespace permission insufficient -> NOT_TESTED/INCONCLUSIVE, not FAIL."""
     from tools.c15_preflight.isolation_probe import probe

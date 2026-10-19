@@ -13,6 +13,7 @@ import multiprocessing
 import os
 import signal
 import sqlite3
+import sys
 
 import pytest
 
@@ -69,6 +70,7 @@ def _child(db_path: str, conn) -> None:
     )
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="multiprocessing fork and SIGKILL are POSIX only")
 def test_real_sigkill_external_signer_recovers_exactly_once_without_redispatch(tmp_path):
     db = tmp_path / "real-sigkill-verifier-only.sqlite"
     SQLiteWorldStore(db)

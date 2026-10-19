@@ -33,6 +33,18 @@ for candidate in (REPO_ROOT, REPO_ROOT / "src"):
     if candidate.is_dir() and entry not in sys.path:
         sys.path.insert(0, entry)
 
+import pytest
+
+
+def pytest_collection_modifyitems(config: Any, items: list[Any]) -> None:
+    if sys.platform == "win32":
+        for item in items:
+            item.add_marker(
+                pytest.mark.skip(
+                    reason="c15_persistence harness requires Linux container/mount/fcntl support"
+                )
+            )
+
 
 # --------------------------------------------------------------------------- CI
 # GitHub check-run *logs* are not always reachable to a reviewer (they live in an

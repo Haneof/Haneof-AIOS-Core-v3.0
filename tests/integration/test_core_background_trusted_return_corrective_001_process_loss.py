@@ -70,7 +70,10 @@ import multiprocessing
 import os
 import signal as posix_signal
 import sqlite3
+import sys
 from datetime import timedelta
+
+import pytest
 
 from aios_core.contracts.enums import ObjectType, SourceClass, WakeSource
 from aios_core.contracts.models import Observation
@@ -297,6 +300,7 @@ def _child_wake_revise_claim_then_sigkill(db_path: str) -> None:
     runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="multiprocessing fork and SIGKILL are POSIX only")
 def test_process_sigkill_after_revise_claim_replays_exactly_once(tmp_path):
     """Real process loss in a revision-advancing NON-create_task family."""
 
@@ -435,6 +439,7 @@ def _child_user_turn_transition_goal_then_sigkill(db_path: str) -> None:
     runtime.run_turn(**TURN)
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="multiprocessing fork and SIGKILL are POSIX only")
 def test_process_sigkill_after_transition_goal_replays_exactly_once(tmp_path):
     db = tmp_path / "pl-turn-transition-goal.db"
     _run_child(_child_user_turn_transition_goal_then_sigkill, db)
@@ -543,6 +548,7 @@ def _child_periodic_review_form_event_then_sigkill(db_path: str) -> None:
     runtime.run_periodic_review(now=NOW)
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="multiprocessing fork and SIGKILL are POSIX only")
 def test_process_sigkill_after_form_event_replays_exactly_once(tmp_path):
     db = tmp_path / "pl-review-form-event.db"
     _run_child(_child_periodic_review_form_event_then_sigkill, db)

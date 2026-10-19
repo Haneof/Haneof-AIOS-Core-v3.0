@@ -58,18 +58,18 @@ def test_successful_freeze_cross_process_restore(tmp_path):
     script = tmp_path / "restore_script.py"
     script.write_text(f"""
 import sys
-sys.path.insert(0, "{REPO_ROOT / 'src'}")
-sys.path.insert(0, "{REPO_ROOT}")
+sys.path.insert(0, r"{(REPO_ROOT / 'src').as_posix()}")
+sys.path.insert(0, r"{REPO_ROOT.as_posix()}")
 import json
 from pathlib import Path
 from tools.c15_preflight.restart import restore_frozen
 from tools.c15_preflight.audit import digest
-src = Path("{final}")
-dst = Path("{other / 'run'}")
+src = Path(r"{final.as_posix()}")
+dst = Path(r"{(other / 'run').as_posix()}")
 manifest_sha = digest(src / "manifest.json")
 state = restore_frozen(src, dst, manifest_sha256=manifest_sha)
 print(json.dumps({{"restored": True, "stage": state["stage"], "completed": state["completed_sequence"]}}))
-""")
+""", encoding="utf-8")
     result = subprocess.run([sys.executable, str(script)], capture_output=True, text=True, timeout=20)
     assert result.returncode == 0, f"subprocess failed: {result.stderr} {result.stdout}"
     out = json.loads(result.stdout.strip())
@@ -80,19 +80,19 @@ print(json.dumps({{"restored": True, "stage": state["stage"], "completed": state
     script2 = tmp_path / "driver_script.py"
     script2.write_text(f"""
 import sys
-sys.path.insert(0, "{REPO_ROOT / 'src'}")
-sys.path.insert(0, "{REPO_ROOT}")
-sys.path.insert(0, "{REPO_ROOT / 'tests/preflight'}")
+sys.path.insert(0, r"{(REPO_ROOT / 'src').as_posix()}")
+sys.path.insert(0, r"{REPO_ROOT.as_posix()}")
+sys.path.insert(0, r"{(REPO_ROOT / 'tests/preflight').as_posix()}")
 from test_driver import setup
 from tools.c15_preflight.audit import digest
 from pathlib import Path
-final = Path("{final}")
-other = Path("{tmp_path / 'other2'}")
+final = Path(r"{final.as_posix()}")
+other = Path(r"{(tmp_path / 'other2').as_posix()}")
 other.mkdir()
 d, peer, modules = setup(other, restore=final)
 print(d.state["completed_sequence"])
 d.close(); d.trace.close()
-""")
+""", encoding="utf-8")
     result2 = subprocess.run([sys.executable, str(script2)], capture_output=True, text=True, timeout=20)
     assert result2.returncode == 0, f"driver subprocess failed: {result2.stderr} {result2.stdout}"
     assert result2.stdout.strip() == "1"

@@ -6,7 +6,10 @@ Clean event-boundary resume only; interrupted phases require operator review.
 """
 from __future__ import annotations
 
-import fcntl
+try:
+    import fcntl
+except ImportError:
+    fcntl = None
 import io
 import json
 import os
@@ -33,17 +36,29 @@ def moment(value: str) -> datetime:
 
 def atomic_json(path: Path, value) -> None:
     temp = path.with_name(path.name + ".tmp")
-    with temp.open("x", encoding="utf-8") as stream:
-        os.chmod(temp, 0o600)
-        stream.write(encode(value) + "\n")
-        stream.flush()
-        os.fsync(stream.fileno())
-    os.replace(temp, path)
-    fd = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
     try:
-        os.fsync(fd)
-    finally:
-        os.close(fd)
+        temp.unlink(missing_ok=True)
+    except Exception:
+        pass
+    try:
+        with temp.open("x", encoding="utf-8") as stream:
+            os.chmod(temp, 0o600)
+            stream.write(encode(value) + "\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temp, path)
+        if os.name != "nt":
+            fd = os.open(path.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+            try:
+                os.fsync(fd)
+            finally:
+                os.close(fd)
+    except Exception:
+        try:
+            temp.unlink(missing_ok=True)
+        except Exception:
+            pass
+        raise
 
 
 class ReleasePort:
@@ -141,7 +156,8 @@ class Driver:
         self.state_path = directory / "driver_state.json"
         self.lock = (directory / "driver.lock").open("a+")
         try:
-            fcntl.flock(self.lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            if fcntl is not None:
+                fcntl.flock(self.lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             release = port.read_state()
             if release["pending_reveal"] is not None:
                 raise DriverBlocked("interrupted reveal requires explicit review; no implicit replay")

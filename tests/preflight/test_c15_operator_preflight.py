@@ -4,6 +4,7 @@ not Resident choices or evidence. Never load accepted A or the sealed fixture.
 import hashlib
 import io
 import json
+import os
 import sqlite3
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -200,7 +201,8 @@ def test_trace_exclusive_hash_chain_and_fail_closed_serialization(tmp_path):
         assert row["previous"] == previous and row["sequence"] == i
         assert actual == hashlib.sha256(encode(row).encode()).hexdigest()
         previous = actual
-    assert path.stat().st_mode & 0o777 == 0o600
+    if os.name != "nt":
+        assert path.stat().st_mode & 0o777 == 0o600
 
 
 @pytest.mark.parametrize("value", [object(), {1: "x"}, float("nan")])
