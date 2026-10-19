@@ -1,6 +1,19 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-28 TRUSTED-RETURN IA FAIL / CORRECTIVE-001 READY
+## 当前控制入口 — 2026-10-19 PM 独立证据与 Core 影响复核
+
+- 唯一派工来源：`governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md` 最新 CURRENT PM CONTROL 段；本地图不是第二张 READY 队列。普通治理合入 main 后本控制段生效。
+- 当前任务：`PM-AUDIT-C15-EVIDENCE-RECONCILIATION-001`，`READY_FOR_ASSIGNMENT / NOT_STARTED / REVIEWER_UNASSIGNED`，尚未启动独立 Reviewer。
+- 发布记录：`governance/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001_RELEASE_2026-10-19.md`；执行提示词：`governance/prompts/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001_2026-10-19.md`。
+- 工程基线 `259d035386ea203981c6247eeb4433dbfd8eed3f` 已含 Window80 四个新模块；旧 RC/Resident 证据不可自动证明新 Core。精确对象、合同与漂移策略见 `reviews/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001/BASELINE.json`。
+- C15 原关闭记录保留为 `RECORDED_CLOSED / EVIDENCE_REVIEW_OPEN`；新的生产/跨模型通过签署及 Window81 Resident/端侧/硬件放行暂 HOLD。未宣布旧实验整体无效，未回滚工程。
+- 复核先解决 R6 身份、R1–R9 证据、真实运行/安全来源、身份差异与新 Core 影响；不修改 Core、不运行测试或模型、不启动 Resident。
+- 只有独立耐久输出与 PM 裁决充分闭合后，才确定下一唯一任务；既有 Core 计划的 C16 → 广泛 P16 → P17 → P18/P19 依赖不因一句“下一阶段”自动取消。
+- 以下历史控制段、阶段进度与 READY 表述用于追溯，不再单独授权施工；已修历史项不得重复实现。
+
+---
+
+## 历史控制入口（已替代，非派工入口）— 2026-09-28 TRUSTED-RETURN IA FAIL / CORRECTIVE-001 READY
 
 - **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = FROZEN_WIP / BLOCKED_ON_CORE_TRUSTED_RETURN_RECOVERY`**。PR #254 已 **CLOSED / DRAFT / UNMERGED / FROZEN**。First scope-violating WIP `f7848952b6519fc40f50806f4a4d8d350ac0f38a` 修改了 `src/aios_core/runtime/turn_runtime.py`，违反 merged PM scope #255（persistence corrective 不得修改 Core），因此该 SHA = **SCOPE_VIOLATION / NOT_A_CANDIDATE**。历史 WIP/red/green CI 全部保留，不得 rewrite。
 - #255 的 narrowed scope 继续有效：C002 reviewer 六 findings 历史保留；C15 release gate binding blockers 为 `001/002/004`，`003/005/006` 为 non-blocking hardening。当前新问题只来自 binding `002` 的合法闭合路径。

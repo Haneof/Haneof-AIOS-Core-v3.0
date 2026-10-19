@@ -1,0 +1,75 @@
+{
+  "schema": "aios.pm.evidence-reconciliation.baseline.v1",
+  "task_id": "PM-AUDIT-C15-EVIDENCE-RECONCILIATION-001",
+  "prepared_date": "2026-10-19",
+  "execution_status": "NOT_STARTED",
+  "reviewer_assignment": "UNASSIGNED",
+  "governance_activation": "EFFECTIVE_ONLY_AFTER_NORMAL_MAIN_INTEGRATION",
+  "repository": "Haneof/Haneof-AIOS-Core-v3.0",
+  "session_branch": "arena/1553085b-haneof-aios-core-v3-0",
+  "scope": "READ_ONLY_EVIDENCE_AND_CORE_IMPACT_REVIEW",
+  "execution_policy": {
+    "run_tests": false,
+    "start_resident": false,
+    "call_model": false,
+    "repair_core": false,
+    "mutate_frozen_evidence": false,
+    "read_or_publish_credentials": false
+  },
+  "first_audit_main": "24193afd949e39a112f873218fc98199265df7fa",
+  "current_implementation_base": "259d035386ea203981c6247eeb4433dbfd8eed3f",
+  "protected_git_objects": {
+    "src/aios_core": "9b9d4f9bab67b05fcf71ae0c29c2859cd12d0a40",
+    "tests": "3947c5a7b3d6e12f4da59e27f91f10acbd8837ee",
+    "tools": "4d007e425a35c19ae066f07d14f294356b24cfd2",
+    ".github/workflows": "9f98c39f1c02456523d62f5279d74bf48055e1fb",
+    "pyproject.toml": "b38833c7537fa60d5c2f02ed4bb19158d8995a11"
+  },
+  "selected_contract_git_blobs": {
+    "governance/C15_RESIDENT_COGNITIVE_CONTINUITY_RULING_2026-09-22.md": "572a5b27275ea659d94a8e52025422d54dbe73b5",
+    "governance/C15_RESIDENT_COGNITIVE_CONTINUITY_TEST_PLAN_2026-09-22.md": "6d6e90df4b880e34a15ce5cff9d6d1d963a34209",
+    "governance/AIOS_CORE_COMPLETION_PLAN_2026-09-24.md": "8680841b3520c8da85ffbbe9f9e862898fe510c3",
+    "reviews/C15_RCC_EVALUATOR_001_2026-10-19/c15_rcc_evaluator_probes.py": "b03625151c0b8aa2264cac17b64e132fc2bc9840",
+    "governance/WINDOW_80_CORE_KERNEL_GAP_CLOSURE_RECEIPT_2026-10-19.md": "53b2f889af81a787bfca41a6a3277ff63c64666a"
+  },
+  "candidates": [
+    {
+      "role": "OPTION_B_ENGINEERING",
+      "pr": 390,
+      "head": "52d169e8fb96248b058ab3685d9dcb1f6cbce204"
+    },
+    {
+      "role": "RESIDENT_A_EVIDENCE",
+      "pr": 392,
+      "head": "2d92328205e16ec8b5317eaca8f3b666656ad09b"
+    },
+    {
+      "role": "RESIDENT_B_EVIDENCE",
+      "pr": 393,
+      "head": "302dab2565f61dd37ca57195bae7ed9337cdfede"
+    },
+    {
+      "role": "RESIDENT_C_EVIDENCE",
+      "pr": 394,
+      "head": "6cd89d6e3761347487946ca95e59bae380a3ae46"
+    }
+  ],
+  "existing_main_ci_observation": {
+    "run_id": 39223062778,
+    "head_sha": "259d035386ea203981c6247eeb4433dbfd8eed3f",
+    "workflow": "p16-convergence-gate",
+    "status_at_preparation": "in_progress",
+    "conclusion_at_preparation": null,
+    "not_a_new_test_run": true
+  },
+  "drift_policy": {
+    "fresh_main_read_required": true,
+    "same_protected_objects_governance_descendant": "RECORD_NEW_MAIN_AND_CONTINUE_IF_TASK_NOT_SUPERSEDED",
+    "protected_object_or_candidate_head_changed": "STOP_REVALIDATION_REQUIRED",
+    "selected_contract_changed": "STOP_PM_CONTRACT_ADJUDICATION_REQUIRED",
+    "task_superseded_or_parallel_owner_conflict": "STOP_OWNER_RECONCILIATION_REQUIRED"
+  },
+  "author_report_is_acceptance": false,
+  "fresh_session_uuid_is_model_attestation": false,
+  "all_valid_requires_independent_evidence": true
+}
