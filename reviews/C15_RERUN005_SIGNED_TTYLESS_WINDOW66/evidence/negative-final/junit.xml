@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="Window66 negative mechanical validation" tests="8" failures="1"><testcase name="expired_response_enrollment" /><testcase name="mechanical_ping_purpose_rejected" /><testcase name="missing_enrollment" /><testcase name="revoked_enrollment" /><testcase name="actual_runner_missing_enrollment" /><testcase name="actual_runner_ping_grant" /><testcase name="actual_runner_expired_grant" /><testcase name="real_remote_rejection_and_exact_restart"><failure>AssertionError: </failure></testcase></testsuite>

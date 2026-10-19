@@ -1,0 +1,6 @@
+RUNNER_RPC 1 b'' b'Traceback (most recent call last):\n  File "<string>", line 5, in <module>\nConnectionResetError: [Errno 104] Connection reset by peer\n'
+Traceback (most recent call last):
+  File "remote-diagnostic-r2", line 13, in record
+  File "remote-diagnostic-r2", line 93, in remote_failure
+AssertionError: retired Publisher endpoint survived
+real_remote_rejection_and_exact_restart FAIL

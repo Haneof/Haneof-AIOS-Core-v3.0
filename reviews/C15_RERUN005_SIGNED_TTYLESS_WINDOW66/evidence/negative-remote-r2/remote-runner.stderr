@@ -1,0 +1,46 @@
+Traceback (most recent call last):
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 375, in run
+    result=core.submit_user_turn(session_id=session_id,turn_index=spec['turn_index'],
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/src/aios_core/headless/core.py", line 306, in submit_user_turn
+    return runtime.run_turn(
+           ^^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/src/aios_core/runtime/turn_runtime.py", line 3633, in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/src/aios_core/runtime/cognitive_runtime.py", line 377, in run_turn
+    directive = self.model_handler(snapshot)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 252, in __call__
+    _,commit=barrier(self.backend,self.repo,'response-authenticated-'+rid)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 113, in barrier
+    return push_run_state(backend,repo_dir=repo,message='Resident mechanical durability: '+label)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/tools/c15_persistence/remote_backend.py", line 312, in push_run_state
+    require(
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/tools/c15_persistence/backend.py", line 132, in require
+    raise BackendError(reason)
+tools.c15_persistence.backend.BackendError: remote atomic CAS/lease rejected persistence update for origin refs/heads/persistence/synthetic-w66-final-user:
+To /var/lib/aios-window66-negative-remote-r2/remote-reject/remote.git
+ ! [remote rejected] d8afa3e36610532210d722cf9534a6eb0eea3c8d -> persistence/synthetic-w66-final-user (pre-receive hook declined)
+error: failed to push some refs to '/var/lib/aios-window66-negative-remote-r2/remote-reject/remote.git'
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in <module>
+    _main()
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 608, in _main
+    main()
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py", line 32, in main
+    elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 405, in run
+    raise ExchangeContractError('failure durability barrier unavailable: '+str(durability_error)) from original
+r005.bridge.ExchangeContractError: failure durability barrier unavailable: remote atomic CAS/lease rejected persistence update for origin refs/heads/persistence/synthetic-w66-final-user:
+To /var/lib/aios-window66-negative-remote-r2/remote-reject/remote.git
+ ! [remote rejected] 13cc989bd23afb4290bb4583cab43cba877dc533 -> persistence/synthetic-w66-final-user (pre-receive hook declined)
+error: failed to push some refs to '/var/lib/aios-window66-negative-remote-r2/remote-reject/remote.git'
+

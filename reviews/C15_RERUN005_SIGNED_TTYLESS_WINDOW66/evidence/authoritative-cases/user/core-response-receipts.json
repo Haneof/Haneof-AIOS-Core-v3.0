@@ -1,0 +1,18 @@
+[
+  {
+    "attempt_id": "bgattempt_c83c16e404912c167952ef8331deddfd",
+    "authenticity_proof": "bgresponse_v2_40c6c28758bbb9e657df4e5a8bbba1cc85125d6ceb15a88fa234c71eeca38b8d",
+    "captured_at": "2026-10-16T20:29:57.505532+00:00",
+    "model": "synthetic-w66-candidate-session-user",
+    "model_round_index": 0,
+    "outbound_request_fingerprint": "b1b4b9dc592371b04351ef26c0fc23b0b92cce971002e95a301c997389e27621",
+    "payload_sha256": "800295f61d28c38a26aaef085f1fb6b9b41c22e56e8dd1dd003642c11d6e6f49",
+    "provider": "external-resident",
+    "provider_request_id": "relay_bfe0380496da825a6090645170fd6d4efb738424408e5632d3c6c1c114ccdd7d",
+    "relay_id": "relay_bfe0380496da825a6090645170fd6d4efb738424408e5632d3c6c1c114ccdd7d",
+    "response_fingerprint": "800295f61d28c38a26aaef085f1fb6b9b41c22e56e8dd1dd003642c11d6e6f49",
+    "subject_id": "user_1",
+    "work_id": "turnexec_f395817b1d11a7d69e0734e4044fe01c",
+    "work_kind": "user_turn"
+  }
+]

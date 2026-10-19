@@ -1,0 +1,55 @@
+{
+  "scenario": "due",
+  "status": "PASS",
+  "no_controlling_tty": true,
+  "core_receipts": 2,
+  "core_proofs": 2,
+  "remote_commit": "bda5bd08896390a543c76243af951c22159bf028",
+  "signer": {
+    "uid": 996,
+    "tty": false,
+    "signed_steps": [
+      {
+        "request_id": "req-0001-model_directive-0e625d65",
+        "kind": "model_directive",
+        "response_sha256": "ed73bdbe17bd27b0be897d9da9aba29a445742316a7ff1c93ebe391eac32ca0f",
+        "authorization_sha256": "3408a70aa213dfa31a18a98fea3aab35f6affcf1aa0756ed2bec2aa63d888966"
+      },
+      {
+        "request_id": "req-0002-model_directive-d5a4bde4",
+        "kind": "model_directive",
+        "response_sha256": "a743c60652486f793b867c26acdbfc35c6015ac12c44465ddb1a0cfcae7d6237",
+        "authorization_sha256": "8cf1571145e5e58a95e2f44909e2a7f353b57f1b5700cb25b9b20c4d95ff1c55"
+      }
+    ],
+    "negative_pass": [
+      "domain",
+      "version",
+      "purpose",
+      "enrollment_id",
+      "enrollment_sha256",
+      "resident_id",
+      "resident_key_id",
+      "run_id",
+      "session_id",
+      "instance_id",
+      "operation_id",
+      "request_id",
+      "request_sha256",
+      "request_kind",
+      "core_attempt_id",
+      "context",
+      "provenance",
+      "publisher_epoch",
+      "publisher_challenge",
+      "issued_at",
+      "expires_at",
+      "response_bytes",
+      "signature",
+      "untrusted_public_key_signature",
+      "register_endpoint",
+      "replay",
+      "replay"
+    ]
+  }
+}

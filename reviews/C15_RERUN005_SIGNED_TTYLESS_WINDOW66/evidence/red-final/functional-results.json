@@ -1,0 +1,26 @@
+[
+  {
+    "scenario": "user",
+    "status": "FAIL",
+    "error_type": "RuntimeError",
+    "reason": "runner failed after legal flow"
+  },
+  {
+    "scenario": "due",
+    "status": "FAIL",
+    "error_type": "RuntimeError",
+    "reason": "runner failed after legal flow"
+  },
+  {
+    "scenario": "summary",
+    "status": "FAIL",
+    "error_type": "RuntimeError",
+    "reason": "runner failed after legal flow"
+  },
+  {
+    "scenario": "delivered",
+    "status": "FAIL",
+    "error_type": "RuntimeError",
+    "reason": "runner failed after legal flow"
+  }
+]

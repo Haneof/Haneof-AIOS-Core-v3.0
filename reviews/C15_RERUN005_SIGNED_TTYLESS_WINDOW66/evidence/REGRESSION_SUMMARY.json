@@ -1,0 +1,46 @@
+{
+  "ORIGINAL_38": {
+    "tests": 38,
+    "pass": 31,
+    "fail": 7,
+    "skip": 0,
+    "failure_names": [
+      "test_sigkill_after_request_never_regenerates_or_redispatches",
+      "test_absent_external_response_bounded_fail_closed",
+      "test_real_core_external_publisher_with_c15_remote_barriers[due]",
+      "test_real_core_external_publisher_with_c15_remote_barriers[user]",
+      "test_real_core_external_publisher_with_c15_remote_barriers[summary]",
+      "test_real_core_external_publisher_with_c15_remote_barriers[delivered]",
+      "test_signer_not_importable_in_recovery_caller"
+    ]
+  },
+  "BASE_ORIGINAL_38": {
+    "tests": 38,
+    "pass": 31,
+    "fail": 7,
+    "skip": 0,
+    "failure_names": [
+      "test_sigkill_after_request_never_regenerates_or_redispatches",
+      "test_absent_external_response_bounded_fail_closed",
+      "test_real_core_external_publisher_with_c15_remote_barriers[due]",
+      "test_real_core_external_publisher_with_c15_remote_barriers[user]",
+      "test_real_core_external_publisher_with_c15_remote_barriers[summary]",
+      "test_real_core_external_publisher_with_c15_remote_barriers[delivered]",
+      "test_signer_not_importable_in_recovery_caller"
+    ]
+  },
+  "WINDOW55": {
+    "tests": 33,
+    "pass": 33,
+    "fail": 0,
+    "skip": 0,
+    "failure_names": []
+  },
+  "WINDOW57": {
+    "tests": 29,
+    "pass": 29,
+    "fail": 0,
+    "skip": 0,
+    "failure_names": []
+  }
+}

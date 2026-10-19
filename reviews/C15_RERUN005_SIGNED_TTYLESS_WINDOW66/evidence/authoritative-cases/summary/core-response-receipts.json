@@ -1,0 +1,18 @@
+[
+  {
+    "attempt_id": "bgattempt_425051ea36bed85ea31f4cfd4eba2e46",
+    "authenticity_proof": "bgresponse_v2_607268ed4a94e3a56b4a7cb7f80dbfdbe93a4c38daa3c289315dc9269cb913a9",
+    "captured_at": "2026-10-16T20:30:23.070055+00:00",
+    "model": "synthetic-w66-candidate-session-summary",
+    "model_round_index": 0,
+    "outbound_request_fingerprint": "8b678e67ae5f6bdc63a579cae46bfe6b43c8fe122e126d1419b3a9a7736249d4",
+    "payload_sha256": "488089a3d9cf76469e3f0ef1d9d6d50480d6813db64e0d6f6185977b72ddf005",
+    "provider": "external-resident",
+    "provider_request_id": "relay_ad1b383cb659a5bb170505006aa70c4422e475c28cc95d3d67e197c8b7cfa3b6",
+    "relay_id": "relay_ad1b383cb659a5bb170505006aa70c4422e475c28cc95d3d67e197c8b7cfa3b6",
+    "response_fingerprint": "488089a3d9cf76469e3f0ef1d9d6d50480d6813db64e0d6f6185977b72ddf005",
+    "subject_id": "user_1",
+    "work_id": "turnexec_8c3bfeba2b11ea3955e4d1905a4edf12",
+    "work_kind": "user_turn"
+  }
+]

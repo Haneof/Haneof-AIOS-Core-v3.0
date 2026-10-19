@@ -1,0 +1,13 @@
+{
+  "failed_candidate": "adf391178d7494ed17e1db802a31f001fb3b5f3b",
+  "failed_tree": "ee335ae61f340919ac4e6a588f6a7e144e29b28b",
+  "fresh_main": "271fa28d695efaeb1c888d93024eeddac9c8aa9f",
+  "frozen_windows_54_55_56_modified": false,
+  "harness_source_and_identity_unchanged": true,
+  "protected_diff": {
+    "reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55": "",
+    "src/aios_core": "",
+    "tests": "",
+    "tools/c15_persistence": ""
+  }
+}

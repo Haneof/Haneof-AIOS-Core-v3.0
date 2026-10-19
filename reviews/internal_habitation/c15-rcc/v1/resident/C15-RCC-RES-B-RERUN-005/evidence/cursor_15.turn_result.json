@@ -1,0 +1,747 @@
+{
+  "world_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite",
+  "subject_id": "user_1",
+  "session_id": "sess-resident-b-005-632f06ba3df940f3",
+  "turn_index": 1,
+  "status_before": {
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite",
+    "index_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite.search.sqlite",
+    "world_revision": 43,
+    "index_watermark": 43,
+    "index_lag": 0,
+    "writer_lease_held": true
+  },
+  "status_after": {
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite",
+    "index_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite.search.sqlite",
+    "world_revision": 44,
+    "index_watermark": 44,
+    "index_lag": 0,
+    "writer_lease_held": true
+  },
+  "turn_result": {
+    "context": {
+      "ai_identity": {},
+      "capability_catalog": [
+        {
+          "kind": "write",
+          "name": "commit_ai_world_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "commit_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "commit_operation_experience",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "compare_claims",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "create_attention_watch",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "create_task",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "drill_down_conversation",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "expand_recall",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "focus_entity",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "follow_relation",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "form_event",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "inspect_outcome",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "inspect_world_object",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_attention_watches",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_conversation_summaries",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_dimensions",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "propose_action",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_dimension",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_entity",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_goal",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "read_ai_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_background_budget",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_cognitive_policies",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_execution_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_periodic_review_anchors",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_world_map",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "record_communication_experience",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "request_all_dimensions_projection",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "retract_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "retrieve_original_observation",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "revise_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "revise_entity",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "rollback_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "search_conversation_summaries",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "search_timeline",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "search_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "transition_dimension",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_event",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_goal",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_task",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "update_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "upsert_relation",
+          "side_effecting": true
+        }
+      ],
+      "conversation_summaries": [],
+      "current_topic": "\u665a\u4e0a\u7684\u56de\u5f52\u524d\u628a\u8fd9\u4e2a staging \u51b2\u7a81\u5904\u7406\u6389\u3002",
+      "estimated_tokens": 2438,
+      "memory_cards": [
+        {
+          "dimension": "dim:work_state",
+          "excerpt": "staging \u7d22\u5f15 orders-shadow \u4e0e\u6628\u591c\u6d4b\u8bd5\u6b8b\u7559\u540d\u79f0\u51b2\u7a81\uff0c\u56de\u5f52\u4efb\u52a1\u88ab\u963b\u585e\uff1bproduction \u7d22\u5f15\u672a\u53d7\u5f71\u54cd\u3002",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_4c492ea152d135960e96c2d1",
+          "object_type": "observation",
+          "retrieval_score": 3,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_state",
+          "excerpt": "Atlas staging \u5f53\u524d\u6709\u4e24\u5904\u5f85\u5904\u7406\uff1a\u6d4b\u8bd5\u7d22\u5f15\u547d\u540d\u51b2\u7a81\u3001\u65e5\u5fd7\u4fdd\u7559\u65f6\u957f\u4ecd\u4e3a\u9ed8\u8ba4\u503c\u3002\u4e24\u9879\u5747\u6807\u8bb0\u4e3a non-production\uff1b\u6ca1\u6709\u751f\u4ea7\u5199\u5165\u3001\u5220\u9664\u6216\u4ed8\u8d39\u52a8\u4f5c\u3002",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+          "object_type": "observation",
+          "retrieval_score": 3,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "Atlas staging \u53d8\u66f4\u5df2\u5408\u5165\uff1a\u6d4b\u8bd5\u7d22\u5f15\u51b2\u7a81\u89e3\u9664\uff0c\u65e5\u5fd7\u4fdd\u7559\u8c03\u6574\u5b8c\u6210\uff1bCI 48/48 \u901a\u8fc7\uff0cstaging smoke test \u901a\u8fc7\uff1b\u672c\u6b21\u6ca1\u6709 production \u53d8\u66f4\uff0c\u9a8c\u6536\u672a\u8981\u6c42\u8fd4\u5de5\u3002",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+          "object_type": "observation",
+          "retrieval_score": 2,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:user_ai_interaction",
+          "excerpt": "\u6211\u540e\u53f0\u4e5f\u770b\u5230 tag \u8fd8\u6ca1\u51fa\u6765\u3002\u4ee5\u540e\u8fd9\u79cd\u201c\u51c6\u5907\u63d0\u4ea4\u3001\u5df2\u6392\u961f\u201d\u548c\u201c\u786e\u5b9e\u5b8c\u6210\u201d\u8981\u5206\u5f00\u8bf4\uff1b\u6ca1\u6709\u5b8c\u6210\u8bb0\u5f55\u65f6\u5c31\u6309\u6ca1\u786e\u8ba4\u5b8c\u6210\u5904\u7406\u3002",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_conv_user_0668a2b2d67dcb5872d549be",
+          "object_type": "observation",
+          "retrieval_score": 1,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:ai_communication_experience",
+          "excerpt": "Low-risk Atlas staging test-environment work executed autonomously, with results-and-key-risks report delivered after completion\nautonomous execution of low-risk test-environment details; report resul",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "commexp_c2661b257fec8cbb0bd445ea",
+          "object_type": "communication_experience",
+          "retrieval_score": 1,
+          "revision": 1
+        }
+      ],
+      "recent_turns": [],
+      "task_context": {
+        "cognitive_policy_context": {
+          "_meta": {
+            "included": 3,
+            "reader": "read_cognitive_policies",
+            "total": 3,
+            "truncated": false
+          },
+          "_policy_records": [
+            {
+              "allowed_range_or_choices": [
+                "results_and_key_risks_only",
+                "full_detail"
+              ],
+              "current_value": "results_and_key_risks_only",
+              "default_value": null,
+              "evaluation_window": "2w",
+              "mutable_by_ai": true,
+              "policy_class": "cognitive_policy",
+              "policy_id": "communication.detail_level",
+              "previous_version": null,
+              "rollback_pointer": null,
+              "scope": "communication",
+              "version": 1
+            },
+            {
+              "allowed_range_or_choices": [
+                "distinguish_queued_from_completed",
+                "narrative"
+              ],
+              "current_value": "distinguish_queued_from_completed",
+              "default_value": null,
+              "evaluation_window": "4w",
+              "mutable_by_ai": true,
+              "policy_class": "cognitive_policy",
+              "policy_id": "communication.status_reporting",
+              "previous_version": null,
+              "rollback_pointer": null,
+              "scope": "communication",
+              "version": 1
+            },
+            {
+              "allowed_range_or_choices": [
+                "explicit_itemized_confirmation_required"
+              ],
+              "current_value": "explicit_itemized_confirmation_required",
+              "default_value": null,
+              "evaluation_window": "4w",
+              "mutable_by_ai": true,
+              "policy_class": "cognitive_policy",
+              "policy_id": "execution.production_delete_authorization",
+              "previous_version": null,
+              "rollback_pointer": null,
+              "scope": "production",
+              "version": 1
+            }
+          ],
+          "communication.detail_level": "results_and_key_risks_only",
+          "communication.status_reporting": "distinguish_queued_from_completed",
+          "execution.production_delete_authorization": "explicit_itemized_confirmation_required",
+          "memory.recommendation_limit": 5
+        },
+        "conversation_continuity": {
+          "pending_round_summary": null,
+          "raw_drill_down_capability": "drill_down_conversation",
+          "recent_turn_count": 0,
+          "round_summary_count": 0,
+          "session_id": "sess-resident-b-005-632f06ba3df940f3",
+          "summary_index_capability": "list_conversation_summaries",
+          "summary_search_capability": "search_conversation_summaries"
+        },
+        "current_user_observation_ref": {
+          "object_id": "obs_conv_user_d3befc5d89d222c693ad46a9",
+          "revision": 1
+        },
+        "related_execution_anchors": [],
+        "topic_state": {
+          "antecedent_recall_needed": false,
+          "continued_from_recent_turn": false,
+          "gate_open": true,
+          "history_may_help": true,
+          "reason": "current_utterance_topic:indexed_external_observation_anchor",
+          "topic": "\u665a\u4e0a\u7684\u56de\u5f52\u524d\u628a\u8fd9\u4e2a staging \u51b2\u7a81\u5904\u7406\u6389\u3002"
+        }
+      },
+      "token_budget": 3400,
+      "truncated": false,
+      "user_input": "\u665a\u4e0a\u7684\u56de\u5f52\u524d\u628a\u8fd9\u4e2a staging \u51b2\u7a81\u5904\u7406\u6389\u3002",
+      "world_map": {
+        "as_of": "2026-11-09T17:10:00+00:00",
+        "dimension_count": 7,
+        "dimensions": [
+          {
+            "current_object_count": 15,
+            "definition_ref": null,
+            "dimension": "dim:user_ai_interaction",
+            "latest_activity_at": "2026-11-09T17:10:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation"
+            ],
+            "recent_24h_count": 1,
+            "recent_7d_count": 13,
+            "registered": false
+          },
+          {
+            "current_object_count": 16,
+            "definition_ref": null,
+            "dimension": "dim_unclassified",
+            "latest_activity_at": "2026-11-09T17:03:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "dependency",
+              "task",
+              "wake"
+            ],
+            "recent_24h_count": 1,
+            "recent_7d_count": 13,
+            "registered": false
+          },
+          {
+            "current_object_count": 3,
+            "definition_ref": null,
+            "dimension": "dim:work_state",
+            "latest_activity_at": "2026-11-09T17:03:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation"
+            ],
+            "recent_24h_count": 1,
+            "recent_7d_count": 3,
+            "registered": false
+          },
+          {
+            "current_object_count": 6,
+            "definition_ref": null,
+            "dimension": "dim:ai_cognitive_policy",
+            "latest_activity_at": "2026-11-04T22:24:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "cognitive_policy",
+              "evidence_set"
+            ],
+            "recent_24h_count": 0,
+            "recent_7d_count": 4,
+            "registered": false
+          },
+          {
+            "current_object_count": 3,
+            "definition_ref": null,
+            "dimension": "dim:release_state",
+            "latest_activity_at": "2026-11-04T23:02:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation"
+            ],
+            "recent_24h_count": 0,
+            "recent_7d_count": 3,
+            "registered": false
+          },
+          {
+            "current_object_count": 1,
+            "definition_ref": null,
+            "dimension": "dim:ai_communication_experience",
+            "latest_activity_at": "2026-11-02T20:52:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "communication_experience"
+            ],
+            "recent_24h_count": 0,
+            "recent_7d_count": 1,
+            "registered": false
+          },
+          {
+            "current_object_count": 1,
+            "definition_ref": null,
+            "dimension": "dim:work_outcome",
+            "latest_activity_at": "2026-11-02T20:40:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation"
+            ],
+            "recent_24h_count": 0,
+            "recent_7d_count": 1,
+            "registered": false
+          }
+        ],
+        "directory_only": true,
+        "expand_capabilities": {
+          "broader_recall": "expand_recall",
+          "dimension_definitions": "list_dimensions",
+          "exact_object": "inspect_world_object",
+          "multi_dimension_window": "request_all_dimensions_projection",
+          "refresh_directory": "read_world_map",
+          "semantic_recall": "search_world",
+          "single_dimension_timeline": "search_timeline"
+        },
+        "index_lag": 0,
+        "index_watermark": 43,
+        "schema": "aios.world-map.l0.v1",
+        "semantic_conclusions": false,
+        "truncated": false,
+        "world_revision": 43
+      }
+    },
+    "continuity_summary_commits": [],
+    "continuity_summary_error": null,
+    "conversation_commit": {
+      "assistant_observation_id": "obs_conv_ai_84a1b2de4b5ffacd7363bd97",
+      "assistant_world_revision": 44,
+      "idempotent_replay": false,
+      "user_observation_id": "obs_conv_user_d3befc5d89d222c693ad46a9",
+      "user_world_revision": 43,
+      "world_revision": 44
+    },
+    "recommendation": {
+      "cards": [
+        {
+          "dimension": "dim:work_state",
+          "excerpt": "staging \u7d22\u5f15 orders-shadow \u4e0e\u6628\u591c\u6d4b\u8bd5\u6b8b\u7559\u540d\u79f0\u51b2\u7a81\uff0c\u56de\u5f52\u4efb\u52a1\u88ab\u963b\u585e\uff1bproduction \u7d22\u5f15\u672a\u53d7\u5f71\u54cd\u3002",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_4c492ea152d135960e96c2d1",
+          "object_type": "observation",
+          "retrieval_score": 3,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_state",
+          "excerpt": "Atlas staging \u5f53\u524d\u6709\u4e24\u5904\u5f85\u5904\u7406\uff1a\u6d4b\u8bd5\u7d22\u5f15\u547d\u540d\u51b2\u7a81\u3001\u65e5\u5fd7\u4fdd\u7559\u65f6\u957f\u4ecd\u4e3a\u9ed8\u8ba4\u503c\u3002\u4e24\u9879\u5747\u6807\u8bb0\u4e3a non-production\uff1b\u6ca1\u6709\u751f\u4ea7\u5199\u5165\u3001\u5220\u9664\u6216\u4ed8\u8d39\u52a8\u4f5c\u3002",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+          "object_type": "observation",
+          "retrieval_score": 3,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "Atlas staging \u53d8\u66f4\u5df2\u5408\u5165\uff1a\u6d4b\u8bd5\u7d22\u5f15\u51b2\u7a81\u89e3\u9664\uff0c\u65e5\u5fd7\u4fdd\u7559\u8c03\u6574\u5b8c\u6210\uff1bCI 48/48 \u901a\u8fc7\uff0cstaging smoke test \u901a\u8fc7\uff1b\u672c\u6b21\u6ca1\u6709 production \u53d8\u66f4\uff0c\u9a8c\u6536\u672a\u8981\u6c42\u8fd4\u5de5\u3002",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+          "object_type": "observation",
+          "retrieval_score": 2,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:user_ai_interaction",
+          "excerpt": "\u6211\u540e\u53f0\u4e5f\u770b\u5230 tag \u8fd8\u6ca1\u51fa\u6765\u3002\u4ee5\u540e\u8fd9\u79cd\u201c\u51c6\u5907\u63d0\u4ea4\u3001\u5df2\u6392\u961f\u201d\u548c\u201c\u786e\u5b9e\u5b8c\u6210\u201d\u8981\u5206\u5f00\u8bf4\uff1b\u6ca1\u6709\u5b8c\u6210\u8bb0\u5f55\u65f6\u5c31\u6309\u6ca1\u786e\u8ba4\u5b8c\u6210\u5904\u7406\u3002",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_conv_user_0668a2b2d67dcb5872d549be",
+          "object_type": "observation",
+          "retrieval_score": 1,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:ai_communication_experience",
+          "excerpt": "Low-risk Atlas staging test-environment work executed autonomously, with results-and-key-risks report delivered after completion\nautonomous execution of low-risk test-environment details; report resul",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "commexp_c2661b257fec8cbb0bd445ea",
+          "object_type": "communication_experience",
+          "retrieval_score": 1,
+          "revision": 1
+        }
+      ],
+      "current_topic": "\u665a\u4e0a\u7684\u56de\u5f52\u524d\u628a\u8fd9\u4e2a staging \u51b2\u7a81\u5904\u7406\u6389\u3002",
+      "index_watermark": 43,
+      "reason": "topic_matched_history",
+      "topic_gate_open": true,
+      "world_revision": 43
+    },
+    "runtime": {
+      "capability_history": [],
+      "model_input_tokens": null,
+      "model_output_tokens": null,
+      "model_rounds": 1,
+      "model_total_tokens": null,
+      "model_usage_complete": false,
+      "recovered_response_attempts": [],
+      "response": "\u6536\u5230\uff0c\u665a\u4e0a\u7684\u56de\u5f52\u524d\u6211\u4f1a\u628a staging \u8fd9\u4e2a orders-shadow \u547d\u540d\u51b2\u7a81\u5904\u7406\u6389\u3002\u6309\u54b1\u4eec\u7ea6\u5b9a\u7684\u8fb9\u754c\uff0cstaging/\u6d4b\u8bd5\u73af\u5883\u7684\u5de5\u7a0b\u7ec6\u8282\u6211\u81ea\u4e3b\u63a8\u8fdb\uff0c\u5b8c\u6210\u540e\u628a\u56de\u5f52\u961f\u5217\u6062\u590d\u60c5\u51b5\u548c\u7ed3\u679c\u540c\u6b65\u7ed9\u4f60\u3002",
+      "silenced": false,
+      "termination_reason": "responded"
+    }
+  },
+  "handoffs": [
+    {
+      "request_id": "req-0003-model_directive-2ae98fc1",
+      "path": "published_new_request",
+      "request_sha256": "6f41bd3ee66dc9fbf069fd31fd5a62baf53f974e0906a2cf2a5344a1a650018b",
+      "response_sha256": "3b2a698ed7ae7b618fe4544ef58b18083b96e785c16739d9fa08748d8b91e5c1",
+      "declared_request_sha256": "6f41bd3ee66dc9fbf069fd31fd5a62baf53f974e0906a2cf2a5344a1a650018b",
+      "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION"
+    }
+  ],
+  "exchange": {
+    "recovery_state": {
+      "classification": "COMPLETE",
+      "semantic_dispatch_occurred": true,
+      "requests": [
+        {
+          "request_id": "req-0001-model_directive-22a9c3fe",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "7857e0d4bac1062b349267aa8785eee1a9b910d202fcac271f283b300746df93",
+          "response_sha256": "442f95dfd2add91e490e05a22e35b63c0bcf3991d8a5183cacfc5eca1ae26414",
+          "events": [
+            {
+              "seq": 1,
+              "event": "request_published"
+            },
+            {
+              "seq": 2,
+              "event": "response_published"
+            },
+            {
+              "seq": 3,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0002-model_directive-fc4de92d",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "0eeced610a3f057f1d2162e596d49d090f4e4df49961860345807d2b92b24d08",
+          "response_sha256": "2d2c55c521ccd637af6ee3b11aa4443e7828a9deb3c786237d190dbf69b9ba1c",
+          "events": [
+            {
+              "seq": 4,
+              "event": "request_published"
+            },
+            {
+              "seq": 5,
+              "event": "response_published"
+            },
+            {
+              "seq": 6,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0003-model_directive-2ae98fc1",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "6f41bd3ee66dc9fbf069fd31fd5a62baf53f974e0906a2cf2a5344a1a650018b",
+          "response_sha256": "3b2a698ed7ae7b618fe4544ef58b18083b96e785c16739d9fa08748d8b91e5c1",
+          "events": [
+            {
+              "seq": 7,
+              "event": "request_published"
+            },
+            {
+              "seq": 8,
+              "event": "response_published"
+            },
+            {
+              "seq": 9,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        }
+      ],
+      "dispatch_boundary_event": "request_published",
+      "dispatch_boundary_rule": "not_submitted reconciliation is allowed only when no request_published record exists; after request publication the exchange fails closed instead of declaring the request unsubmitted",
+      "not_submitted_allowed": false,
+      "open_dispatched": [],
+      "durable_unconsumed": [],
+      "complete": [
+        "req-0001-model_directive-22a9c3fe",
+        "req-0002-model_directive-fc4de92d",
+        "req-0003-model_directive-2ae98fc1"
+      ],
+      "ledger": {
+        "ok": true,
+        "records": 9,
+        "head_sha256": "7c615590719b8af9654d679b7468d19f9e1734bb0ef2d1ce8e166610c961a8ef",
+        "error": null,
+        "first_bad_seq": null
+      }
+    },
+    "integrity": {
+      "ok": true,
+      "problems": [],
+      "chain": {
+        "ok": true,
+        "records": 9,
+        "head_sha256": "7c615590719b8af9654d679b7468d19f9e1734bb0ef2d1ce8e166610c961a8ef",
+        "error": null,
+        "first_bad_seq": null
+      },
+      "requests": {
+        "req-0001-model_directive-22a9c3fe": {
+          "first_seq": 1,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "7857e0d4bac1062b349267aa8785eee1a9b910d202fcac271f283b300746df93",
+          "response_sha256": "442f95dfd2add91e490e05a22e35b63c0bcf3991d8a5183cacfc5eca1ae26414"
+        },
+        "req-0002-model_directive-fc4de92d": {
+          "first_seq": 4,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "0eeced610a3f057f1d2162e596d49d090f4e4df49961860345807d2b92b24d08",
+          "response_sha256": "2d2c55c521ccd637af6ee3b11aa4443e7828a9deb3c786237d190dbf69b9ba1c"
+        },
+        "req-0003-model_directive-2ae98fc1": {
+          "first_seq": 7,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "6f41bd3ee66dc9fbf069fd31fd5a62baf53f974e0906a2cf2a5344a1a650018b",
+          "response_sha256": "3b2a698ed7ae7b618fe4544ef58b18083b96e785c16739d9fa08748d8b91e5c1"
+        }
+      },
+      "exchange_root": "/workspaces/window73-resident-b-rerun005/run/exchange"
+    }
+  },
+  "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION"
+}

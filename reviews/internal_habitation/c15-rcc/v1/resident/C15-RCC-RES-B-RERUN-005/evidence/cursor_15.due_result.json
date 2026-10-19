@@ -1,0 +1,178 @@
+{
+  "status_before": {
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite",
+    "index_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite.search.sqlite",
+    "world_revision": 44,
+    "index_watermark": 44,
+    "index_lag": 0,
+    "writer_lease_held": true
+  },
+  "status_after": {
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite",
+    "index_path": "/workspaces/window73-resident-b-rerun005/run/world/world.sqlite.search.sqlite",
+    "world_revision": 44,
+    "index_watermark": 44,
+    "index_lag": 0,
+    "writer_lease_held": true
+  },
+  "due_work_result": {
+    "periodic_review": null,
+    "wakes": []
+  },
+  "handoffs": [],
+  "exchange": {
+    "recovery_state": {
+      "classification": "COMPLETE",
+      "semantic_dispatch_occurred": true,
+      "requests": [
+        {
+          "request_id": "req-0001-model_directive-22a9c3fe",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "7857e0d4bac1062b349267aa8785eee1a9b910d202fcac271f283b300746df93",
+          "response_sha256": "442f95dfd2add91e490e05a22e35b63c0bcf3991d8a5183cacfc5eca1ae26414",
+          "events": [
+            {
+              "seq": 1,
+              "event": "request_published"
+            },
+            {
+              "seq": 2,
+              "event": "response_published"
+            },
+            {
+              "seq": 3,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0002-model_directive-fc4de92d",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "0eeced610a3f057f1d2162e596d49d090f4e4df49961860345807d2b92b24d08",
+          "response_sha256": "2d2c55c521ccd637af6ee3b11aa4443e7828a9deb3c786237d190dbf69b9ba1c",
+          "events": [
+            {
+              "seq": 4,
+              "event": "request_published"
+            },
+            {
+              "seq": 5,
+              "event": "response_published"
+            },
+            {
+              "seq": 6,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0003-model_directive-2ae98fc1",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "6f41bd3ee66dc9fbf069fd31fd5a62baf53f974e0906a2cf2a5344a1a650018b",
+          "response_sha256": "3b2a698ed7ae7b618fe4544ef58b18083b96e785c16739d9fa08748d8b91e5c1",
+          "events": [
+            {
+              "seq": 7,
+              "event": "request_published"
+            },
+            {
+              "seq": 8,
+              "event": "response_published"
+            },
+            {
+              "seq": 9,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        }
+      ],
+      "dispatch_boundary_event": "request_published",
+      "dispatch_boundary_rule": "not_submitted reconciliation is allowed only when no request_published record exists; after request publication the exchange fails closed instead of declaring the request unsubmitted",
+      "not_submitted_allowed": false,
+      "open_dispatched": [],
+      "durable_unconsumed": [],
+      "complete": [
+        "req-0001-model_directive-22a9c3fe",
+        "req-0002-model_directive-fc4de92d",
+        "req-0003-model_directive-2ae98fc1"
+      ],
+      "ledger": {
+        "ok": true,
+        "records": 9,
+        "head_sha256": "7c615590719b8af9654d679b7468d19f9e1734bb0ef2d1ce8e166610c961a8ef",
+        "error": null,
+        "first_bad_seq": null
+      }
+    },
+    "integrity": {
+      "ok": true,
+      "problems": [],
+      "chain": {
+        "ok": true,
+        "records": 9,
+        "head_sha256": "7c615590719b8af9654d679b7468d19f9e1734bb0ef2d1ce8e166610c961a8ef",
+        "error": null,
+        "first_bad_seq": null
+      },
+      "requests": {
+        "req-0001-model_directive-22a9c3fe": {
+          "first_seq": 1,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "7857e0d4bac1062b349267aa8785eee1a9b910d202fcac271f283b300746df93",
+          "response_sha256": "442f95dfd2add91e490e05a22e35b63c0bcf3991d8a5183cacfc5eca1ae26414"
+        },
+        "req-0002-model_directive-fc4de92d": {
+          "first_seq": 4,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "0eeced610a3f057f1d2162e596d49d090f4e4df49961860345807d2b92b24d08",
+          "response_sha256": "2d2c55c521ccd637af6ee3b11aa4443e7828a9deb3c786237d190dbf69b9ba1c"
+        },
+        "req-0003-model_directive-2ae98fc1": {
+          "first_seq": 7,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "6f41bd3ee66dc9fbf069fd31fd5a62baf53f974e0906a2cf2a5344a1a650018b",
+          "response_sha256": "3b2a698ed7ae7b618fe4544ef58b18083b96e785c16739d9fa08748d8b91e5c1"
+        }
+      },
+      "exchange_root": "/workspaces/window73-resident-b-rerun005/run/exchange"
+    }
+  },
+  "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION"
+}

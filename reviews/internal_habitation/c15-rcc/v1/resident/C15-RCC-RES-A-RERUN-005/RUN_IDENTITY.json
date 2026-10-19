@@ -1,0 +1,10 @@
+{
+  "run_id": "c15-rcc-res-a-rerun-005-8e605da939b0",
+  "task_id": "C15-RCC-RES-A-RERUN-005",
+  "resident_process_id": "eb935e2d-575c-44dc-bf48-5f8907390d9e",
+  "resident_session_id": "resident-a-005-d49cb630c1014fac",
+  "conversation_session_id": "sess-resident-a-005-75029e633ec54fd0",
+  "subject_id": "user_1",
+  "minted_utc": "2026-10-18T13:40:10.034967+00:00",
+  "freshness": "NEW: minted for Window 71 RERUN-005 only; no prior run state reused"
+}

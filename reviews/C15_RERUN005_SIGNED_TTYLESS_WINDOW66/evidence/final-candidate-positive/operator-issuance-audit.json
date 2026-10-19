@@ -1,0 +1,42 @@
+[
+  {
+    "scenario": "user",
+    "enrollment_id": "W66-f7a36917-4aef-4cc2-aa34-ed221e917e77",
+    "grant_sha256": "1a98db7a26813cc082e20db63c02dfc0761884a0bc74670a4e870e57ad0c80ad",
+    "signature_sha256": "421910bf190cc8fbd30266efc68d6a42161f105e9dafdb7288393c27ba5db701",
+    "issued_at": 1792182589,
+    "expires_at": 1792186189,
+    "issuer_euid": 0,
+    "issuer_fingerprint": "1124f54a497c9dfa5fcc6e16fb9fc570816fadba6f32016a8b53d5f0243090dd"
+  },
+  {
+    "scenario": "due",
+    "enrollment_id": "W66-9be4c86e-1bd6-45d0-9430-bc91feb05f5c",
+    "grant_sha256": "8a07150dd375be750ce3efcc3fa9fa9458d37190e1dcbcf93c6e54bc5e7b11e5",
+    "signature_sha256": "99def244809581728b2dc80fb347bbed5d174a162ff3702a9091b4bfea332125",
+    "issued_at": 1792182589,
+    "expires_at": 1792186189,
+    "issuer_euid": 0,
+    "issuer_fingerprint": "1124f54a497c9dfa5fcc6e16fb9fc570816fadba6f32016a8b53d5f0243090dd"
+  },
+  {
+    "scenario": "summary",
+    "enrollment_id": "W66-bf25daf0-db5c-4b27-af3a-ba2206f21e0c",
+    "grant_sha256": "d0d30aa329b2f989c8eed726a5dab902e4f1fe0338fd97776e6e53b0c1c7881f",
+    "signature_sha256": "8ad54655d320354f88d2f86186087c5ebf893c37b41b32d970863a265a39f3dc",
+    "issued_at": 1792182589,
+    "expires_at": 1792186189,
+    "issuer_euid": 0,
+    "issuer_fingerprint": "1124f54a497c9dfa5fcc6e16fb9fc570816fadba6f32016a8b53d5f0243090dd"
+  },
+  {
+    "scenario": "delivered",
+    "enrollment_id": "W66-12adf927-a242-4b9d-8ddb-00f4a9173f20",
+    "grant_sha256": "990885544cff2bf7234517b3258ff4bc5bb212f8e80ef33b9e6b86bafc415e62",
+    "signature_sha256": "9ca0d655115655b800cad3c6f0d506c8cb75a958b49bb7039fca9b7ad449914c",
+    "issued_at": 1792182589,
+    "expires_at": 1792186189,
+    "issuer_euid": 0,
+    "issuer_fingerprint": "1124f54a497c9dfa5fcc6e16fb9fc570816fadba6f32016a8b53d5f0243090dd"
+  }
+]
