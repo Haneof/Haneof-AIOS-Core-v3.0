@@ -17,6 +17,24 @@
 
 ---
 
+## 2026-10-19 — WINDOW 83 MULTI-MODEL EDGE SCHEDULER & HARDWARE SENSOR STREAMING PIPELINE
+- **WINDOW 83 STATUS: 100% COMPLETE & VERIFIED (46/46 PASS)**.
+- **Scope & Delivery** (100% Core Kernel, Zero UI):
+  - Component 1: `WearableSensorPipeline` (`src/aios_core/ingest/sensor_pipeline.py`, `tests/ingest/test_sensor_pipeline.py` 6/6 PASS):
+    - 50Hz IMU swinging-door adaptive deadband compression without raw DB flooding.
+    - Dual-condition impact escalation (jump >= 10.0g, magnitude >= 3.0g) triggering `WakePriority.P0_CRITICAL_SAFETY` fall alert.
+    - Continuous optical PPG: resting rates collapsed into `EpisodeMean`, acute arrhythmias escalated to `wearable_ppg_anomaly`.
+    - Multimodal audio & camera byte purging (`RawByteSink` physical zeroing, 0 raw bytes stored in SQLite, 180-day TTL voiceprint LSH).
+  - Component 2: `MultiModelEdgeScheduler` (`src/aios_core/runtime/edge_model_scheduler.py`, `tests/runtime/test_edge_model_scheduler.py` 5/5 PASS):
+    - Iron Rule 3: P0 critical safety events bypass cloud roundtrips and global world boards, routing directly to Edge SLM within <= 50ms budget.
+    - Offline network degradation: automatic graceful routing to Edge SLM without turn dropping.
+    - Timeout and exception circuit breakers for cloud model dispatch.
+    - Strict 2.0GB (2048 MB) resident memory budget gate.
+  - Component 3: Adaptive compression and high-entropy audio regression (`tests/tools/test_adaptive_temporal_compressor.py` 7/7 PASS, `tests/unit/test_m1_001r_high_entropy_audio.py` 11/11 PASS, `tests/unit/test_m1_001r_adv_independent_redteam.py` 17/17 PASS).
+- **Unique next READY:** `WINDOW 84 — WEARABLE LOW-POWER HIBERNATION STATE MACHINE & HAPTIC DRIVER ABSTRACTION`.
+
+---
+
 ## 2026-10-19 — WINDOW 82 CORE-RUNTIME-INTEGRATION-001 / FUSED TURN RUNTIME COGNITIVE SUBSYSTEMS FULL INTEGRATION
 - PM Formal Integration Receipt = `governance/WINDOW_82_CORE_RUNTIME_INTEGRATION_RECEIPT_2026-10-19.md`.
 - **WINDOW 82 STATUS: 100% COMPLETE & VERIFIED (54/54 PASS)**.
