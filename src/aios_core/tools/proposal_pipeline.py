@@ -327,6 +327,8 @@ class ToolProposalPipeline:
             world_revision=commit_res.world_revision,
         )
 
+    _AUTHORIZED_EXECUTORS = frozenset({"runtime_kernel", "system:operator", "system", "test_executor"})
+
     def execute_proposal(
         self,
         *,
@@ -335,7 +337,18 @@ class ToolProposalPipeline:
         execution_context: dict[str, Any] | None = None,
         executed_at: datetime | None = None,
     ) -> ToolProposalReceipt:
-        """Mark an approved tool proposal as EXECUTED (mounted in runtime)."""
+        """Mark an approved tool proposal as EXECUTED in the governance ledger.
+
+        Safety Boundary (DEF-001 Remediation):
+        ToolProposalPipeline is a formal governance state ledger, NOT an arbitrary Python code
+        execution engine. It records architectural approvals and mounting milestones.
+        Arbitrary unsandboxed code execution on wearable hardware is strictly disallowed.
+        Execution requires caller authorization in AUTHORIZED_EXECUTORS.
+        """
+        if not executor or executor.strip() not in self._AUTHORIZED_EXECUTORS:
+            raise PermissionError(
+                f"Unauthorized executor '{executor}'. Only authorized roles ({', '.join(sorted(self._AUTHORIZED_EXECUTORS))}) may execute proposals."
+            )
         if proposal_ref.revision is None or proposal_ref.revision < 1:
             raise ValueError("proposal_ref requires pinned revision")
 
@@ -355,6 +368,9 @@ class ToolProposalPipeline:
         meta["execution_context"] = execution_context or {}
         meta["executed_at"] = dt.isoformat()
         meta["supersedes_revision"] = old_proposal.revision
+        meta["execution_safety"] = "METADATA_RECORD_ONLY_NO_ARBITRARY_CODE_EXECUTION"
+        meta["is_code_sandboxed"] = False
+        meta["requires_formal_operator_release"] = True
 
         rec_at = max(dt, old_proposal.recorded_at)
         lrn_at = max(dt, old_proposal.learned_at)

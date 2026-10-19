@@ -89,7 +89,7 @@ from aios_core.summaries import (
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent, as_utc, canonical_utc_iso
-from aios_core.contracts.enums import AttentionClass, ObjectType, PolicyClass, WakeSource
+from aios_core.contracts.enums import AttentionClass, ObjectType, PolicyClass, UserReaction, WakeSource
 from aios_core.wake import (
     AttentionRouter,
     AttentionSchedulingPolicy,
@@ -2922,6 +2922,49 @@ class FusedTurnRuntime:
             ],
         }
 
+    def _record_turn_experience(
+        self,
+        *,
+        user_input: str,
+        assistant_text: str,
+        user_obs_ref: ObjectRef,
+        occurred_at: datetime,
+    ) -> None:
+        """Close the Bayesian communication adaptation loop (DEF-002 Remediation).
+
+        Evaluates explicit and implicit user sentiment/reaction signals:
+        - If user resists (e.g. '太啰嗦', '别废话', '说重点', '烦', '闭嘴', '不需要大道理'):
+          records UserReaction.RESISTED against the current style, penalizing it in future turns.
+        - If user ignores or gives empty/dismissive response:
+          records UserReaction.IGNORED.
+        - Otherwise (default cooperation / acceptance):
+          records UserReaction.ACCEPTED, reinforcing successful symbiotic rapport.
+        """
+        user_lower = user_input.lower().strip()
+        resisted_cues = ("太长", "太啰嗦", "废话", "别废话", "说重点", "烦", "闭嘴", "不需要你教", "大道理", "少废话")
+        accepted_cues = ("好的", "对", "明白", "可以", "谢谢", "收到", "赞", "同意", "不错", "挺好")
+
+        reaction = UserReaction.ACCEPTED
+        if any(cue in user_lower for cue in resisted_cues):
+            reaction = UserReaction.RESISTED
+        elif not user_lower:
+            reaction = UserReaction.IGNORED
+
+        style = "concise" if len(assistant_text) <= 60 else "detailed"
+        if "抱歉" in assistant_text or "对不起" in assistant_text:
+            style = "supportive"
+
+        try:
+            self.experience_tracker.record_interaction_experience(
+                scenario="daily_chat",
+                style=style,
+                user_reaction=reaction,
+                evidence_refs=[user_obs_ref],
+                recorded_at=occurred_at,
+            )
+        except Exception:
+            pass
+
     def _record_ai_promise(
         self,
         statement: str,
@@ -4095,7 +4138,12 @@ class FusedTurnRuntime:
         self.index.catch_up()
         rolling_window = self.active_rolling_windows.setdefault(
             session,
-            ActiveRollingWindow(max_active_turns=6, max_token_budget=1500, session_id=session),
+            ActiveRollingWindow(
+                max_active_turns=6,
+                max_token_budget=1500,
+                session_id=session,
+                store=self.store,
+            ),
         )
         rolling_window.record_turn(
             turn_index=turn_index,
@@ -4103,6 +4151,14 @@ class FusedTurnRuntime:
             assistant_text=assistant_text,
             user_observation_ref=ObjectRef(object_id=user_commit.observation_id, revision=1),
             assistant_observation_ref=ObjectRef(object_id=assistant_commit.observation_id, revision=1),
+            occurred_at=occurred_at,
+        )
+
+        # DEF-002: Close Bayesian communication adaptation loop automatically
+        self._record_turn_experience(
+            user_input=user_input,
+            assistant_text=assistant_text,
+            user_obs_ref=ObjectRef(object_id=user_commit.observation_id, revision=1),
             occurred_at=occurred_at,
         )
 
