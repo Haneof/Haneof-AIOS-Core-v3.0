@@ -15,8 +15,11 @@ from .search import (
     normalize_alias,
     tokens_for,
 )
+from .topic_associator import AdHocTopicCard, DynamicTopicAssociator
 
 __all__ = [
+    "AdHocTopicCard",
+    "DynamicTopicAssociator",
     "MindSearchHit",
     "MindSearchPage",
     "SearchHit",

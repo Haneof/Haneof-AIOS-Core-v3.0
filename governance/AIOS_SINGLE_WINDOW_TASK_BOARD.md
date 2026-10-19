@@ -17,7 +17,17 @@
 
 ---
 
-## Historical record — 2026-10-19 — WINDOW 80 CORE-GAP-CLOSURE-001 / FOUR CORE SUBSYSTEMS PRODUCTION READY / ZERO UI FOCUS
+## 2026-10-19 — WINDOW 81 CORE-ADVANCEMENT-001 / LONG-SESSION ROLLING WINDOW, AD-HOC TOPIC RECALL & PROMISE LEDGER
+- PM Formal Advancement Receipt = `governance/WINDOW_81_CORE_ADVANCEMENT_001_RECEIPT_2026-10-19.md`.
+- **WINDOW 81 STATUS: 100% COMPLETE & VERIFIED (29/29 PASS)**.
+- **Scope & Delivery**:
+  - Instruction: Focus 100% on AIOS Core Kernel development without UI/interface code.
+  - Component 1: `ActiveRollingWindow` (`src/aios_core/context/active_window.py`, `tests/context/test_active_window.py` 4/4 PASS).
+  - Component 2: `DynamicTopicAssociator` (`src/aios_core/query/topic_associator.py`, `tests/query/test_topic_associator.py` 3/3 PASS).
+  - Component 3: `AISelfMindTracker` (`src/aios_core/cognition/ai_self.py`, `tests/cognition/test_ai_self.py` 4/4 PASS).
+- **Unique next READY:** `WINDOW 82 — RUNTIME MODEL HABITATION & WEARABLE EDGE COGNITION`.
+
+## 2026-10-19 — WINDOW 80 CORE-GAP-CLOSURE-001 / FOUR CORE SUBSYSTEMS PRODUCTION READY / ZERO UI FOCUS
 - PM Formal Gap Closure Receipt = `governance/WINDOW_80_CORE_KERNEL_GAP_CLOSURE_RECEIPT_2026-10-19.md`.
 - **WINDOW 80 STATUS: 100% COMPLETE & VERIFIED (18/18 PASS)**.
 - **Scope & Delivery**:
