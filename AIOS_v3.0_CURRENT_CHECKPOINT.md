@@ -12,6 +12,25 @@
 
 ---
 
+## 2026-10-19 — WINDOW 82 CORE-RUNTIME-INTEGRATION-001 / Fused Turn Runtime Cognitive Subsystems Full Integration
+- **Receipt**: `governance/WINDOW_82_CORE_RUNTIME_INTEGRATION_RECEIPT_2026-10-19.md`
+- **WINDOW 82 STATUS**: **100% COMPLETE & VERIFIED (54/54 PASS)**.
+- **Scope & Delivery** (100% Core Kernel, Zero UI):
+  - FusedTurnRuntime Deep Assembly (`src/aios_core/runtime/turn_runtime.py`):
+    - Subsystem 1: `NarrativeSegmenter` (life chapters & open/seal narrative segmenting)
+    - Subsystem 2: `DimensionCurveTracker` (cognitive derivatives & burnout risk detection)
+    - Subsystem 3: `ToolProposalPipeline` (tool proposals drafting & state machine)
+    - Subsystem 4: `ExperienceTracker` (Bayesian adaptive communication style tracking)
+    - Subsystem 5: `DynamicTopicAssociator` (sub-30ms multi-path topological associative recall)
+    - Subsystem 6: `AISelfMindTracker` (double-entry promise ledger & symbiotic posture tracking)
+    - Subsystem 7: `ActiveRollingWindow` (strict 6-turn / 1500-token envelope)
+  - Capabilities expanded from 43 to 53 with full side-effect authorization allowlist entries.
+  - End-to-End Integration Suite: `tests/runtime/test_fused_turn_cognitive_integration.py` (5/5 PASS).
+  - Regression: 54/54 PASS across all runtime and cognitive test suites.
+- **Unique next task**: `WINDOW 83 — MULTI-MODEL EDGE SCHEDULER & HARDWARE SENSOR STREAMING PIPELINE`.
+
+---
+
 ## 2026-10-19 — WINDOW 81 CORE-ADVANCEMENT-001 / Rolling Window, Ad-Hoc Recall & AI Promise Ledger Ready
 - **Receipt**: `governance/WINDOW_81_CORE_ADVANCEMENT_001_RECEIPT_2026-10-19.md`
 - **WINDOW 81 STATUS**: **100% COMPLETE & VERIFIED (29/29 PASS)**.

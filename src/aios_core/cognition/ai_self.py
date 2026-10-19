@@ -92,7 +92,6 @@ class AISelfMindTracker:
         self.store = store
         self.ai_subject_id = ai_subject_id
         self.user_subject_id = user_subject_id
-        self._ensure_ai_dimensions()
 
     def _ensure_ai_dimensions(self) -> None:
         """Ensure standard AI self cognitive dimensions exist in the store."""
@@ -148,6 +147,7 @@ class AISelfMindTracker:
         clean_desc = description.strip()
         if not clean_desc:
             raise ValueError("Promise description must not be blank")
+        self._ensure_ai_dimensions()
 
         dt = as_utc(committed_at or datetime.now(timezone.utc), "committed_at")
         due_dt = as_utc(due_time, "due_time") if due_time is not None else None

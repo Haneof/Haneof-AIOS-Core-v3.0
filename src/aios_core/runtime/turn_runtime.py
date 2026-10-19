@@ -28,8 +28,15 @@ from aios_core.context.continuity import (
     RoundSummaryCommit,
     RoundSummaryRequest,
 )
+from aios_core.context.active_window import ActiveRollingWindow, ActiveTurn
 from aios_core.context.controller import ContextController, ModelContextBundle
 from aios_core.communication import CommunicationExperienceRequest, CommunicationExperienceService
+from aios_core.communication.experience_tracker import ExperienceTracker
+from aios_core.cognition.ai_self import AISelfMindTracker
+from aios_core.curves.dimension_curve import DimensionCurveTracker
+from aios_core.narrative.segmenter import NarrativeSegmenter
+from aios_core.query.topic_associator import DynamicTopicAssociator
+from aios_core.tools.proposal_pipeline import ToolProposalPipeline
 from aios_core.dimensions import (
     DimensionProposalRequest,
     DimensionRegistryService,
@@ -385,6 +392,35 @@ class FusedTurnRuntime:
             subject_id=self.subject_id,
             observation_listener=self.attention_watches.evaluate_observation,
         )
+        self.narrative_segmenter = NarrativeSegmenter(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+        )
+        self.dimension_curves = DimensionCurveTracker(
+            store=store,
+            subject_id=self.subject_id,
+        )
+        self.tool_proposals = ToolProposalPipeline(
+            store=store,
+            subject_id=self.subject_id,
+        )
+        self.experience_tracker = ExperienceTracker(
+            store=store,
+            service=self.communication_experience,
+            subject_id=self.subject_id,
+        )
+        self.topic_associator = DynamicTopicAssociator(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+        )
+        self.ai_self_tracker = AISelfMindTracker(
+            store=store,
+            ai_subject_id=AI_SELF_SUBJECT_ID,
+            user_subject_id=self.subject_id,
+        )
+        self.active_rolling_windows: dict[str, ActiveRollingWindow] = {}
         self._active_turn_time: datetime | None = None
         self._active_meter_time: datetime | None = None
         self._active_session_id: str | None = None
@@ -1131,6 +1167,172 @@ class FusedTurnRuntime:
                 },
             ),
             self._rollback_cognitive_policy,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="associate_topics",
+                description=(
+                    "Perform sub-30ms multi-path topological associative recall for unpredictable "
+                    "topics across keywords, entities, claims, and temporal relevance."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "query": "string",
+                    "max_tokens": "integer?",
+                },
+            ),
+            self._associate_topics,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="get_effective_communication_style",
+                description=(
+                    "Query Bayesian adaptive symbiotic communication style recommendation "
+                    "and avoidance blacklist for a scenario."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "scenario": "string",
+                },
+            ),
+            self._get_effective_communication_style,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="record_ai_promise",
+                description=(
+                    "Record an AI promise or commitment to the user as a first-class Claim "
+                    "with double-entry liability accounting."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "statement": "string",
+                    "reason": "string",
+                    "confidence": "number[0,1]?",
+                    "tags": "array[string]?",
+                },
+            ),
+            self._record_ai_promise,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="reconcile_ai_promise",
+                description=(
+                    "Reconcile an AI promise upon fulfillment, failure, or red-line cancellation "
+                    "with an offsetting credit record (history is byte-level immutable)."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "promise_id": "string",
+                    "new_status": "fulfilled|cancelled|violated",
+                    "reason": "string",
+                },
+            ),
+            self._reconcile_ai_promise,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="inspect_ai_self_mind",
+                description=(
+                    "Inspect AI self subjectivity state including symbiotic posture, "
+                    "rapport score, and outstanding promises."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={},
+            ),
+            self._inspect_ai_self_mind,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="open_narrative_segment",
+                description=(
+                    "Open a new life narrative segment for thematic clustering and phase "
+                    "transition tracking."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "dimension_key": "string",
+                    "title": "string",
+                    "start_time": "ISO-8601 datetime",
+                    "reason": "string",
+                    "event_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._open_narrative_segment,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="seal_narrative_segment",
+                description=(
+                    "Seal an active narrative segment with summary and key claims upon "
+                    "phase completion."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "segment_id": "string",
+                    "summary": "string",
+                    "end_time": "ISO-8601 datetime",
+                    "key_claim_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._seal_narrative_segment,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="record_dimension_curve_point",
+                description=(
+                    "Record a point on a cognitive dimension curve and atomically calculate "
+                    "velocity and acceleration derivatives. Forbids raw sensors."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "dimension_id": "string",
+                    "point_time": "ISO-8601 datetime",
+                    "value": "number",
+                    "unit": "string?",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._record_dimension_curve_point,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="detect_burnout_risk",
+                description=(
+                    "Detect potential burnout or exhaustion risk across cognitive dimensions "
+                    "from consecutive negative derivative trajectories."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "dimension_ids": "array[string]?",
+                    "min_negative_streak": "integer?",
+                },
+            ),
+            self._detect_burnout_risk,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="propose_tool",
+                description=(
+                    "Propose a dynamic tool or capability gap resolution with structured "
+                    "motivation, schema, and expected gain."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "tool_name": "string",
+                    "capability_gap": "string",
+                    "motivation": "string",
+                    "proposed_schema": "object",
+                    "expected_gain": "string",
+                },
+            ),
+            self._propose_tool,
         )
         self.registry = registry
         self.cognitive_runtime = CognitiveRuntime(
@@ -2685,6 +2887,225 @@ class FusedTurnRuntime:
         )
         return asdict(receipt)
 
+    def _associate_topics(
+        self,
+        query: str,
+        max_tokens: int = 500,
+    ) -> dict[str, Any]:
+        card = self.topic_associator.associate_topic(
+            query=str(query),
+            max_tokens=int(max_tokens or 500),
+        )
+        return card.as_context_card()
+
+    def _get_effective_communication_style(
+        self,
+        scenario: str,
+    ) -> dict[str, Any]:
+        rec = self.experience_tracker.get_effective_style(str(scenario))
+        avoidance = self.experience_tracker.get_avoidance_list(str(scenario))
+        return {
+            "scenario": rec.scenario,
+            "recommended_style": rec.recommended_style,
+            "recommended_tone": rec.recommended_tone,
+            "posterior_score": rec.posterior_score,
+            "confidence": rec.confidence,
+            "sample_count": rec.sample_count,
+            "avoidance_blacklist": [
+                {
+                    "style": rule.style,
+                    "tone": rule.tone,
+                    "resistance_rate": rule.resistance_rate,
+                    "reason": rule.reason,
+                }
+                for rule in avoidance
+            ],
+        }
+
+    def _record_ai_promise(
+        self,
+        statement: str,
+        reason: str,
+        confidence: float = 1.0,
+        tags: Sequence[str] | None = None,
+    ) -> dict[str, Any]:
+        now = self._active_turn_time or datetime.now(timezone.utc)
+        receipt = self.ai_self_tracker.record_promise(
+            description=str(statement),
+            committed_at=now,
+        )
+        return {
+            "promise_id": receipt.promise_id,
+            "revision": receipt.revision,
+            "statement": receipt.description,
+            "status": receipt.status.value,
+            "double_entry_effect": "DEBIT_LIABILITY",
+            "world_revision": receipt.world_revision,
+        }
+
+    def _reconcile_ai_promise(
+        self,
+        promise_id: str,
+        new_status: str,
+        reason: str,
+    ) -> dict[str, Any]:
+        now = self._active_turn_time or datetime.now(timezone.utc)
+        norm_status = str(new_status).lower()
+        if norm_status == "fulfilled":
+            receipt = self.ai_self_tracker.fulfill_promise(
+                promise_id=str(promise_id),
+                fulfilment_note=str(reason),
+                fulfilled_at=now,
+            )
+        else:
+            receipt = self.ai_self_tracker.cancel_promise(
+                promise_id=str(promise_id),
+                cancellation_reason=str(reason),
+                cancelled_at=now,
+            )
+        return {
+            "promise_id": receipt.promise_id,
+            "revision": receipt.revision,
+            "status": receipt.status.value,
+            "double_entry_effect": "CREDIT_RED_LINE_OFFSET",
+            "world_revision": receipt.world_revision,
+        }
+
+    def _inspect_ai_self_mind(self) -> dict[str, Any]:
+        return self.ai_self_tracker.get_mind_summary()
+
+    def _open_narrative_segment(
+        self,
+        dimension_key: str,
+        title: str,
+        start_time: str,
+        reason: str,
+        event_refs: Sequence[Mapping[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        now = self._active_turn_time or datetime.now(timezone.utc)
+        st = datetime.fromisoformat(str(start_time).replace("Z", "+00:00"))
+        refs = self._coerce_refs(event_refs or ())
+        dim_refs: list[ObjectRef] = []
+        if dimension_key:
+            try:
+                payload = self.store.get_payload(str(dimension_key))
+                dim_refs.append(ObjectRef(object_id=str(dimension_key), revision=int(payload.get("revision", 1))))
+            except Exception:
+                pass
+        receipt = self.narrative_segmenter.open_segment(
+            title=str(title),
+            description=str(reason),
+            segment_time=TemporalExtent(start=st, end=None),
+            dimension_refs=dim_refs,
+            key_event_refs=refs,
+            created_at=now,
+        )
+        return {
+            "segment_id": receipt.segment_id,
+            "revision": receipt.revision,
+            "status": receipt.status.value,
+            "world_revision": receipt.world_revision,
+        }
+
+    def _seal_narrative_segment(
+        self,
+        segment_id: str,
+        summary: str,
+        end_time: str,
+        key_claim_refs: Sequence[Mapping[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        now = self._active_turn_time or datetime.now(timezone.utc)
+        payload = self.store.get_payload(str(segment_id))
+        seg_ref = ObjectRef(object_id=str(segment_id), revision=int(payload.get("revision", 1)))
+        receipt = self.narrative_segmenter.seal_segment(
+            segment_ref=seg_ref,
+            reason=str(summary),
+            sealed_at=now,
+        )
+        return {
+            "segment_id": receipt.segment_id,
+            "revision": receipt.revision,
+            "status": receipt.status.value,
+            "world_revision": receipt.world_revision,
+        }
+
+    def _record_dimension_curve_point(
+        self,
+        dimension_id: str,
+        point_time: str,
+        value: float,
+        unit: str | None = None,
+        evidence_refs: Sequence[Mapping[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        now = self._active_turn_time or datetime.now(timezone.utc)
+        pt = datetime.fromisoformat(str(point_time).replace("Z", "+00:00"))
+        refs = self._coerce_refs(evidence_refs or ())
+        dim_payload = self.store.get_payload(str(dimension_id))
+        dim_ref = ObjectRef(object_id=str(dimension_id), revision=int(dim_payload.get("revision", 1)))
+        receipt = self.dimension_curves.record_point(
+            dimension_ref=dim_ref,
+            point_time=pt,
+            value=float(value),
+            recorded_at=now,
+        )
+        return {
+            "point_id": receipt.point_id,
+            "revision": receipt.revision,
+            "dimension_id": receipt.dimension_id,
+            "value": receipt.value,
+            "velocity": receipt.velocity,
+            "acceleration": receipt.acceleration,
+            "anomaly_flag": receipt.anomaly_flag,
+            "world_revision": receipt.world_revision,
+        }
+
+    def _detect_burnout_risk(
+        self,
+        dimension_ids: Sequence[str] | None = None,
+        min_negative_streak: int = 3,
+    ) -> list[dict[str, Any]]:
+        warnings = self.dimension_curves.detect_burnout_risk(
+            dimension_ids=list(dimension_ids) if dimension_ids else None,
+            min_negative_streak=int(min_negative_streak),
+        )
+        return [
+            {
+                "dimension_id": w["dimension_id"],
+                "negative_streak": w["negative_streak"],
+                "current_velocity": w["current_velocity"],
+                "burnout_risk": w["burnout_risk"],
+                "message": w["message"],
+            }
+            for w in warnings
+        ]
+
+    def _propose_tool(
+        self,
+        tool_name: str,
+        capability_gap: str,
+        motivation: str,
+        proposed_schema: Mapping[str, Any],
+        expected_gain: str,
+    ) -> dict[str, Any]:
+        now = self._active_turn_time or datetime.now(timezone.utc)
+        receipt = self.tool_proposals.draft_proposal(
+            capability_gap=str(capability_gap),
+            use_cases=[str(motivation)],
+            current_limitations=[f"Missing tool: {tool_name}"],
+            proposed_interface=dict(proposed_schema),
+            expected_benefit=str(expected_gain),
+            validation_plan="Benchmark latency and correctness against test suite",
+            created_at=now,
+            custom_metadata={"tool_name": str(tool_name)},
+        )
+        return {
+            "proposal_id": receipt.proposal_id,
+            "revision": receipt.revision,
+            "status": receipt.status.value,
+            "capability_gap": receipt.capability_gap,
+            "world_revision": receipt.world_revision,
+        }
+
     def _cognitive_policy_context(
         self,
         *,
@@ -2804,6 +3225,12 @@ class FusedTurnRuntime:
             "propose_cognitive_policy",
             "update_cognitive_policy",
             "rollback_cognitive_policy",
+            "record_ai_promise",
+            "reconcile_ai_promise",
+            "open_narrative_segment",
+            "seal_narrative_segment",
+            "record_dimension_curve_point",
+            "propose_tool",
         }
 
     def _commit_operation_experience(
@@ -3563,6 +3990,10 @@ class FusedTurnRuntime:
             if ai_identity is not None
             else self._ai_world_core_context(occurred_at, per_domain=3)
         )
+        mind_summary = self.ai_self_tracker.get_mind_summary()
+        continuity_context.setdefault("symbiotic_posture", mind_summary["posture"])
+        continuity_context.setdefault("rapport_score", mind_summary["rapport_score"])
+        continuity_context.setdefault("active_promise_count", len(mind_summary["outstanding_promises"]))
 
         current_task_context = dict(task_context or {})
         current_task_context["topic_state"] = topic_state.model_dump(mode="json")
@@ -3662,6 +4093,18 @@ class FusedTurnRuntime:
             assistant_world_revision=assistant_commit.world_revision,
         )
         self.index.catch_up()
+        rolling_window = self.active_rolling_windows.setdefault(
+            session,
+            ActiveRollingWindow(max_active_turns=6, max_token_budget=1500, session_id=session),
+        )
+        rolling_window.record_turn(
+            turn_index=turn_index,
+            user_text=user_input,
+            assistant_text=assistant_text,
+            user_observation_ref=ObjectRef(object_id=user_commit.observation_id, revision=1),
+            assistant_observation_ref=ObjectRef(object_id=assistant_commit.observation_id, revision=1),
+            occurred_at=occurred_at,
+        )
 
         # Summarization is maintenance after the user-visible turn. Deterministic
         # code decides when a closed range needs summarization; an injected real
