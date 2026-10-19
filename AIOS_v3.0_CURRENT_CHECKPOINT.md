@@ -1,4 +1,18 @@
-## 2026-10-19 — WINDOW 80 CORE-GAP-CLOSURE-001 / Four Core Cognitive Subsystems Production Ready
+## 2026-10-19 — CURRENT PM CHECKPOINT / Evidence & Core-Impact Review Pending
+
+- Current dispatch authority: `governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md`, newest CURRENT PM CONTROL block; effective only after normal governance integration into main.
+- Unique current task: `PM-AUDIT-C15-EVIDENCE-RECONCILIATION-001 = READY_FOR_ASSIGNMENT`; execution `NOT_STARTED`; independent Reviewer `UNASSIGNED`.
+- Exact implementation baseline: `259d035386ea203981c6247eeb4433dbfd8eed3f`; pins/drift policy: `reviews/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001/BASELINE.json`.
+- First PM audit bound `24193afd...`; Window80 subsequently changed actual Core. Read `reviews/AIOS_PM_PROJECT_AUDIT_WINDOW80_ADDENDUM_2026-10-19.md`; do not reuse the old no-implementation-drift statement for new main.
+- Existing C15 closure receipts remain recorded; evidence review is OPEN. Replacement-model / production sign-off and Window81 new Resident/edge/hardware launch are HOLD pending independent evidence and Core-impact review, not retroactively declared experiment failures.
+- Full release: `governance/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001_RELEASE_2026-10-19.md`.
+- Ready-to-handoff prompt: `governance/prompts/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001_2026-10-19.md`.
+- No tests/model/Resident executed by this PM task; no product implementation changes. Existing remote CI is an observation, not a new PM PASS.
+- Required exit: independent, durable REVIEW_ONLY evidence -> explicit PM adjudication -> one next task. Historical entries below do not authorize current execution.
+
+---
+
+## Historical record — 2026-10-19 — WINDOW 80 CORE-GAP-CLOSURE-001 / Four Core Cognitive Subsystems Production Ready
 - **Receipt**: `governance/WINDOW_80_CORE_KERNEL_GAP_CLOSURE_RECEIPT_2026-10-19.md`
 - **WINDOW 80 STATUS**: **100% COMPLETE & VERIFIED (18/18 PASS)**.
 - **Scope & Delivery** (100% Core Kernel, Zero UI):

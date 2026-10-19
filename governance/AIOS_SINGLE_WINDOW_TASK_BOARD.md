@@ -1,4 +1,23 @@
-## 2026-10-19 — WINDOW 80 CORE-GAP-CLOSURE-001 / FOUR CORE SUBSYSTEMS PRODUCTION READY / ZERO UI FOCUS
+## 2026-10-19 — CURRENT PM CONTROL / INDEPENDENT EVIDENCE RECONCILIATION READY FOR ASSIGNMENT
+
+- **Effectiveness:** this governance control takes effect only after normal main integration. A branch/PR alone is not activation. This current block supersedes downstream launch permissions in the historical blocks below; their original evidence and verdict records are preserved.
+- **Unique current task:** `PM-AUDIT-C15-EVIDENCE-RECONCILIATION-001 = READY_FOR_ASSIGNMENT`.
+- **Execution:** `NOT_STARTED`; independent Reviewer `UNASSIGNED`. No independent agent has been launched by this PM session. Do not count the task packet as completed acceptance.
+- PM release: `governance/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001_RELEASE_2026-10-19.md`.
+- Executable handoff: `governance/prompts/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001_2026-10-19.md`.
+- Machine-readable pins: `reviews/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001/BASELINE.json`.
+- Implementation baseline = `259d035386ea203981c6247eeb4433dbfd8eed3f`; selected implementation/contract objects are pinned in the manifest. Fresh main and candidate checks are mandatory; protected drift stops the task.
+- Scope = read-only existing-evidence review + Window80 Core-impact reconciliation. No tests, model calls, Resident execution, Core repair, credential access, fixture mutation, UI or hardware work.
+- Existing C15 close = `RECORDED_CLOSED / EVIDENCE_REVIEW_OPEN`. Preserve all original accepted/failed records. New production-ready / replacement-model sign-off = `HOLD_PENDING_INDEPENDENT_EVIDENCE_REVIEW`; this is PM launch control, not a new technical FAIL verdict.
+- Window80 code is already in main: preserve it as `IMPLEMENTED / AUTHOR_REPORTED_TESTS / INDEPENDENT_ACCEPTANCE_NOT_ESTABLISHED`. Old RC/Resident evidence does not automatically certify the changed Core.
+- **Window81 multi-model / edge / hardware launch = HOLD_PENDING_EVIDENCE_AND_CORE_IMPACT.** New Resident, cursor reveal, C16 engineering and P17/P18/P19 launch are not authorized by this task.
+- Reviewer must independently address PM-AUD-01..06, R6 model attestation or PARTIAL/INSUFFICIENT_EVIDENCE, R1..R9 requirement-level proof, security provenance/raw receipts, run identity differences and new Core impact. PM report claims are challenge inputs, not predetermined verdicts.
+- Exit = durable REVIEW_ONLY output (`EVIDENCE_SUPPORTED`, `GAPS_CONFIRMED`, `BLOCKED/EVIDENCE_ACCESS_REQUIRED` or `REVALIDATION_REQUIRED`) -> PM adjudication -> one next task. No self-release or automatic Resident rerun.
+- Below this block, READY/COMPLETE/PRODUCTION READY statements are historical records, not a second current queue. Task board remains the sole dispatch authority; checkpoint/master map link back here.
+
+---
+
+## Historical record — 2026-10-19 — WINDOW 80 CORE-GAP-CLOSURE-001 / FOUR CORE SUBSYSTEMS PRODUCTION READY / ZERO UI FOCUS
 - PM Formal Gap Closure Receipt = `governance/WINDOW_80_CORE_KERNEL_GAP_CLOSURE_RECEIPT_2026-10-19.md`.
 - **WINDOW 80 STATUS: 100% COMPLETE & VERIFIED (18/18 PASS)**.
 - **Scope & Delivery**:
