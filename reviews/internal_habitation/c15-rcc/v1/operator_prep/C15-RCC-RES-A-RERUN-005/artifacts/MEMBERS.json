@@ -1,0 +1,112 @@
+{
+  "harness/IDENTITY.json": {
+    "mode": 420,
+    "sha256": "cf3d3356a6746f21a817a2bdd8a3aa7a111ce87e0289abfeaf3729b41b0d1ed5",
+    "size": 18257
+  },
+  "harness/launch.py": {
+    "mode": 420,
+    "sha256": "6b46ac1531e04aeb836066c403898e7917a44857cfff910e819a45c633ff436b",
+    "size": 28556
+  },
+  "harness/r005/__init__.py": {
+    "mode": 420,
+    "sha256": "7900d69b069ca6440302895c4e82531bc776757648511aef25a0133efd7a465b",
+    "size": 1154
+  },
+  "harness/r005/atomic.py": {
+    "mode": 420,
+    "sha256": "b2f8df9258045fbb72a966d9b2b0fc72b23476655ff9c9c9ab390dc7634a4683",
+    "size": 4870
+  },
+  "harness/r005/bridge.py": {
+    "mode": 420,
+    "sha256": "c482e289d2e2e7f1d2ae49f5996aaa1766d2dfdaba0749fbf62b1c3d0b5cbeef",
+    "size": 13928
+  },
+  "harness/r005/canonical.py": {
+    "mode": 420,
+    "sha256": "d1ae3e5a46bced68bedb455bf4e6ce6c6783391c9f319b3317bf0bff83800ac1",
+    "size": 3171
+  },
+  "harness/r005/checks.py": {
+    "mode": 420,
+    "sha256": "28fc8dd2aa11551180130a2854b7edfcb02211b0664ab068cc904117836ffa87",
+    "size": 4727
+  },
+  "harness/r005/cli.py": {
+    "mode": 420,
+    "sha256": "9863560647b26b314dfd355c98fb72477f8bd359f1b672289f42794c896e45b0",
+    "size": 3892
+  },
+  "harness/r005/completion.py": {
+    "mode": 420,
+    "sha256": "bea191cdbed2d2e710b360409c60c4c68c5cbd4d5e0db2f843a68e79bb854966",
+    "size": 6782
+  },
+  "harness/r005/content_manifest.py": {
+    "mode": 420,
+    "sha256": "4f8cdd3f0b957c2958d897765dfcaed05b698582ddb652faa838fe564d1e0a5b",
+    "size": 1513
+  },
+  "harness/r005/ledger.py": {
+    "mode": 420,
+    "sha256": "31356e9d42e068d52bccd152487321d43a09861d8af68aeef693d34f6e55b217",
+    "size": 15468
+  },
+  "harness/r005/payload.py": {
+    "mode": 420,
+    "sha256": "d982c639439bbd74aa697e8df1c514eb46a2834806467ff5d86dc47fe4848e89",
+    "size": 872
+  },
+  "harness/r005/publisher_service.py": {
+    "mode": 420,
+    "sha256": "c0fe9bb01ff48a8db6c081269c8caf0384649800ecdd69b9eccb392e118f47cb",
+    "size": 15069
+  },
+  "harness/r005/registration.py": {
+    "mode": 420,
+    "sha256": "2cb5f84727c3817603161b958ad4ec17e04a623584b546db22eeea8279456d01",
+    "size": 8779
+  },
+  "harness/r005/registration_ipc.py": {
+    "mode": 420,
+    "sha256": "6b83f2ed577c435bcbdd485af324218d3b7c5666a792261812a3840e6ff716e1",
+    "size": 4655
+  },
+  "harness/r005/remote_completion.py": {
+    "mode": 420,
+    "sha256": "cb7634a499b057fb1dbf04ae5601ff44b3e784f4d67c49a6417e1bd1c62f07f6",
+    "size": 7324
+  },
+  "harness/r005/requests.py": {
+    "mode": 420,
+    "sha256": "ece7fa0aaeb91eecb1596a8c0febd70e1c7973398318b827b0c684519965f830",
+    "size": 9231
+  },
+  "harness/r005/response_authorization.py": {
+    "mode": 420,
+    "sha256": "5ec8cc012fadfdc98d59e0566fb513bc9a6a234c48dafaba4722601485f69a28",
+    "size": 14701
+  },
+  "harness/r005/responses.py": {
+    "mode": 420,
+    "sha256": "89e062dfd597333cb5033e4b7523c53c70bbe05e656a36aefdd59cee35cc9f37",
+    "size": 9233
+  },
+  "harness/r005/safe_runner.py": {
+    "mode": 420,
+    "sha256": "864bd8cb6695f3d64d06938e215115048d4828afc44157f060234a4da97f13e7",
+    "size": 28060
+  },
+  "harness/r005/schema.py": {
+    "mode": 420,
+    "sha256": "e92e81589f1b4e301f4741cd736b153262c076fd0226dae470d355a5751892a9",
+    "size": 15629
+  },
+  "harness/r005/verify.py": {
+    "mode": 420,
+    "sha256": "aafea0b78e4b19ee4b4a64845529f2a2de78d8b0fe4dbfd875ae6890729312e5",
+    "size": 7695
+  }
+}

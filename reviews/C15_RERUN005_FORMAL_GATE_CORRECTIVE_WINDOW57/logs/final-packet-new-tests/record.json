@@ -1,0 +1,34 @@
+{
+  "classification": "DEVELOPMENT_ONLY_NOT_FORMAL_ACCEPTANCE",
+  "command": [
+    "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py",
+    "reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_publisher_contract.py",
+    "--basetemp=/workspace/scratch/b59abdecf5a1/devtmp/finalpacket",
+    "--junitxml=reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/logs/final-packet-new-tests.xml",
+    "-vv"
+  ],
+  "cwd": "/workspace/scratch/b59abdecf5a1/repo",
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "TMPDIR": "/workspace/scratch/b59abdecf5a1/devtmp"
+  },
+  "exit_code": 0,
+  "finished": "2026-10-15T02:08:43.384761+00:00",
+  "git_head": "adf391178d7494ed17e1db802a31f001fb3b5f3b",
+  "logs": {
+    "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "72f21975920953f756f17276ea7982606330e6f6743378b0a26adfd033e82c7b"
+  },
+  "started": "2026-10-15T02:08:38.844669+00:00",
+  "tested_source_sha256": {
+    "/workspace/scratch/b59abdecf5a1/repo/reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py": "9b1572820383cb6585ec57081ea4bb3e1e7cc83beecbd5913dd290b6de239e52",
+    "/workspace/scratch/b59abdecf5a1/repo/reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_publisher_contract.py": "000052d05a064df6eb8e13757f4e24cf44a547374af49e2562e3d1d580d1042d",
+    "/workspace/scratch/b59abdecf5a1/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/RESIDENT_SAFE_LAUNCH_PACKET.json": "04123169ec305273bd971f6254acb66f4bfdccf9bcce29d52e3d93d9fadf5e0c",
+    "/workspace/scratch/b59abdecf5a1/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz": "e3afa5bcf5f55667767fecac5151f3cf53c69950fabeb11c47c7cded4cc4f222",
+    "/workspace/scratch/b59abdecf5a1/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/IDENTITY.json": "ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd"
+  }
+}

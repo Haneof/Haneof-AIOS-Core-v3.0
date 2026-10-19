@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="0.765" timestamp="2026-10-15T01:57:46.010664+00:00" hostname="cd3bd4e48dfb"><testcase classname="reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW53.test_artifact_delivery" name="test_exact_tar_into_independent_sandbox_runs_pinned_entry" time="0.001"><failure message="KeyError: 'cross_sandbox_harness_materialization'">tmp_path = PosixPath('/workspace/scratch/b59abdecf5a1/redtmp/pytest/test_exact_tar_into_independen0')
+
+    def test_exact_tar_into_independent_sandbox_runs_pinned_entry(tmp_path):
+        artifact=BASE/'artifacts/resident-harness.tar.gz'
+&gt;       target,result=materialize(tmp_path,artifact)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/workspace/scratch/b59abdecf5a1/redtmp/pytest/test_exact_tar_into_independen0')
+artifact = PosixPath('/workspace/scratch/b59abdecf5a1/redrepo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz')
+
+    def materialize(tmp_path,artifact):
+        target=tmp_path/'delivery'
+        env=dict(os.environ,ARTIFACT=str(artifact),DELIVERY_DIR=str(target))
+&gt;       result=subprocess.run(['bash','-c',PACKET['cross_sandbox_harness_materialization']['materialization_command']],
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            env=env,capture_output=True,text=True,timeout=15)
+E       KeyError: 'cross_sandbox_harness_materialization'
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py:16: KeyError</failure></testcase><testcase classname="reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW53.test_artifact_delivery" name="test_artifact_substitution_rejected_before_materialization" time="0.003"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/workspace/scratch/b59abdecf5a1/redrepo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz'">tmp_path = PosixPath('/workspace/scratch/b59abdecf5a1/redtmp/pytest/test_artifact_substitution_rej0')
+
+    def test_artifact_substitution_rejected_before_materialization(tmp_path):
+        artifact=tmp_path/'tampered.tar.gz'
+&gt;       artifact.write_bytes((BASE/'artifacts/resident-harness.tar.gz').read_bytes()+b'replaced')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/python/lib/python3.12/pathlib.py:1019: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/workspace/scratch/b59abdecf5a1/redrepo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/workspace/scratch/b59abdecf5a1/redrepo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz'
+
+/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/python/lib/python3.12/pathlib.py:1013: FileNotFoundError</failure></testcase><testcase classname="reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW53.test_identity_delivery" name="test_signer_not_importable_in_recovery_caller" time="0.669"><failure message="Failed: DID NOT RAISE &lt;class 'ImportError'&gt;">def test_signer_not_importable_in_recovery_caller():
+&gt;       with pytest.raises(ImportError):__import__('r005.publisher_service')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE &lt;class 'ImportError'&gt;
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py:55: Failed</failure></testcase></testsuite></testsuites>

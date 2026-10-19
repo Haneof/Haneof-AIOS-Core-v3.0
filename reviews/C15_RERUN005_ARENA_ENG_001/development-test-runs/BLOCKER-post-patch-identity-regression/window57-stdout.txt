@@ -1,0 +1,9 @@
+FFFFF...............F........                                            [100%]
+--------------- generated xml file: /tmp/arena-eng/w57-post.xml ----------------
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_exact_identity_and_closed_members
+FAILED reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_independent_full_source_materialization_and_pinned_verify
+FAILED reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_transport_tampering_fails_before_destination[append]
+FAILED reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_transport_tampering_fails_before_destination[truncate]
+FAILED reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_transport_tampering_fails_before_destination[flip]
+FAILED reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_parallel_materialization_has_one_winner

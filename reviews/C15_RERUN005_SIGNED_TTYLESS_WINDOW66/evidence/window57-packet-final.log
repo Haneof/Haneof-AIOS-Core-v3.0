@@ -1,0 +1,17 @@
+.....................F.......                                            [100%]
+=================================== FAILURES ===================================
+___________ test_packet_is_pending_and_excludes_historical_material ____________
+
+    def test_packet_is_pending_and_excludes_historical_material():
+        assert PACKET['real_resident_use_authorized'] is False
+        assert PACKET['self_acceptance'] is False
+>       assert (PACKET['allowed_cursor_start'],PACKET['allowed_cursor_end'],PACKET['stop_after_ack_cursor'],PACKET['forbidden_next_cursor']) == (1,13,13,14)
+E       assert (0, 0, 0, 1) == (1, 13, 13, 14)
+E         
+E         At index 0 diff: 0 != 1
+E         Use -v to get more diff
+
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py:143: AssertionError
+- generated xml file: /workspaces/window66-gate0-20261016T1509Z/window57-packet-final.xml -
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_packet_is_pending_and_excludes_historical_material

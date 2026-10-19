@@ -1,0 +1,89 @@
+test_gate_rejects_a_blank_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_blank_run_or_session_scope) ... 
+  test_gate_rejects_a_blank_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_blank_run_or_session_scope) (field='run_id') ... FAIL
+  test_gate_rejects_a_blank_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_blank_run_or_session_scope) (field='session_id') ... FAIL
+test_gate_rejects_a_grant_that_omits_the_run_and_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_grant_that_omits_the_run_and_session_scope)
+The approval gate must refuse what its callers treat as mandatory. ... FAIL
+test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) ... 
+  test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='run_id', value='int') ... FAIL
+  test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='session_id', value='NoneType') ... FAIL
+  test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='run_id', value='list') ... FAIL
+  test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='session_id', value='dict') ... FAIL
+test_positive_control_a_fully_scoped_grant_is_accepted (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_positive_control_a_fully_scoped_grant_is_accepted)
+Without this, the refusals below could pass vacuously. ... ok
+test_refusal_is_a_clean_gate_error_not_a_late_key_error (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_refusal_is_a_clean_gate_error_not_a_late_key_error)
+The refusal must arrive at the enrollment gate as a ValueError. ... FAIL
+test_safe_runner_scope_check_also_depends_on_these_fields (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_safe_runner_scope_check_also_depends_on_these_fields)
+Documents the second production consumer of the unvalidated fields. ... ok
+test_unscoped_grant_can_never_authorize_a_response (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_unscoped_grant_can_never_authorize_a_response)
+Holds pre- and post-patch: no publication, no proof, no marker. ... ok
+
+======================================================================
+FAIL: test_gate_rejects_a_blank_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_blank_run_or_session_scope) (field='run_id')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RERUN005_ARENA_ENG_001/tests/test_enrollment_scope_gate.py", line 149, in test_gate_rejects_a_blank_run_or_session_scope
+    with self.assertRaises(ValueError) as caught:
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gate_rejects_a_blank_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_blank_run_or_session_scope) (field='session_id')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RERUN005_ARENA_ENG_001/tests/test_enrollment_scope_gate.py", line 149, in test_gate_rejects_a_blank_run_or_session_scope
+    with self.assertRaises(ValueError) as caught:
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gate_rejects_a_grant_that_omits_the_run_and_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_grant_that_omits_the_run_and_session_scope)
+The approval gate must refuse what its callers treat as mandatory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RERUN005_ARENA_ENG_001/tests/test_enrollment_scope_gate.py", line 141, in test_gate_rejects_a_grant_that_omits_the_run_and_session_scope
+    with self.assertRaises(ValueError) as caught:
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='run_id', value='int')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RERUN005_ARENA_ENG_001/tests/test_enrollment_scope_gate.py", line 158, in test_gate_rejects_a_non_string_run_or_session_scope
+    with self.assertRaises(ValueError) as caught:
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='session_id', value='NoneType')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RERUN005_ARENA_ENG_001/tests/test_enrollment_scope_gate.py", line 158, in test_gate_rejects_a_non_string_run_or_session_scope
+    with self.assertRaises(ValueError) as caught:
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='run_id', value='list')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RERUN005_ARENA_ENG_001/tests/test_enrollment_scope_gate.py", line 158, in test_gate_rejects_a_non_string_run_or_session_scope
+    with self.assertRaises(ValueError) as caught:
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='session_id', value='dict')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RERUN005_ARENA_ENG_001/tests/test_enrollment_scope_gate.py", line 158, in test_gate_rejects_a_non_string_run_or_session_scope
+    with self.assertRaises(ValueError) as caught:
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_refusal_is_a_clean_gate_error_not_a_late_key_error (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_refusal_is_a_clean_gate_error_not_a_late_key_error)
+The refusal must arrive at the enrollment gate as a ValueError.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RERUN005_ARENA_ENG_001/tests/test_enrollment_scope_gate.py", line 173, in test_refusal_is_a_clean_gate_error_not_a_late_key_error
+    self.fail('an enrollment without run/session scope was approved by the gate')
+AssertionError: an enrollment without run/session scope was approved by the gate
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.732s
+
+FAILED (failures=8)

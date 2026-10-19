@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/b59abdecf5a1/repo/reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/build_delivery.py", line 133, in <module>
+    build()
+  File "/workspace/scratch/b59abdecf5a1/repo/reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/build_delivery.py", line 32, in build
+    state = launcher.scan_identity(HARN, REPO, pin)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/b59abdecf5a1/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 329, in scan_identity
+    scanned, directory_identities = _scan_tree(
+                                    ^^^^^^^^^^^
+  File "/workspace/scratch/b59abdecf5a1/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 220, in _scan_tree
+    visit(root_fd, "")
+  File "/workspace/scratch/b59abdecf5a1/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 200, in visit
+    visit(child_fd, rel)
+  File "/workspace/scratch/b59abdecf5a1/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 186, in visit
+    _fail("UNAPPROVED_OR_REPLACED_DIRECTORY", f"{scope}/{rel}")
+  File "/workspace/scratch/b59abdecf5a1/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 35, in _fail
+    raise IdentityBlocked(f"BLOCKED / {code}{suffix}")
+delivery_identity_scan.IdentityBlocked: BLOCKED / UNAPPROVED_OR_REPLACED_DIRECTORY: harness/r005/__pycache__

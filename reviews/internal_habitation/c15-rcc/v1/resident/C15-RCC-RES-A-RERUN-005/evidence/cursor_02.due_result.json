@@ -1,0 +1,216 @@
+{
+  "status_before": {
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/workspaces/window71-resident-a-rerun005/run/world/world.sqlite",
+    "index_path": "/workspaces/window71-resident-a-rerun005/run/world/world.sqlite.search.sqlite",
+    "world_revision": 7,
+    "index_watermark": 7,
+    "index_lag": 0,
+    "writer_lease_held": true
+  },
+  "status_after": {
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/workspaces/window71-resident-a-rerun005/run/world/world.sqlite",
+    "index_path": "/workspaces/window71-resident-a-rerun005/run/world/world.sqlite.search.sqlite",
+    "world_revision": 7,
+    "index_watermark": 7,
+    "index_lag": 0,
+    "writer_lease_held": true
+  },
+  "due_work_result": {
+    "periodic_review": null,
+    "wakes": []
+  },
+  "handoffs": [],
+  "exchange": {
+    "recovery_state": {
+      "classification": "COMPLETE",
+      "semantic_dispatch_occurred": true,
+      "requests": [
+        {
+          "request_id": "req-0001-model_directive-9c0844bc",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "6e766c2b694eb4f6cc005e8aae1f0928856d4c1c624814a8db9eaf4fd48dcccf",
+          "response_sha256": "4c632f708d65621a221d784ff7bc6e3de2a6b2ec54489ff8bd38b143b856c5e2",
+          "events": [
+            {
+              "seq": 1,
+              "event": "request_published"
+            },
+            {
+              "seq": 2,
+              "event": "response_published"
+            },
+            {
+              "seq": 3,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0002-model_directive-91f42681",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "e442abae3f4e03d0ae61e5e560108ae24eb8606139c90027c74b11921900889d",
+          "response_sha256": "ca34767fa49abce6bda846d91d6f76d2b812010dd777da52238c65579471f05d",
+          "events": [
+            {
+              "seq": 4,
+              "event": "request_published"
+            },
+            {
+              "seq": 5,
+              "event": "response_published"
+            },
+            {
+              "seq": 6,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0003-model_directive-c6106d4e",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "529aecd82bd30e9587d97da36298991bb720e833800f164fefbd572453e76ab1",
+          "response_sha256": "f0023f6d9ad7b586148beff610b2d4fcc2abadd12e6fc6c705a97f71d8ebe9ff",
+          "events": [
+            {
+              "seq": 7,
+              "event": "request_published"
+            },
+            {
+              "seq": 8,
+              "event": "response_published"
+            },
+            {
+              "seq": 9,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        },
+        {
+          "request_id": "req-0004-model_directive-51b8724c",
+          "classification": "COMPLETE",
+          "not_submitted_allowed": false,
+          "semantic_dispatch_occurred": true,
+          "request_sha256": "31f850b5b070ce031b9f202b8d600cc1fb11c48010db600a868dcc83b48fb363",
+          "response_sha256": "ca3feb555d2da0e7c7fc6dcd21e093be93f43bc3b50b3b4b31b8e9c713e339db",
+          "events": [
+            {
+              "seq": 10,
+              "event": "request_published"
+            },
+            {
+              "seq": 11,
+              "event": "response_published"
+            },
+            {
+              "seq": 12,
+              "event": "response_consumed"
+            }
+          ],
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ]
+        }
+      ],
+      "dispatch_boundary_event": "request_published",
+      "dispatch_boundary_rule": "not_submitted reconciliation is allowed only when no request_published record exists; after request publication the exchange fails closed instead of declaring the request unsubmitted",
+      "not_submitted_allowed": false,
+      "open_dispatched": [],
+      "durable_unconsumed": [],
+      "complete": [
+        "req-0001-model_directive-9c0844bc",
+        "req-0002-model_directive-91f42681",
+        "req-0003-model_directive-c6106d4e",
+        "req-0004-model_directive-51b8724c"
+      ],
+      "ledger": {
+        "ok": true,
+        "records": 12,
+        "head_sha256": "2005d85c75d208e760c66d83a42f78e31101802ebaa686357841a648ef3a9f2c",
+        "error": null,
+        "first_bad_seq": null
+      }
+    },
+    "integrity": {
+      "ok": true,
+      "problems": [],
+      "chain": {
+        "ok": true,
+        "records": 12,
+        "head_sha256": "2005d85c75d208e760c66d83a42f78e31101802ebaa686357841a648ef3a9f2c",
+        "error": null,
+        "first_bad_seq": null
+      },
+      "requests": {
+        "req-0001-model_directive-9c0844bc": {
+          "first_seq": 1,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "6e766c2b694eb4f6cc005e8aae1f0928856d4c1c624814a8db9eaf4fd48dcccf",
+          "response_sha256": "4c632f708d65621a221d784ff7bc6e3de2a6b2ec54489ff8bd38b143b856c5e2"
+        },
+        "req-0002-model_directive-91f42681": {
+          "first_seq": 4,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "e442abae3f4e03d0ae61e5e560108ae24eb8606139c90027c74b11921900889d",
+          "response_sha256": "ca34767fa49abce6bda846d91d6f76d2b812010dd777da52238c65579471f05d"
+        },
+        "req-0003-model_directive-c6106d4e": {
+          "first_seq": 7,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "529aecd82bd30e9587d97da36298991bb720e833800f164fefbd572453e76ab1",
+          "response_sha256": "f0023f6d9ad7b586148beff610b2d4fcc2abadd12e6fc6c705a97f71d8ebe9ff"
+        },
+        "req-0004-model_directive-51b8724c": {
+          "first_seq": 10,
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "request_sha256": "31f850b5b070ce031b9f202b8d600cc1fb11c48010db600a868dcc83b48fb363",
+          "response_sha256": "ca3feb555d2da0e7c7fc6dcd21e093be93f43bc3b50b3b4b31b8e9c713e339db"
+        }
+      },
+      "exchange_root": "/workspaces/window71-resident-a-rerun005/run/exchange"
+    }
+  },
+  "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION"
+}

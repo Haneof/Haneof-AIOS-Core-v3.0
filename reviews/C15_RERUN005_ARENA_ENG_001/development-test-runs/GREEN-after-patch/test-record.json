@@ -1,0 +1,584 @@
+{
+  "task": "C15-ARENA-ENG-001-SIGNED-TTYLESS-REGRESSION-CORRECTIVE-PILOT",
+  "classification": [
+    "DEVELOPMENT_ONLY",
+    "FORMAL_VALIDATION_NOT_PERFORMED",
+    "DO_NOT_MERGE"
+  ],
+  "suite_name": "arena.c15.eng.001.GREEN-after-patch",
+  "started_utc": "2026-10-17T08:51:52+00:00",
+  "elapsed_seconds": 5.60598,
+  "exit_code": 0,
+  "was_successful": true,
+  "counts": {
+    "tests": 108,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "testsRun": 108,
+  "junit": "/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RERUN005_ARENA_ENG_001/development-test-runs/GREEN-after-patch/test-results.xml",
+  "environment": {
+    "python_implementation": "CPython",
+    "python_version": "3.11.2",
+    "approved_python_3_12_14_used": false,
+    "approved_python_note": "Arena sandbox provides CPython 3.11.2; the project-approved 3.12.14 runtime is NOT present and was NOT exercised",
+    "platform": "Linux-6.1.158+-x86_64-with-glibc2.36",
+    "system": "Linux",
+    "release": "6.1.158+",
+    "uid": 1001,
+    "gid": 1001,
+    "runner_uid_is_999": false,
+    "resident_uid_is_996": false,
+    "stdin_isatty": false,
+    "stdout_isatty": false,
+    "controlling_tty_available": "unavailable: [Errno 6] No such device or address: '/dev/tty'",
+    "openssl_path": "/usr/bin/openssl",
+    "openssl_version": "OpenSSL 3.0.20 7 Apr 2026 (Library: OpenSSL 3.0.20 7 Apr 2026)",
+    "argv0": "run_engineering_tests.py",
+    "executable": "/tmp/c15venv/bin/python",
+    "dont_write_bytecode": true
+  },
+  "outcomes": [
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_gate_rejects_a_blank_run_or_session_scope",
+      "status": "passed"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_gate_rejects_a_grant_that_omits_the_run_and_session_scope",
+      "status": "passed"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_gate_rejects_a_non_string_run_or_session_scope",
+      "status": "passed"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_positive_control_a_fully_scoped_grant_is_accepted",
+      "status": "passed"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_refusal_is_a_clean_gate_error_not_a_late_key_error",
+      "status": "passed"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_safe_runner_scope_check_also_depends_on_these_fields",
+      "status": "passed"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_unscoped_grant_can_never_authorize_a_response",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.FinalizeLocalGateTests",
+      "name": "test_completed_record_is_bound_to_its_exact_remote_candidate",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.FinalizeLocalGateTests",
+      "name": "test_completion_record_requires_a_canonical_persistence_ref",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.FinalizeLocalGateTests",
+      "name": "test_completion_record_requires_a_valid_commit_identity",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.FinalizeLocalGateTests",
+      "name": "test_locally_modified_candidate_is_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.FinalizeLocalGateTests",
+      "name": "test_matching_remote_candidate_bytes_do_complete_the_operation",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.FinalizeLocalGateTests",
+      "name": "test_mismatched_remote_candidate_bytes_never_complete_the_operation",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.RejectedRemoteAuthorityTests",
+      "name": "test_absent_remote_ref_is_refused_without_completion",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.RejectedRemoteAuthorityTests",
+      "name": "test_cached_completion_replay_is_refused_when_the_authority_now_rejects",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.RejectedRemoteAuthorityTests",
+      "name": "test_genuine_remote_head_divergence_is_refused_by_the_real_authority",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.RejectedRemoteAuthorityTests",
+      "name": "test_locally_diverged_candidate_is_refused_by_the_tree_comparison",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.RejectedRemoteAuthorityTests",
+      "name": "test_positive_control_a_verified_remote_authority_does_complete_locally",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.RejectedRemoteAuthorityTests",
+      "name": "test_rejected_authority_is_consulted_before_any_local_confirmation",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.RejectedRemoteAuthorityTests",
+      "name": "test_rejected_remote_authority_produces_no_completed_marker",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.RejectedRemoteAuthorityTests",
+      "name": "test_remote_tree_containing_an_unexpected_file_refuses_recovery",
+      "status": "passed"
+    },
+    {
+      "classname": "test_rejected_remote_authority_no_marker.RejectedRemoteAuthorityTests",
+      "name": "test_wrong_remote_ref_binding_is_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_a_definite_negative_does_not_permanently_consume_the_challenge",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_a_request_cannot_be_armed_twice",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_a_restarted_publisher_epoch_cannot_honor_a_previous_round",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_challenge_expiry_is_capped_by_a_sooner_enrollment_expiry",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_changed_durable_registration_is_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_changed_enrollment_during_an_operation_is_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_command_schema_is_exactly_the_response_only_schema",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_dead_runner_refuses_an_otherwise_valid_signed_response",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_every_issued_envelope_binding_is_individually_enforced",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_expired_challenge_is_refused_and_ttl_is_bounded",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_extra_or_removed_envelope_keys_are_rejected",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_ipc_framing_violations_fail_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_malformed_signature_encodings_fail_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_non_enrolled_kernel_peer_is_refused_before_the_command_is_read",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_pending_disclosure_is_refused_to_an_unapproved_peer",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_pending_lists_only_unconsumed_challenges_with_the_live_epoch",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_publish_failure_after_verification_never_restores_authority",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_raw_bytes_that_disagree_with_the_signed_response_hash_are_rejected",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_replay_of_an_identical_signed_response_authorizes_nothing_second",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_replay_with_different_bytes_is_also_refused_after_consumption",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_request_outside_the_enrollment_scope_cannot_be_armed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_response_endpoint_cannot_register_runner_requests",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_response_hash_claimed_without_a_matching_signature_is_rejected",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_signature_from_an_unapproved_key_is_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_unknown_request_id_is_refused_before_any_envelope_evaluation",
+      "status": "passed"
+    },
+    {
+      "classname": "test_signed_response_binding.SignedResponseBindingTests",
+      "name": "test_valid_signed_response_is_published_once_and_credit_is_recorded",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.ConstructorGateTests",
+      "name": "test_endpoint_cannot_be_opened_without_the_operator_response_root",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.ConstructorGateTests",
+      "name": "test_expired_grant_never_reaches_construction",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.ConstructorGateTests",
+      "name": "test_missing_enrollment_environment_refuses_construction",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.ConstructorGateTests",
+      "name": "test_non_runner_uid_is_refused_at_construction",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.ConstructorGateTests",
+      "name": "test_rejected_grant_never_reaches_construction",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.ConstructorGateTests",
+      "name": "test_valid_grant_constructs_an_authority_that_has_authorized_nothing",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.ConstructorGateTests",
+      "name": "test_wrong_instance_scope_is_refused_at_construction",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.ConstructorGateTests",
+      "name": "test_wrong_operation_scope_is_refused_at_construction",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.CryptoPrimitiveTests",
+      "name": "test_fingerprint_is_a_stable_sha256_hex_digest",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.CryptoPrimitiveTests",
+      "name": "test_flipped_message_bit_is_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.CryptoPrimitiveTests",
+      "name": "test_flipped_signature_bit_is_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.CryptoPrimitiveTests",
+      "name": "test_invalid_public_key_is_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.CryptoPrimitiveTests",
+      "name": "test_valid_signature_verifies",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.CryptoPrimitiveTests",
+      "name": "test_wrong_key_is_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.CryptoPrimitiveTests",
+      "name": "test_wrong_signature_length_is_refused_before_any_subprocess",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.RealTrustAnchorsAbsentTests",
+      "name": "test_operator_response_socket_root_is_absent",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.RealTrustAnchorsAbsentTests",
+      "name": "test_pinned_constants_are_unchanged_by_this_suite",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.RealTrustAnchorsAbsentTests",
+      "name": "test_pinned_operator_trust_root_is_absent",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_configured_grant_is_none_when_the_environment_is_unset",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_expired_grant_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_grant_signed_by_a_non_issuer_key_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_invalid_enrollment_or_instance_identity_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_missing_grant_file_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_non_integer_grant_time_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_non_test_only_grant_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_noncanonical_enrollment_bytes_fail_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_not_yet_valid_grant_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_operation_scope_is_bounded_and_exact",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_overlong_grant_lifetime_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_real_pinned_trust_root_is_demanded_without_the_synthetic_redirect",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_reloaded_grant_digest_is_stable",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_request_kind_scope_is_bounded",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_resident_public_key_must_equal_the_pinned_trust_copy",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_revocation_epoch_mismatch_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_revoked_enrollment_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_signature_over_different_bytes_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_unpinned_issuing_root_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_valid_synthetic_response_grant_is_accepted",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_wrong_domain_or_version_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_wrong_issuer_identity_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_wrong_purpose_grant_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.SyntheticGrantGateTests",
+      "name": "test_wrong_resident_identity_fails_closed",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.TrustedBytesFailClosedTests",
+      "name": "test_ancestor_gate_precedes_file_access_so_there_is_no_existence_oracle",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.TrustedBytesFailClosedTests",
+      "name": "test_relative_path_is_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_test_only_grant_fail_closed.TrustedBytesFailClosedTests",
+      "name": "test_unprivileged_ancestor_is_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.NoStdoutTokenFallbackTests",
+      "name": "test_no_harness_module_echoes_the_capability_token_to_stdout_or_stderr",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.NoStdoutTokenFallbackTests",
+      "name": "test_open_resident_terminal_requires_o_nofollow_and_a_real_tty",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.NoStdoutTokenFallbackTests",
+      "name": "test_the_token_is_written_only_through_the_pre_opened_descriptor",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.SignedModeNeedsNoTerminalTests",
+      "name": "test_runner_engages_signed_mode_only_from_the_configured_enrollment",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.SignedModeNeedsNoTerminalTests",
+      "name": "test_signed_authority_is_imported_only_inside_main",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.SignedModeNeedsNoTerminalTests",
+      "name": "test_signed_endpoint_is_closed_on_shutdown",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.SignedModeNeedsNoTerminalTests",
+      "name": "test_terminal_descriptor_is_closed_on_shutdown",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.SignedModeNeedsNoTerminalTests",
+      "name": "test_tty_open_is_conditional_on_signed_mode_being_absent",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.TerminalDescriptorFailClosedTests",
+      "name": "test_a_character_device_that_is_not_a_tty_is_also_refused",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.TerminalDescriptorFailClosedTests",
+      "name": "test_a_regular_file_is_refused_and_the_descriptor_is_not_leaked",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.TerminalDescriptorFailClosedTests",
+      "name": "test_missing_o_nofollow_support_is_refused_outright",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.TtylessEnvironmentTests",
+      "name": "test_dev_tty_cannot_be_opened_without_a_controlling_terminal",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.TtylessEnvironmentTests",
+      "name": "test_kernel_facilities_the_signed_path_does_need_are_present",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.TtylessEnvironmentTests",
+      "name": "test_legacy_resident_terminal_disclosure_is_refused_here",
+      "status": "passed"
+    },
+    {
+      "classname": "test_ttyless_disclosure_refusal.TtylessEnvironmentTests",
+      "name": "test_this_process_has_no_controlling_terminal",
+      "status": "passed"
+    }
+  ]
+}

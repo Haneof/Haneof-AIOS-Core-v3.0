@@ -1,0 +1,19 @@
+{
+  "added_modules": [
+    "r005/completion.py",
+    "r005/registration.py",
+    "r005/registration_ipc.py",
+    "r005/remote_completion.py",
+    "r005/response_authorization.py"
+  ],
+  "changed_modules": [
+    "launch.py",
+    "r005/checks.py",
+    "r005/publisher_service.py",
+    "r005/safe_runner.py"
+  ],
+  "current_harness_python_count": 21,
+  "current_manifest_unchanged_from_failed_candidate": true,
+  "historical_harness_python_count": 16,
+  "removed_modules": []
+}

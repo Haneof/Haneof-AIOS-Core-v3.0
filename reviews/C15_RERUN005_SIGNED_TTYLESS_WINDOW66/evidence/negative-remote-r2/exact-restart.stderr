@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 287, in run
+    raise ExchangeContractError('interrupted operation has no remote completion candidate; no redispatch')
+r005.bridge.ExchangeContractError: interrupted operation has no remote completion candidate; no redispatch
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in <module>
+    _main()
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 608, in _main
+    main()
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py", line 32, in main
+    elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 405, in run
+    raise ExchangeContractError('failure durability barrier unavailable: '+str(durability_error)) from original
+r005.bridge.ExchangeContractError: failure durability barrier unavailable: remote atomic CAS/lease rejected persistence update for origin refs/heads/persistence/synthetic-w66-final-user:
+To /var/lib/aios-window66-negative-remote-r2/remote-reject/remote.git
+ ! [remote rejected] ccd84b06843e770be7bef3aaee632b5b213d46dd -> persistence/synthetic-w66-final-user (pre-receive hook declined)
+error: failed to push some refs to '/var/lib/aios-window66-negative-remote-r2/remote-reject/remote.git'
+
