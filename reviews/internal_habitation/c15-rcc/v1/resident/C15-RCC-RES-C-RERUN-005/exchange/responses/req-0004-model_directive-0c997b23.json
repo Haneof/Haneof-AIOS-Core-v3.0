@@ -1,0 +1,1 @@
+{"authored_by":"EXTERNAL_CURRENT_RESIDENT_SESSION","directive":{"capability_calls":[],"response":"staging 测试环境的 orders-shadow 命名冲突已妥善处理完毕，回归测试链路已恢复畅通，工程细节全部就绪，不影响后续版本集成验证。","silence":false},"request_id":"req-0004-model_directive-0c997b23","request_sha256":"631b10dc14fd32f4b0b5d17131d6a5127fd69966801a80e3ba96b293ca627767","response_version":1}
