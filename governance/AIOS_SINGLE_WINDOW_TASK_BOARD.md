@@ -1,3 +1,21 @@
+## 2026-10-19 — WINDOW 75 RESIDENT C RERUN-005 PHASE-C COMPLETE / PR #394 CREATED / WINDOW 76 FRESH IA RELEASED
+
+- Window 75 Fresh Resident C Habitation candidate = [PR #394](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/394) (`[DO NOT MERGE / REVIEW ONLY] C15-RCC-RES-C-RERUN-005 Phase-C Fresh Resident C Replacement-Execution Evidence`).
+- Candidate branch = `resident/c15-rcc-res-c-rerun-005-phase-c`.
+- Candidate commit = `94221b512a573bbe9922eea444552ac9122b3a0e` (parent `302dab2565f61dd37ca57195bae7ed9337cdfede`).
+- Sealed run evidence directory = `reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-C-RERUN-005/`.
+- Run ID = `c15-rcc-res-c-rerun-005-bd8446e1205d`.
+- Durable lineage inherited from Phase B (`world.sqlite` revision 60, search watermark 60, `release-state.json` sequence 22).
+- Cursor range 23..30 sequentially revealed, ingested, acked (8 cursors complete).
+- 14 real model requests dispatched, served, and consumed via `aios_exchange` (0 synthetic shortcuts).
+- Final World revision = 82; final acknowledged cursor sequence = 30.
+- Terminal boundary verified: Cursor 31 refused with `release-operator-error: fixture release already complete` (0 leakage).
+- All 82 evidence files in RUN_DIR verified against `SHA256SUMS` (100% OK).
+- Zero code drift verified: exactly 0 files modified outside evidence tree.
+- **Unique next READY:** `WINDOW 76 — C15-RCC-RES-C-RERUN-005-INDEPENDENT-ACCEPTANCE (Phase-C Fresh Resident C Independent Acceptance)`.
+- Acceptance probe harness to run against exact commit `94221b51` with PR #394 OPEN.
+- All downstream stages (Evaluator, Release Gate) remain BLOCKED until Fresh Resident C passes independent acceptance.
+
 ## 2026-10-19 — WINDOW 74 FRESH IA PASS (10/10) / RESIDENT B RERUN-005 PHASE-B ACCEPTED / WINDOW 75 RESIDENT C RELEASED
 
 - PM Acceptance Receipt = `governance/C15_RCC_RES_B_RERUN_005_PHASE_B_ACCEPTANCE_RECEIPT_2026-10-19.md`.
