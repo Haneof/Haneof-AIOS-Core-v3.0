@@ -1,3 +1,17 @@
+## 2026-10-19 — WINDOW 72 FRESH IA PASS (10/10) / RESIDENT A RERUN-005 PHASE-A ACCEPTED / WINDOW 73 RESIDENT B RELEASED
+
+- PM Acceptance Receipt = `governance/C15_RCC_RES_A_RERUN_005_PHASE_A_ACCEPTANCE_RECEIPT_2026-10-19.md`.
+- Window 72 Independent Acceptance = `ACCEPTANCE_PASS / 10 OF 10 PROBES SATISFIED (100%)` on exact Resident A candidate HEAD `2d92328205e16ec8b5317eaca8f3b666656ad09b`, tree `7435f8d586b709621d2bedf7e1a8c9a49c7dda5b`, parent `52d169e8fb96248b058ab3685d9dcb1f6cbce204` (PR #392 OPEN).
+- Independent acceptance review directory = `reviews/C15_RCC_RES_A_RERUN_005_INDEPENDENT_ACCEPTANCE_2026-10-19/`.
+- Probes P00..P09 all passed: zero code drift on `src/aios_core/**` and `tools/c15_persistence/**`, 123 sealed evidence files verified via Git blob SHA256SUMS, receipts 1..13 recomputed from fixture, cursor 14 never revealed and refused by freeze guard, 7 canonical USER turns ingested idempotently, 0 future cursor leakage in 21 model requests, 63 ledger entries hash-chained, World revision 38 coherent with search watermark 38 (0 lag), 0 dangling refs across 56 objects, fresh run identity verified.
+- **Unique next READY:** `WINDOW 73 — C15-RCC-RES-B-RERUN-005 (Phase-B Fresh Resident B Habitation Rerun)`.
+- Resident B inherits the Phase-A private SQLite AIOS World (`world.sqlite`, revision 38) and `release-state.json`.
+- Allowed cursor range = `14..22` sequentially; ACK 22 then freeze and permanently stop; cursor 23 forbidden.
+- Run contract: `reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md`.
+- Resident-safe prompt: `reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_FRESH_WINDOW_PROMPT.md`.
+- All downstream stages (Resident C, Evaluator, Release Gate) remain BLOCKED until Fresh Resident B completes and passes independent acceptance.
+
+
 ## 2026-10-18 — WINDOW 70 OPTION B FORMAL ACCEPTANCE PASS / WINDOW 71 FRESH RESIDENT A RERUN-005 RELEASED
 
 - PM Acceptance Receipt = `governance/C15_RCC_ARENA_ENG_001_OPTION_B_ACCEPTANCE_INTEGRATION_RECEIPT_2026-10-18.md`.
