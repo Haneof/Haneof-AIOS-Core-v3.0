@@ -1,0 +1,7 @@
+[
+  {
+    "case": "real_remote_rejection_and_exact_restart",
+    "status": "FAIL",
+    "error": "AssertionError: "
+  }
+]

@@ -1,0 +1,1 @@
+{"dimension":"dim:work_state","event_id":"c15rcc-023","modality":"structured_text","occurred_at":"2026-11-16T09:12:00-08:00","resident_visible_payload":"staging 告警阈值仍是默认值，昨夜测试产生 37 条无行动价值的噪声告警；production 告警策略未受影响。","sequence":23,"source_class":"PLATFORM","source_kind":"monitoring"}

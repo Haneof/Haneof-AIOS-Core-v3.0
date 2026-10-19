@@ -1,0 +1,60 @@
+test_cli_harness_without_repo_is_a_usage_error (test_regenerator_fail_closed.CliTests.test_cli_harness_without_repo_is_a_usage_error) ... usage: python3 -m unittest [-h] [--write] [--expect-changed harness_files:REL]
+                           [--harness DIR] [--repo DIR]
+python3 -m unittest: error: --harness and --repo must be given together
+ok
+test_cli_write_with_allowlist_succeeds (test_regenerator_fail_closed.CliTests.test_cli_write_with_allowlist_succeeds) ... ok
+test_cli_write_without_allowlist_exits_nonzero (test_regenerator_fail_closed.CliTests.test_cli_write_without_allowlist_exits_nonzero) ... ok
+test_absent_manifest_is_refused (test_regenerator_fail_closed.FailClosedTests.test_absent_manifest_is_refused) ... ok
+test_allowlist_absolute_entry_is_refused (test_regenerator_fail_closed.FailClosedTests.test_allowlist_absolute_entry_is_refused) ... ok
+test_allowlist_entry_not_listed_in_manifest_is_refused (test_regenerator_fail_closed.FailClosedTests.test_allowlist_entry_not_listed_in_manifest_is_refused) ... ok
+test_allowlist_naming_protected_source_scope_is_refused (test_regenerator_fail_closed.FailClosedTests.test_allowlist_naming_protected_source_scope_is_refused) ... ok
+test_allowlist_non_py_entry_is_refused (test_regenerator_fail_closed.FailClosedTests.test_allowlist_non_py_entry_is_refused) ... ok
+test_allowlist_traversal_entry_is_refused (test_regenerator_fail_closed.FailClosedTests.test_allowlist_traversal_entry_is_refused) ... ok
+test_allowlisted_entry_that_did_not_change_is_refused (test_regenerator_fail_closed.FailClosedTests.test_allowlisted_entry_that_did_not_change_is_refused) ... ok
+test_compact_serialization_is_refused_before_writing (test_regenerator_fail_closed.FailClosedTests.test_compact_serialization_is_refused_before_writing)
+A single-line compact manifest changes the line count entirely. ... ok
+test_completely_unrelated_allowlist_is_refused (test_regenerator_fail_closed.FailClosedTests.test_completely_unrelated_allowlist_is_refused) ... ok
+test_duplicate_allowlist_entry_is_refused (test_regenerator_fail_closed.FailClosedTests.test_duplicate_allowlist_entry_is_refused) ... ok
+test_empty_harness_files_scope_is_refused (test_regenerator_fail_closed.FailClosedTests.test_empty_harness_files_scope_is_refused) ... ok
+test_equality_is_enforced_in_both_directions (test_regenerator_fail_closed.FailClosedTests.test_equality_is_enforced_in_both_directions)
+Subset and superset mismatches are both refused, not just extras. ... ok
+test_foreign_indentation_is_refused_before_writing (test_regenerator_fail_closed.FailClosedTests.test_foreign_indentation_is_refused_before_writing)
+indent=4 keeps the line count but re-indents every line. ... ok
+test_invalid_json_manifest_is_refused (test_regenerator_fail_closed.FailClosedTests.test_invalid_json_manifest_is_refused) ... ok
+test_loose_pyc_pollution_is_refused (test_regenerator_fail_closed.FailClosedTests.test_loose_pyc_pollution_is_refused) ... ok
+test_malformed_allowlist_entry_without_colon_is_refused (test_regenerator_fail_closed.FailClosedTests.test_malformed_allowlist_entry_without_colon_is_refused) ... ok
+test_missing_listed_harness_file_is_refused (test_regenerator_fail_closed.FailClosedTests.test_missing_listed_harness_file_is_refused) ... ok
+test_missing_listed_source_file_is_refused (test_regenerator_fail_closed.FailClosedTests.test_missing_listed_source_file_is_refused) ... ok
+test_missing_protected_field_is_refused (test_regenerator_fail_closed.FailClosedTests.test_missing_protected_field_is_refused) ... ok
+test_missing_trailing_newline_is_refused_before_writing (test_regenerator_fail_closed.FailClosedTests.test_missing_trailing_newline_is_refused_before_writing)
+Dropping the trailing newline changes the line count. ... ok
+test_non_object_manifest_root_is_refused (test_regenerator_fail_closed.FailClosedTests.test_non_object_manifest_root_is_refused) ... ok
+test_protected_c15_source_drift_is_refused (test_regenerator_fail_closed.FailClosedTests.test_protected_c15_source_drift_is_refused) ... ok
+test_protected_core_source_drift_is_refused (test_regenerator_fail_closed.FailClosedTests.test_protected_core_source_drift_is_refused) ... ok
+test_pycache_pollution_is_refused (test_regenerator_fail_closed.FailClosedTests.test_pycache_pollution_is_refused) ... ok
+test_reordered_key_serialization_is_refused_before_writing (test_regenerator_fail_closed.FailClosedTests.test_reordered_key_serialization_is_refused_before_writing)
+A manifest whose keys are not sorted would rewrite into a huge diff. ... ok
+test_unauthorized_extra_digest_change_is_refused (test_regenerator_fail_closed.FailClosedTests.test_unauthorized_extra_digest_change_is_refused) ... ok
+test_unlisted_new_harness_file_is_refused (test_regenerator_fail_closed.FailClosedTests.test_unlisted_new_harness_file_is_refused) ... ok
+test_write_with_empty_allowlist_is_refused (test_regenerator_fail_closed.FailClosedTests.test_write_with_empty_allowlist_is_refused) ... ok
+test_write_without_allowlist_is_refused_and_writes_nothing (test_regenerator_fail_closed.FailClosedTests.test_write_without_allowlist_is_refused_and_writes_nothing) ... ok
+test_write_without_allowlist_is_refused_even_on_a_clean_tree (test_regenerator_fail_closed.FailClosedTests.test_write_without_allowlist_is_refused_even_on_a_clean_tree) ... ok
+test_real_authorized_change_is_exactly_response_authorization (test_regenerator_fail_closed.RealCheckoutReadOnlyTests.test_real_authorized_change_is_exactly_response_authorization)
+Reproduce the single authorized transition on a temporary copy. ... ok
+test_real_manifest_is_already_consistent_with_disk (test_regenerator_fail_closed.RealCheckoutReadOnlyTests.test_real_manifest_is_already_consistent_with_disk)
+The committed manifest is exactly what the tool would produce. ... ok
+test_real_write_without_allowlist_is_refused (test_regenerator_fail_closed.RealCheckoutReadOnlyTests.test_real_write_without_allowlist_is_refused)
+Even against the real tree, --write with no allowlist is refused. ... ok
+test_digest_values_are_pure_sha256_of_disk_bytes (test_regenerator_fail_closed.SuccessfulPathTests.test_digest_values_are_pure_sha256_of_disk_bytes) ... ok
+test_dry_run_without_allowlist_reports_drift_informationally (test_regenerator_fail_closed.SuccessfulPathTests.test_dry_run_without_allowlist_reports_drift_informationally) ... ok
+test_dry_run_without_allowlist_reports_no_change_on_clean_tree (test_regenerator_fail_closed.SuccessfulPathTests.test_dry_run_without_allowlist_reports_no_change_on_clean_tree) ... ok
+test_dry_run_writes_nothing (test_regenerator_fail_closed.SuccessfulPathTests.test_dry_run_writes_nothing) ... ok
+test_exact_allowlist_match_writes_a_one_line_diff (test_regenerator_fail_closed.SuccessfulPathTests.test_exact_allowlist_match_writes_a_one_line_diff) ... ok
+test_only_the_allowlisted_digest_differs_in_the_parsed_manifest (test_regenerator_fail_closed.SuccessfulPathTests.test_only_the_allowlisted_digest_differs_in_the_parsed_manifest) ... ok
+test_successful_write_is_idempotent (test_regenerator_fail_closed.SuccessfulPathTests.test_successful_write_is_idempotent) ... ok
+test_untouchable_fields_survive_a_successful_write (test_regenerator_fail_closed.SuccessfulPathTests.test_untouchable_fields_survive_a_successful_write) ... ok
+
+----------------------------------------------------------------------
+Ran 44 tests in 0.121s
+
+OK

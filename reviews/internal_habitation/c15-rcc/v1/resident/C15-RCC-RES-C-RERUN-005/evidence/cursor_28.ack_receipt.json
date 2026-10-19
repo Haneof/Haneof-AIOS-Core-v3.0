@@ -1,0 +1,19 @@
+{
+  "binding_mode": "canonical_user_turn",
+  "binding_version": "c15-rcc-canonical-conversation-binding-v1",
+  "event_id": "c15rcc-028",
+  "fixture_payload_sha256": "sha256:60dbc927c10e14c2f770796fcdbb8fae3deaf8f1f6fb7d7e54b0555f60899d28",
+  "fixture_projection_sha256": "sha256:8f199ed0e6b418a15c803c0e64bf8cc0a67b9ddc02fba9c0767e55479a21b4d0",
+  "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+  "ingest_object_id": "obs_conv_user_aaee328917681e2e5badd35e",
+  "ingest_ref": "obs_conv_user_aaee328917681e2e5badd35e@1",
+  "ingest_revision": 1,
+  "ingest_source_class": "user",
+  "ingest_world_revision": 75,
+  "next_sequence": 29,
+  "occurred_at": "2026-11-19T08:50:00-08:00",
+  "sequence": 28,
+  "session_id": "sess-resident-c-005-7969eff964ce44c9",
+  "status": "acked",
+  "turn_index": 3
+}

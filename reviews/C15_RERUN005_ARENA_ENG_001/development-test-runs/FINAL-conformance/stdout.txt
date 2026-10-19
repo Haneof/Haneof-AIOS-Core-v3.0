@@ -1,0 +1,14 @@
+{
+  "suite_name": "arena.c15.eng.001.conformance",
+  "elapsed_seconds": 5.820006,
+  "exit_code": 0,
+  "was_successful": true,
+  "counts": {
+    "tests": 101,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "testsRun": 101,
+  "junit": "/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RERUN005_ARENA_ENG_001/development-test-runs/20261017T085516Z-8816/test-results.xml"
+}

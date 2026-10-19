@@ -1,0 +1,1 @@
+{"dimension":"dim:production_state","event_id":"c15rcc-027","modality":"structured_text","occurred_at":"2026-11-18T21:44:00-08:00","resident_visible_payload":"21:04 迁移任务在写入前因目标端证书校验失败而 ABORTED；migration-start 未进入数据写入阶段，production 数据保持原版本，没有 migration-complete 记录。","sequence":27,"source_class":"PLATFORM","source_kind":"deployment_platform"}

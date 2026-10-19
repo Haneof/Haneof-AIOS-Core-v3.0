@@ -1,0 +1,8 @@
+{
+  "authority": "ISOLATED_LOCAL_BARE_GIT_TEST_ORIGIN",
+  "commit": "c70b5351d804e59001518a057fcb6e4c73f03cad",
+  "operation_remote_commit": "c70b5351d804e59001518a057fcb6e4c73f03cad",
+  "ref": "refs/heads/persistence/synthetic-w66-candidate-user",
+  "source_root": "/var/lib/aios-window66-tests-finalcandidate/user",
+  "test_only": true
+}

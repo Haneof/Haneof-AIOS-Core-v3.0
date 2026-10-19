@@ -1,0 +1,23 @@
+{
+  "classification": "DEVELOPMENT_ONLY_NOT_FORMAL_ACCEPTANCE",
+  "command": [
+    "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "-B",
+    "reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/run_development_tests.py",
+    "--junit",
+    "reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/logs/window55-development-final.xml"
+  ],
+  "cwd": "/workspace/scratch/b59abdecf5a1/repo",
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "TMPDIR": "/workspace/scratch/b59abdecf5a1/devtmp"
+  },
+  "exit_code": 1,
+  "finished": "2026-10-15T02:03:08.878291+00:00",
+  "git_head": "adf391178d7494ed17e1db802a31f001fb3b5f3b",
+  "logs": {
+    "stderr": "215fa610401712c968ee566fb6a7b2348bf65fee11da0f6b67e274f88b3131c0",
+    "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "started": "2026-10-15T02:03:07.554023+00:00"
+}

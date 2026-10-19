@@ -1,0 +1,1 @@
+{"dimension":"dim:calendar","event_id":"c15rcc-025","modality":"structured_text","occurred_at":"2026-11-18T20:55:00-08:00","resident_visible_payload":"production 数据迁移窗口登记为 21:00–21:30；状态 SCHEDULED。当前记录只有计划窗口，没有 migration-start、migration-complete 或生产写入 Outcome。","sequence":25,"source_class":"PLATFORM","source_kind":"calendar"}

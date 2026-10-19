@@ -1,0 +1,16 @@
+{
+  "run_id": "c15-rcc-res-c-rerun-005-cf585be261f9",
+  "task_id": "C15-RCC-RES-C-RERUN-005",
+  "resident_process_id": "01961445-e0d9-4373-bb70-8e3543fafb4f",
+  "resident_session_id": "resident-c-005-826a8a7bcef345ab",
+  "conversation_session_id": "sess-resident-c-005-7969eff964ce44c9",
+  "subject_id": "user_1",
+  "minted_utc": "2026-10-19T01:19:17.004372+00:00",
+  "phase": "C",
+  "inherited_phase_b": {
+    "run_id": "c15-rcc-res-b-rerun-005-4b4993c81a85",
+    "final_world_revision": 60,
+    "final_cursor": 22
+  },
+  "freshness": "NEW: minted for Window 75 RERUN-005 Phase-C only; durable lineage inherited"
+}

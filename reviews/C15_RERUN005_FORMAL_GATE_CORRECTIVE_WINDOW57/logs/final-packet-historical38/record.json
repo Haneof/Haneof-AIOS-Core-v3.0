@@ -1,0 +1,42 @@
+{
+  "classification": "DEVELOPMENT_ONLY_NOT_FORMAL_ACCEPTANCE",
+  "command": [
+    "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53",
+    "--basetemp=/workspace/scratch/b59abdecf5a1/devtmp/finalhistorical38",
+    "--junitxml=/workspace/scratch/b59abdecf5a1/repo/reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/logs/final-packet-historical38.xml",
+    "-vv"
+  ],
+  "cwd": "/workspace/scratch/b59abdecf5a1/devrepo",
+  "environment": {
+    "APPROVED53_PYTHON": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONPATH": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness:src:.",
+    "TMPDIR": "/workspace/scratch/b59abdecf5a1/devtmp"
+  },
+  "exit_code": 1,
+  "finished": "2026-10-15T02:08:53.738124+00:00",
+  "git_head": "adf391178d7494ed17e1db802a31f001fb3b5f3b",
+  "logs": {
+    "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "717973507438b0efe080e703ababb7ba4ebf7155501b95480c7258c12514d2dd"
+  },
+  "started": "2026-10-15T02:08:40.115172+00:00",
+  "tested_source_sha256": {
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/build_delivery.py": "dd13da049413a6e0de25c6603cd14c40cbddab1e53d5538c5edb940cea07e679",
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/draft_runner.py": "18f9734396972138aea03c2860fc2ae9ca6a00671fa3b9352ccfb14bd32d011a",
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/freeze_identity.py": "3b8f81060f419e9c0ba3f47834086d2f7b65a36a539d98b4b8c0b7f916bc82bb",
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/readiness.py": "ddb4c50a6b3c454fa03af9dc5744481c6649f1d2533f7e876a562089810ea43b",
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py": "b2d4a3091ce8ab2a08ca4a93b9f99db745d4b269e2463ee4c80316ae7f5c00aa",
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_crash_recovery.py": "3447bb597eefe8c24545743735d74ef280252ce95b5e3a71441869731aafef83",
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py": "4202b769e582df71e806e65a73075002121a7582ceea8f259fb75a1a3f01a966",
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py": "e6a852f8d8a05b7ae8738c68edd357879a768861f3d183ccc5905b9481144c09",
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py": "f508b5b6c018ebf422626b588e42759e07cfa9e4cf5742075109d26f77b8cc9d",
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/RESIDENT_SAFE_LAUNCH_PACKET.json": "04123169ec305273bd971f6254acb66f4bfdccf9bcce29d52e3d93d9fadf5e0c",
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz": "e3afa5bcf5f55667767fecac5151f3cf53c69950fabeb11c47c7cded4cc4f222",
+    "/workspace/scratch/b59abdecf5a1/devrepo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/IDENTITY.json": "ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd"
+  }
+}

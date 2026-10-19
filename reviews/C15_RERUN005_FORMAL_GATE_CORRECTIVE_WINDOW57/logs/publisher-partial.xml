@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="7" time="1.929" timestamp="2026-10-15T02:00:50.305539+00:00" hostname="cd3bd4e48dfb"><testcase classname="reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract" name="test_import_exposes_no_existing_private_key_or_sign_closure" time="0.000" /><testcase classname="reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract" name="test_private_key_and_sign_definition_are_local_to_main" time="0.005" /><testcase classname="reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract" name="test_imported_main_cannot_gain_existing_authority_by_role_claim[service-argv]" time="0.597" /><testcase classname="reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract" name="test_imported_main_cannot_gain_existing_authority_by_role_claim[env-role]" time="0.330" /><testcase classname="reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract" name="test_imported_main_cannot_gain_existing_authority_by_role_claim[env-pinned-launch]" time="0.336" /><testcase classname="reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract" name="test_registration_identity_checks_have_no_role_environment_fallback" time="0.000" /><testcase classname="reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract" name="test_rsa_verifier_rejects_unsigned_and_substituted_key_proofs" time="0.000"><failure message="AttributeError: 'LateReturnVerifier' object has no attribute 'verify'">def test_rsa_verifier_rejects_unsigned_and_substituted_key_proofs():
+        from aios_core.runtime.late_return import LateReturnVerifier
+        # Synthetic verifier, not genuine Publisher key. Does NOT prove live signing isolation.
+        verifier = LateReturnVerifier(key_id='synthetic-approved-publisher',algorithm='rsa-pkcs1v15-sha256',
+            modulus_hex=format((1&lt;&lt;2047)+1,'x'),public_exponent=65537)
+        fields = dict(attempt_id='a',subject_id='s',work_kind='w',work_id='i',model_round_index=0,
+            outbound_request_fingerprint='f',relay_id='r',provider='external-resident',model='s',
+            provider_request_id='r',response_fingerprint='h',payload_sha256='h')
+&gt;       assert not verifier.verify(proof='bglate_rsa_v1:attacker-key:'+('01'*256),**fields)
+                   ^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_publisher_contract.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = LateReturnVerifier(key_id='synthetic-approved-publisher', algorithm='rsa-pkcs1v15-sha256', modulus_hex='80000000000000...0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001', public_exponent=65537)
+item = 'verify'
+
+    def __getattr__(self, item: str) -&gt; Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+&gt;                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'LateReturnVerifier' object has no attribute 'verify'
+
+/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/lib/python3.12/site-packages/pydantic/main.py:1042: AttributeError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,18 @@
+{
+  "binding_mode": "canonical_user_turn",
+  "binding_version": "c15-rcc-canonical-conversation-binding-v1",
+  "durable_source_class": "user",
+  "fixture_event_id": "c15rcc-024",
+  "fixture_payload_sha256": "sha256:049c942bef3c9b2e96677dcbbf6f3abdb3f8d75de9d6073ed3c61f73d2872ee5",
+  "fixture_projection_sha256": "sha256:97e76272fa5068b26a4396cef10c29e7d142b57ba9367e9e38729d8bb1f17af0",
+  "fixture_sequence": 24,
+  "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+  "fixture_version": "c15-rcc-fixture-v1",
+  "idempotent_replay": false,
+  "ingest_ref": "obs_conv_user_6c06f332619a4ca4bb599e00@1",
+  "object_id": "obs_conv_user_6c06f332619a4ca4bb599e00",
+  "revision": 1,
+  "session_id": "sess-resident-c-005-7969eff964ce44c9",
+  "turn_index": 1,
+  "world_revision": 65
+}

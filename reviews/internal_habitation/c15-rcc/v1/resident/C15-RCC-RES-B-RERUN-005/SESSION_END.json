@@ -1,0 +1,9 @@
+{
+  "ended_at": "2026-10-19T00:33:09.955744+00:00",
+  "phase": "B",
+  "stop_reason": "CURSOR_22_ACKNOWLEDGED_PHASE_B_COMPLETE",
+  "cursor_23_revealed": false,
+  "last_acked_sequence": 22,
+  "next_sequence": 23,
+  "total_exchanges": 12
+}
