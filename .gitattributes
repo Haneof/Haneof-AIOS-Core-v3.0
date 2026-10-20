@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+# Frozen evidence manifests hash exact bytes; CRLF checkout would break them.
+*.json text eol=lf
+*.jsonl text eol=lf
+*.sha256 text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
