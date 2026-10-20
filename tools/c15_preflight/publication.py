@@ -157,7 +157,6 @@ def create_receipt(
             finally:
                 token.unlink(missing_ok=True)
     except BaseException as parent_fsync_exc:
-        raise
         # Parent fsync failed: receipt file exists and is valid inside package,
         # but parent directory entry may not be durable.
         # Per protocol: cannot mark CONFIRMED only by exists(), must require independent verification
@@ -386,10 +385,9 @@ def confirm_uncertain_package(
             finally:
                 os.close(fd)
         except BaseException:
+            # Parent fsync failed -> persistence uncertain, cannot ordinary auto pass
+            # Leave receipt but raise, require explicit re-verification
             raise
-        # Parent fsync failed -> persistence uncertain, cannot ordinary auto pass
-        # Leave receipt but raise, require explicit re-verification
-        raise
     # Verify receipt after creation is complete, valid, matching
     try:
         load_and_verify_receipt(source, expected_manifest_sha256=actual_hash, expected_publication_id=pub_id)
