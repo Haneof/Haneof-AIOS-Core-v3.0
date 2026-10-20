@@ -1,9 +1,13 @@
 {
   "_comment": "AIOS 基线钉住文件。受保护路径的任何变更，必须由对应 task 授权，且提交信息含 Authorized-Task trailer。由 PM 维护，实现方不得自行更新。",
-  "pinned_sha": "7d70e123c91de29c4605f916dec3e8e41917c28f",
-  "pinned_at": "2026-10-20T01:17:29Z",
+  "pinned_sha": "93e6353d13f1afe9d9b94e75f5c4b2b37b1ac5c4",
+  "pinned_at": "2026-10-20T15:32:24Z",
   "pinned_by": "PM",
-  "task_id": "PHASE0-RECOVERY-001",
+  "task_id": [
+    "P16-RECALL-FIX-001",
+    "P16-METERING-FIX-001",
+    "P16-BENCH-001"
+  ],
   "allowed_paths": [
     "governance/",
     "reviews/",
