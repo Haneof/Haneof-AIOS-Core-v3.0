@@ -106,6 +106,9 @@ def main() -> int:
     baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
     pinned = baseline["pinned_sha"]
     task_id = baseline["task_id"]
+    # `task_id` may be a single string or a list; several authorised tasks can be
+    # in flight at once (e.g. a stacked branch spanning two windows).
+    expected_tasks = {task_id} if isinstance(task_id, str) else set(task_id)
     allowed = baseline.get("allowed_paths", [])
     protected = baseline.get("protected_paths", [])
     scan_prefixes = baseline.get("secret_scan_paths", [])
@@ -127,8 +130,11 @@ def main() -> int:
             governance_only.append(path)
             continue
         entry = {"file": path, "reason": None}
-        if require_trailer and task_id not in authorized_tasks:
-            entry["reason"] = f"missing 'Authorized-Task: {task_id}' trailer in commits {pinned[:7]}..{args.head}"
+        if require_trailer and not (expected_tasks & authorized_tasks):
+            entry["reason"] = (
+                f"none of {sorted(expected_tasks)} declared via 'Authorized-Task' "
+                f"in commits {pinned[:7]}..{args.head}"
+            )
             unauthorized.append(entry)
         else:
             authorized.append(entry)
