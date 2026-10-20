@@ -224,10 +224,14 @@ def count_sql(
             conn.set_trace_callback(counter.trace)
             yield conn
 
-    def index_connect() -> sqlite3.Connection:
-        conn = original_index_connect()
-        conn.set_trace_callback(counter.trace)
-        return conn
+    @contextlib.contextmanager
+    def index_connect() -> Iterator[sqlite3.Connection]:
+        # WorldSearchIndex._connect is a contextmanager since the SQLite
+        # connection-leak fix; calling it as a plain function yields the
+        # generator wrapper, not a connection.
+        with original_index_connect() as conn:
+            conn.set_trace_callback(counter.trace)
+            yield conn
 
     store._connection = store_connection  # type: ignore[method-assign]
     index._connect = index_connect  # type: ignore[method-assign]
