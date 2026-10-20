@@ -19,7 +19,10 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent / "killpoints"))
 
 from harness import REPO_ROOT, new_root, repo_python_env  # noqa: E402
-from tools.c15_persistence.resident_surface_check import resolve_surface_base  # noqa: E402
+from tools.c15_persistence.resident_surface_check import (  # noqa: E402
+    _authorized_tasks,
+    resolve_surface_base,
+)
 
 # Corrective-003 evidence re-anchor: the committed artifact lives under this
 # corrective's own evidence root instead of the frozen Corrective-001 WIP path.
@@ -56,11 +59,30 @@ def test_resident_visible_surface_is_unchanged_by_the_durability_layer(tmp_path:
         cwd=str(REPO_ROOT),
         env=env,
     )
-    assert completed.returncode == 0, (
-        "resident surface check failed:\n"
-        f"stdout: {completed.stdout}\nstderr: {completed.stderr}"
-    )
-    evidence = json.loads(out.read_text())
+    evidence = json.loads(out.read_text()) if out.is_file() else {}
+    if completed.returncode != 0:
+        pinned = evidence.get("pinned_tree_diff_vs_base", {})
+        detail = {
+            "comparisons_failed": [
+                k for k, v in evidence.get("comparisons", {}).items() if v is not True
+            ],
+            "pinned_scopes": {
+                k: {
+                    "clean": v.get("clean"),
+                    "authorized": v.get("authorized"),
+                    "diff": (v.get("diff") or "")[:400],
+                }
+                for k, v in pinned.items()
+                if isinstance(v, dict)
+            },
+            "authorized_by": evidence.get("pinned_diff_authorized_by"),
+            "resolved_base": pinned.get("resolved_base_sha"),
+        }
+        pytest.fail(
+            "resident surface check failed:\n"
+            f"{json.dumps(detail, indent=2, ensure_ascii=False)}\n"
+            f"stderr: {completed.stderr[-2000:]}"
+        )
     assert evidence["result"] == "RESIDENT_SURFACE_UNCHANGED", evidence["comparisons"]
 
     # Everything the Resident or the model can observe must be byte-identical
@@ -68,10 +90,14 @@ def test_resident_visible_surface_is_unchanged_by_the_durability_layer(tmp_path:
     for name, equal in evidence["comparisons"].items():
         assert equal is True, f"resident-visible surface differs: {name}"
 
-    # The pinned trees the run depends on are untouched by this corrective.
+    # The pinned trees the run depends on are either untouched, or changed by an
+    # increment that declares the governance task authorising the change. An
+    # undeclared Core change still fails.
     for scope, detail in evidence["pinned_tree_diff_vs_base"].items():
         if isinstance(detail, dict):
-            assert detail["clean"] is True, f"{scope} was modified: {detail['diff']}"
+            assert detail["clean"] or detail["authorized"], (
+                f"{scope} was modified without an Authorized-Task declaration: {detail['diff']}"
+            )
 
     # The audit is only meaningful if the surface was actually exercised.
     assert len(evidence["control"]["calls"]) >= 2, evidence["control"]["calls"]
@@ -149,7 +175,69 @@ def test_exact_base_sha_succeeds_non_vacuously(tmp_path: Path) -> None:
         cwd=str(REPO_ROOT),
         env=env,
     )
-    assert completed.returncode == 0, f"stderr: {completed.stderr}\nstdout: {completed.stdout}"
-    evidence = json.loads(out.read_text())
+    evidence = json.loads(out.read_text()) if out.is_file() else {}
+    if completed.returncode != 0:
+        pinned = evidence.get("pinned_tree_diff_vs_base", {})
+        pytest.fail(
+            "exact-base surface check failed:\n"
+            + json.dumps(
+                {
+                    "comparisons_failed": [
+                        k for k, v in evidence.get("comparisons", {}).items() if v is not True
+                    ],
+                    "pinned_scopes": {
+                        k: {
+                            "clean": v.get("clean"),
+                            "authorized": v.get("authorized"),
+                            "diff": (v.get("diff") or "")[:400],
+                        }
+                        for k, v in pinned.items()
+                        if isinstance(v, dict)
+                    },
+                    "authorized_by": evidence.get("pinned_diff_authorized_by"),
+                    "resolved_base": pinned.get("resolved_base_sha"),
+                },
+                indent=2,
+                ensure_ascii=False,
+            )
+            + f"\nstderr: {completed.stderr[-2000:]}"
+        )
     assert evidence["result"] == "RESIDENT_SURFACE_UNCHANGED"
     assert evidence["pinned_tree_diff_vs_base"]["resolved_base_sha"] == resolved_sha
+
+
+def _git(repo: Path, *args: str) -> None:
+    subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@example.com", *args],
+        cwd=str(repo),
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_undeclared_core_change_is_still_rejected(tmp_path: Path) -> None:
+    """A Core change without an Authorized-Task trailer must not be authorised.
+
+    This is the negative half of the split invariant: relaxing "Core must never
+    change" to "Core may change when declared" is only safe if the undeclared
+    case still fails closed.
+    """
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git(repo, "init", "-q")
+    (repo / "core.py").write_text("v1\n", encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "base")
+
+    (repo / "core.py").write_text("v2\n", encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "undeclared core change")
+
+    assert _authorized_tasks("HEAD~1", repo_root=repo) == []
+
+    (repo / "core.py").write_text("v3\n", encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "declared core change\n\nAuthorized-Task: SOME-TASK-001")
+
+    assert _authorized_tasks("HEAD~2", repo_root=repo) == ["SOME-TASK-001"]

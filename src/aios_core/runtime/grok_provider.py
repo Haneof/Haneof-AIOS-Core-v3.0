@@ -38,10 +38,9 @@ from aios_core.runtime.cognitive_runtime import (
 SILENCE_TOKEN = "<AIOS_SILENCE>"
 
 DEFAULT_BASE_URL = os.environ.get("AIOS_GROK_BASE_URL", "http://127.0.0.1:8080/v1")
-DEFAULT_API_KEY = os.environ.get(
-    "AIOS_GROK_API_KEY",
-    "sk-11e77b2687af13919d345c94678332219a997f264c3cc392d7032374b36f58d1",
-)
+# Credentials MUST come from the environment. A literal default here would be
+# committed to the repository and leak on every clone; fail closed instead.
+DEFAULT_API_KEY = os.environ.get("AIOS_GROK_API_KEY", "")
 DEFAULT_MODEL_PRIMARY = os.environ.get("AIOS_GROK_MODEL_PRIMARY", "grok-4.7")
 DEFAULT_MODEL_SECONDARY = os.environ.get("AIOS_GROK_MODEL_SECONDARY", "grok-4.5")
 
@@ -79,6 +78,12 @@ class GrokStreamingProvider:
         """
         chosen_model = model or self.config.default_model
         temp = temperature if temperature is not None else self.config.temperature
+
+        if not self.config.api_key:
+            raise RuntimeError(
+                "AIOS_GROK_API_KEY is not configured; refusing to send an "
+                "unauthenticated request to the provider endpoint"
+            )
 
         headers = {
             "Authorization": f"Bearer {self.config.api_key}",

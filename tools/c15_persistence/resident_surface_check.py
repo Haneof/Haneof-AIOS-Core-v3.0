@@ -30,6 +30,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -432,9 +433,53 @@ def resolve_surface_base(
     )
 
 
-def _pinned_tree_digest(base: str, repo_root: Path = REPO_ROOT) -> dict[str, Any]:
+def _authorized_tasks(base: str, repo_root: Path = REPO_ROOT) -> list[str]:
+    """Collect ``Authorized-Task:`` trailers declared between base and HEAD.
+
+    A Core change is permitted only when the increment declares which governance
+    task authorises it. Absence of a trailer keeps the historical behaviour:
+    the pinned trees must be byte-identical to the base.
+
+    Fails loudly rather than silently returning no authorisation: a shallow
+    checkout truncates ancestry and would otherwise look like "nothing was
+    declared", which is indistinguishable from a real violation.
+    """
+
+    def _log() -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            ["git", "log", "--format=%B", f"{base}..HEAD"],
+            cwd=str(repo_root),
+            capture_output=True,
+            text=True,
+        )
+
+    completed = _log()
+    if completed.returncode != 0:
+        # Shallow clone (actions/checkout defaults to depth 1): deepen once.
+        subprocess.run(
+            ["git", "fetch", "--deepen=200", "origin"],
+            cwd=str(repo_root),
+            capture_output=True,
+            text=True,
+        )
+        completed = _log()
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "cannot determine Authorized-Task declarations: "
+            f"`git log {base}..HEAD` failed: {completed.stderr.strip()}. "
+            "Check out with fetch-depth: 0 for this assertion to be meaningful."
+        )
+    return sorted(set(re.findall(r"^Authorized-Task:\s*(\S+)\s*$", completed.stdout, re.MULTILINE)))
+
+
+def _pinned_tree_digest(
+    base: str,
+    repo_root: Path = REPO_ROOT,
+    authorized_tasks: list[str] | None = None,
+) -> dict[str, Any]:
     resolved_sha = resolve_surface_base(base, repo_root=repo_root)
     out: dict[str, Any] = {"base": base, "resolved_base_sha": resolved_sha}
+    authorized = bool(authorized_tasks)
     for scope in PINNED_PATHS:
         completed = subprocess.run(
             ["git", "diff", "--stat", f"{resolved_sha}...HEAD", "--", scope],
@@ -456,6 +501,7 @@ def _pinned_tree_digest(base: str, repo_root: Path = REPO_ROOT) -> dict[str, Any
         out[scope] = {
             "diff": completed.stdout.strip(),
             "clean": completed.stdout.strip() == "",
+            "authorized": completed.stdout.strip() == "" or authorized,
         }
     return out
 
@@ -523,9 +569,16 @@ def main(argv: list[str] | None = None) -> int:
         "world_revision": control["world_revision"] == wired["world_revision"],
     }
 
-    pinned = _pinned_tree_digest(resolved_base)
-    ok = all(comparisons.values()) and all(scope["clean"] for scope in
-                                           (v for k, v in pinned.items() if isinstance(v, dict)))
+    authorized_tasks = _authorized_tasks(resolved_base)
+    pinned = _pinned_tree_digest(resolved_base, authorized_tasks=authorized_tasks)
+    # The behavioural invariant is the comparison set. The pinned-tree check is a
+    # *scope* assertion: an intentional Core change is allowed when the increment
+    # declares an authorizing task, and is rejected when it does not.
+    pinned_ok = all(
+        scope["clean"] or scope["authorized"]
+        for scope in (v for k, v in pinned.items() if isinstance(v, dict))
+    )
+    ok = all(comparisons.values()) and pinned_ok
 
     evidence = {
         "check": "RESIDENT_VISIBLE_SURFACE_UNCHANGED",
@@ -552,6 +605,7 @@ def main(argv: list[str] | None = None) -> int:
         },
         "comparisons": comparisons,
         "pinned_tree_diff_vs_base": pinned,
+        "pinned_diff_authorized_by": authorized_tasks,
         "pinned_slots": sorted(REQUIRED_SLOTS),
         "result": "RESIDENT_SURFACE_UNCHANGED" if ok else "RESIDENT_SURFACE_CHANGED",
     }

@@ -1,0 +1,56 @@
+name: governance-drift
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  baseline-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history for diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify pinned baseline is reachable
+        run: |
+          PINNED=$(python -c "import json;print(json.load(open('governance/baseline.json'))['pinned_sha'])")
+          echo "pinned=$PINNED"
+          git cat-file -e "${PINNED}^{commit}" || {
+            echo "::error::pinned_sha $PINNED 不可达，基线已丢失或历史被重写"
+            exit 1
+          }
+
+      - name: Baseline drift + secret scan
+        run: |
+          python tools/governance/check_baseline.py \
+            --repo . \
+            --baseline governance/baseline.json \
+            --head HEAD \
+            --json drift-report.json
+
+      - name: Upload drift report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: governance-drift-report
+          path: drift-report.json
+          retention-days: 90
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f drift-report.json ]; then
+            python -c "import json;r=json.load(open('drift-report.json'));print('### Baseline drift');print();print('- pinned: '+r['pinned_sha'][:12]);print('- head: '+r['head'][:12]);print('- expected task: '+r['expected_task']);print('- declarations found: '+str(r['authorized_tasks_found']));print('- protected changes: '+str(len(r['authorized_protected_changes'])+len(r['unauthorized_protected_changes'])));print('- undeclared protected changes: '+str(len(r['unauthorized_protected_changes'])));print('- secret findings: '+str(len(r['secret_findings'])));print();print('**Verdict: '+r['verdict']+'**')" >> "$GITHUB_STEP_SUMMARY"
+          fi

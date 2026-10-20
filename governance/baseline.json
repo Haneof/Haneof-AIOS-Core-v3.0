@@ -1,0 +1,33 @@
+{
+  "_comment": "AIOS 基线钉住文件。受保护路径的任何变更，必须由对应 task 授权，且提交信息含 Authorized-Task trailer。由 PM 维护，实现方不得自行更新。",
+  "pinned_sha": "7d70e123c91de29c4605f916dec3e8e41917c28f",
+  "pinned_at": "2026-10-20T01:17:29Z",
+  "pinned_by": "PM",
+  "task_id": "PHASE0-RECOVERY-001",
+  "allowed_paths": [
+    "governance/",
+    "reviews/",
+    "docs/",
+    "release/"
+  ],
+  "protected_paths": [
+    "src/",
+    "tests/",
+    "tools/",
+    "pyproject.toml",
+    ".github/workflows/"
+  ],
+  "secret_scan_paths": [
+    "governance/",
+    "reviews/",
+    "docs/"
+  ],
+  "require_trailer": true,
+  "notes": [
+    "pinned_sha 是 PM 裁决过的唯一可信实现基线。",
+    "推进新窗口时必须由 PM 更新 task_id 与 pinned_sha。",
+    "allowed_paths 内变更无需 trailer（治理/文档类）。",
+    "protected_paths 内变更若无 trailer 或无匹配 task_id，CI 直接 FAIL。",
+    "reviews/internal_habitation 属封存证据，任何情况下不得变更。"
+  ]
+}
