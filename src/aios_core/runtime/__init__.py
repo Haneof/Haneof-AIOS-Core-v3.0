@@ -62,3 +62,14 @@ from .turn_runtime import (
 from .turn_execution import (
     TurnAlreadyCompleted, TurnExecutionInDoubt, TurnExecutionRefused, TurnInputConflict,
 )
+from .edge_model_scheduler import (
+    MultiModelEdgeScheduler,
+    ModelTier,
+    ModelDescriptor,
+    ModelDispatchResult,
+    ResidentMemoryExceededError,
+)
+from .grok_provider import (
+    GrokStreamingProvider,
+    GrokProviderConfig,
+)

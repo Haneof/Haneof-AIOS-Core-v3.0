@@ -73,6 +73,8 @@ class MultiModelEdgeScheduler:
         self._cloud_llm_executor = cloud_llm_executor or self._default_cloud_llm_stub
         self._is_network_online = is_network_online
         self._cloud_timeout_ms = cloud_timeout_ms
+        self._active_cloud_model_id: str | None = None
+        self._active_edge_model_id: str | None = None
 
         # Register default baseline models
         self.register_model(
@@ -226,7 +228,21 @@ class MultiModelEdgeScheduler:
                 metadata={"reason": "CLOUD_EXCEPTION_FALLBACK", "error": str(exc)},
             )
 
+    def set_active_model(self, model_id: str) -> None:
+        """Explicitly switch the active model for its tier."""
+        if model_id not in self._models:
+            raise KeyError(f"Model '{model_id}' is not registered.")
+        model = self._models[model_id]
+        if model.tier == ModelTier.CLOUD_LLM:
+            self._active_cloud_model_id = model_id
+        else:
+            self._active_edge_model_id = model_id
+
     def _get_active_model_id(self, tier: ModelTier) -> str:
+        if tier == ModelTier.CLOUD_LLM and self._active_cloud_model_id:
+            return self._active_cloud_model_id
+        if tier == ModelTier.EDGE_SLM and self._active_edge_model_id:
+            return self._active_edge_model_id
         for model in self._models.values():
             if model.tier == tier and model.is_available:
                 return model.model_id
@@ -243,3 +259,51 @@ class MultiModelEdgeScheduler:
     @staticmethod
     def _default_cloud_llm_stub(prompt: str, context: dict[str, Any]) -> str:
         return "【云端深度心智】根据长周期认知图谱与多维因果证据分析：" + prompt[:100]
+
+
+def create_production_edge_scheduler(
+    *,
+    grok_provider: Any = None,
+    edge_slm_executor: Callable[[str, dict[str, Any]], str] | None = None,
+    is_network_online: bool = True,
+    cloud_timeout_ms: float = 30000.0,
+) -> MultiModelEdgeScheduler:
+    """Creates a production-ready edge scheduler pre-configured with Grok Cloud LLM and Edge SLM."""
+    if grok_provider is not None:
+        cloud_executor = grok_provider.as_executor(model="grok-4.7")
+    else:
+        cloud_executor = None
+
+    scheduler = MultiModelEdgeScheduler(
+        edge_slm_executor=edge_slm_executor,
+        cloud_llm_executor=cloud_executor,
+        is_network_online=is_network_online,
+        cloud_timeout_ms=cloud_timeout_ms,
+    )
+
+    # Register grok-4.7 as primary cloud model and grok-4.5 as secondary cloud model
+    scheduler.register_model(
+        ModelDescriptor(
+            model_id="grok-4.7",
+            tier=ModelTier.CLOUD_LLM,
+            param_size_billion=100.0,
+            memory_footprint_mb=0.0,
+            max_context_tokens=131072,
+            is_resident=False,
+            is_available=True,
+        )
+    )
+    scheduler.register_model(
+        ModelDescriptor(
+            model_id="grok-4.5",
+            tier=ModelTier.CLOUD_LLM,
+            param_size_billion=50.0,
+            memory_footprint_mb=0.0,
+            max_context_tokens=65536,
+            is_resident=False,
+            is_available=True,
+        )
+    )
+    scheduler.set_active_model("grok-4.7")
+
+    return scheduler

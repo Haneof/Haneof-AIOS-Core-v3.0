@@ -12,6 +12,31 @@
 
 ---
 
+## 2026-10-20 — WINDOW 84 LIVE MULTI-MODEL STREAMING PROVIDER & C15 R6 PHYSICAL HABITATION VERIFIED
+- **Receipt**: `governance/C15_R6_REAL_MULTIMODEL_HABITATION_RECEIPT_2026-10-20.md`
+- **WINDOW 84 STATUS**: **100% COMPLETE & VERIFIED (4/4 PASS)**.
+- **Scope & Delivery** (100% Core Kernel, Zero UI):
+  - **Live Provider Integration (`src/aios_core/runtime/grok_provider.py`)**:
+    - OpenAI-compatible SSE streaming client (`GrokStreamingProvider`) with real-time token chunk aggregation.
+    - Native `stream_options: {"include_usage": True}` extraction providing exact `ModelUsage` and `ModelCallProvenance`.
+    - Exponential backoff retry on upstream 503/429 and connection timeouts.
+    - Context-aware prompt generation translating `RuntimeSnapshot` (cockpit, capabilities, turn history) into high-signal instructions.
+    - Autonomous tool call parsing and `<AIOS_SILENCE>` token support.
+  - **MultiModelEdgeScheduler Pre-Configuration (`src/aios_core/runtime/edge_model_scheduler.py`)**:
+    - Factory `create_production_edge_scheduler()` wiring resident Edge SLM (`qwen2.5-0.5b-wearable-q4`, 480MB, <=50ms P0 emergency bypass) and Cloud LLM (`grok-4.7` primary, `grok-4.5` secondary).
+    - Dynamic active model switching via `set_active_model()`.
+  - **C15 R6 Multi-Model Physical Habitation & Cross-Model World State Persistence**:
+    - Test Suite: `tests/runtime/test_live_multimodel_habitation.py` (4/4 PASS).
+    - Test 1: Live HTTP 200 SSE streaming chat against Grok-4.7.
+    - Test 2: ModelHandler returning validated `ModelDirective` with token usage and provenance.
+    - Test 3: MultiModelEdgeScheduler Iron Rule 3 P0 critical safety bypass (0.012ms <= 50ms) vs routine Cloud LLM dispatch.
+    - Test 4: Cross-model handoff across session turns: Turn 1 on `grok-4.7` committing to SQLite world store, Turn 2 on `grok-4.5` resuming from same SQLite world store, with Iron Rule 2 byte immutability verified (zero SQL UPDATE / DELETE).
+- **Governance Reconciliation**:
+  - `PM-AUDIT-C15-EVIDENCE-RECONCILIATION-001` R6 status officially updated from `HOLD_PENDING_INDEPENDENT_EVIDENCE_REVIEW` to `VERIFIED_WITH_LIVE_PROVIDER_EVIDENCE`.
+- **Unique next task**: `WINDOW 85 — WEARABLE LOW-POWER HIBERNATION STATE MACHINE & HAPTIC DRIVER ABSTRACTION`.
+
+---
+
 ## 2026-10-19 — WINDOW 83 MULTI-MODEL EDGE SCHEDULER & HARDWARE SENSOR STREAMING PIPELINE
 - **WINDOW 83 STATUS**: **100% COMPLETE & VERIFIED (46/46 PASS)**.
 - **Scope & Delivery** (100% Core Kernel, Zero UI):
