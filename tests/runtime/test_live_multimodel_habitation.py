@@ -39,7 +39,12 @@ from aios_core.contracts.enums import SourceClass, WakePriority
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
 from aios_core.query.search import WorldSearchIndex
-from aios_core.runtime.cognitive_runtime import ModelDirective, RuntimeSnapshot
+from aios_core.runtime.cognitive_runtime import (
+    ModelCallProvenance,
+    ModelDirective,
+    ModelUsage,
+    RuntimeSnapshot,
+)
 from aios_core.runtime.edge_model_scheduler import (
     ModelTier,
     create_production_edge_scheduler,
@@ -430,3 +435,76 @@ def test_04_cross_model_continuity_and_immutability(
         stored_payload["value"]
         == "用户在杭州设立了AIOS端侧硬件心智实验室，重点研发23cm柔性屏手环。"
     )
+
+
+# ---------------------------------------------------------------------------
+# Hermetic: prompt assembly must not drop the conversation
+# ---------------------------------------------------------------------------
+
+
+def test_model_handler_includes_recent_conversation_in_prompt():
+    """The system prompt must carry verbatim recent turns.
+
+    Regression guard: the prompt builder used to keep only scalar cockpit values,
+    so `recent_turns` (a list) never reached the model. The assistant then told
+    users it could not remember something it had just been told, and burned tool
+    rounds re-retrieving it.
+    """
+    provider = GrokStreamingProvider(GrokProviderConfig(api_key="prompt-test-key"))
+    captured: dict[str, object] = {}
+
+    def fake_stream_chat(messages, model=None):
+        captured["messages"] = messages
+        return (
+            "OK",
+            ModelUsage(
+                total_tokens=3,
+                input_tokens=2,
+                output_tokens=1,
+                provider="grok",
+                model="test-model",
+                request_id="req-test",
+            ),
+            ModelCallProvenance(provider="grok", model="test-model", request_id="req-test"),
+        )
+
+    provider.stream_chat = fake_stream_chat  # type: ignore[method-assign]
+
+    snapshot = RuntimeSnapshot(
+        user_input="我刚才让你记住的那句话里，我在哪个城市？",
+        wake_reason="user_explicit",
+        cockpit={
+            "current_topic": "recall",
+            "token_budget": 3400,
+            "estimated_tokens": 120,
+            "truncated": False,
+            "recent_turns": [
+                {
+                    "turn_index": 1,
+                    "user": {"text": "请记住：我在杭州做 23cm 柔性屏手环项目。"},
+                    "assistant": {"text": "已记录。"},
+                }
+            ],
+            "memory_cards": [
+                {
+                    "object_type": "observation",
+                    "dimension": "dim_work",
+                    "excerpt": "杭州 23cm 柔性屏手环项目",
+                }
+            ],
+        },
+        capability_catalog=(),
+        capability_history=(),
+        round_index=0,
+        remaining_tool_rounds=2,
+    )
+
+    provider.as_model_handler(model="test-model")(snapshot)
+    messages = captured["messages"]
+    system_prompt = messages[0]["content"]
+
+    assert "RECENT CONVERSATION" in system_prompt
+    assert "杭州" in system_prompt, "prior user turn was dropped from the prompt"
+    assert "[turn 1] user:" in system_prompt
+    assert "RELEVANT WORLD MEMORY" in system_prompt
+    assert "token_budget" not in system_prompt, "bookkeeping keys must not consume prompt budget"

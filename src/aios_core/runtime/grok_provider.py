@@ -44,6 +44,57 @@ DEFAULT_API_KEY = os.environ.get("AIOS_GROK_API_KEY", "")
 DEFAULT_MODEL_PRIMARY = os.environ.get("AIOS_GROK_MODEL_PRIMARY", "grok-4.7")
 DEFAULT_MODEL_SECONDARY = os.environ.get("AIOS_GROK_MODEL_SECONDARY", "grok-4.5")
 
+# Cockpit keys that are bookkeeping rather than context; they only waste budget.
+_COCKPIT_SCALAR_SKIP = frozenset({"token_budget", "estimated_tokens", "truncated", "user_input"})
+_MAX_RECENT_CHARS = 6000
+_MAX_CARD_CHARS = 2000
+
+
+def _render_recent_turns(turns: Any, *, max_chars: int = _MAX_RECENT_CHARS) -> str:
+    """Render verbatim recent dialogue for the system prompt.
+
+    The cockpit carries ``recent_turns`` as a list of dicts. The scalar-only
+    filter that used to build the prompt dropped it entirely, so the model never
+    saw the conversation it was supposed to be continuing.
+    """
+    if not isinstance(turns, (list, tuple)) or not turns:
+        return ""
+    lines: list[str] = []
+    for turn in turns:
+        if not isinstance(turn, dict):
+            continue
+        idx = turn.get("turn_index")
+        user = turn.get("user") or {}
+        assistant = turn.get("assistant") or {}
+        user_text = str(user.get("text", "")).strip() if isinstance(user, dict) else ""
+        ai_text = str(assistant.get("text", "")).strip() if isinstance(assistant, dict) else ""
+        if user_text:
+            lines.append(f"[turn {idx}] user: {user_text}")
+        if ai_text:
+            lines.append(f"[turn {idx}] assistant: {ai_text}")
+    text = "\n".join(lines)
+    if len(text) > max_chars:
+        text = "…(earlier turns trimmed)…\n" + text[-max_chars:]
+    return text
+
+
+def _render_memory_cards(cards: Any, *, max_chars: int = _MAX_CARD_CHARS) -> str:
+    """Render proactively recommended world objects for the system prompt."""
+    if not isinstance(cards, (list, tuple)) or not cards:
+        return ""
+    lines: list[str] = []
+    for card in cards:
+        if not isinstance(card, dict):
+            continue
+        excerpt = str(card.get("excerpt", "")).strip()
+        if not excerpt:
+            continue
+        obj_type = card.get("object_type", "object")
+        dimension = card.get("dimension", "")
+        lines.append(f"- [{obj_type}/{dimension}] {excerpt[:400]}")
+    text = "\n".join(lines)
+    return text[-max_chars:] if len(text) > max_chars else text
+
 
 @dataclass(frozen=True)
 class GrokProviderConfig:
@@ -224,6 +275,10 @@ class GrokStreamingProvider:
             system_sections = [
                 "You are the AIOS 3.0 symbiotic mind on an ultra-compact wearable band.",
                 "CONSTITUTIONAL RULES:",
+                "0. The RECENT CONVERSATION block below is the verbatim dialogue. "
+                "If the answer is already visible there, answer from it directly — "
+                "never claim you cannot remember something that is in front of you, "
+                "and do not spend a tool round retrieving what you can already read.",
                 "1. If no response or action is warranted, output exactly '<AIOS_SILENCE>'.",
                 "2. If you need to invoke a registered capability, output a JSON block:",
                 "```json",
@@ -233,12 +288,27 @@ class GrokStreamingProvider:
             ]
 
             if snapshot.cockpit:
+                # Scalars only. Structured blocks (recent_turns / memory_cards /
+                # conversation_summaries) are lists and were silently dropped by
+                # this filter, which is why the model could not answer follow-up
+                # questions about things it had just been told.
                 summary_items = []
                 for k, v in snapshot.cockpit.items():
-                    if isinstance(v, (str, int, float, bool)):
+                    if isinstance(v, (str, int, float, bool)) and k not in _COCKPIT_SCALAR_SKIP:
                         summary_items.append(f"{k}: {v}")
                 if summary_items:
                     system_sections.append("ACTIVE COCKPIT CONTEXT:\n" + "\n".join(summary_items[:8]))
+
+            recent = _render_recent_turns(snapshot.cockpit.get("recent_turns"))
+            if recent:
+                system_sections.append(
+                    "RECENT CONVERSATION (verbatim, newest last — this is the real "
+                    "dialogue, treat it as ground truth):\n" + recent
+                )
+
+            cards = _render_memory_cards(snapshot.cockpit.get("memory_cards"))
+            if cards:
+                system_sections.append("RELEVANT WORLD MEMORY:\n" + cards)
 
             if snapshot.capability_catalog:
                 cat_desc = [
