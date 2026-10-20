@@ -3,7 +3,10 @@
   "pinned_sha": "7d70e123c91de29c4605f916dec3e8e41917c28f",
   "pinned_at": "2026-10-20T01:17:29Z",
   "pinned_by": "PM",
-  "task_id": "PHASE0-RECOVERY-001",
+  "task_id": [
+    "PHASE0-RECOVERY-001",
+    "P16-RECALL-FIX-001"
+  ],
   "allowed_paths": [
     "governance/",
     "reviews/",
@@ -25,6 +28,7 @@
   "require_trailer": true,
   "notes": [
     "pinned_sha 是 PM 裁决过的唯一可信实现基线。",
+    "task_id 可为字符串或列表；多个窗口并行（含 stacked 分支）时登记全部授权任务。",
     "推进新窗口时必须由 PM 更新 task_id 与 pinned_sha。",
     "allowed_paths 内变更无需 trailer（治理/文档类）。",
     "protected_paths 内变更若无 trailer 或无匹配 task_id，CI 直接 FAIL。",
