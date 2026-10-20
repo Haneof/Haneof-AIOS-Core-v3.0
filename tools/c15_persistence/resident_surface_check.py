@@ -439,15 +439,36 @@ def _authorized_tasks(base: str, repo_root: Path = REPO_ROOT) -> list[str]:
     A Core change is permitted only when the increment declares which governance
     task authorises it. Absence of a trailer keeps the historical behaviour:
     the pinned trees must be byte-identical to the base.
+
+    Fails loudly rather than silently returning no authorisation: a shallow
+    checkout truncates ancestry and would otherwise look like "nothing was
+    declared", which is indistinguishable from a real violation.
     """
-    completed = subprocess.run(
-        ["git", "log", "--format=%B", f"{base}..HEAD"],
-        cwd=str(repo_root),
-        capture_output=True,
-        text=True,
-    )
+
+    def _log() -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            ["git", "log", "--format=%B", f"{base}..HEAD"],
+            cwd=str(repo_root),
+            capture_output=True,
+            text=True,
+        )
+
+    completed = _log()
     if completed.returncode != 0:
-        return []
+        # Shallow clone (actions/checkout defaults to depth 1): deepen once.
+        subprocess.run(
+            ["git", "fetch", "--deepen=200", "origin"],
+            cwd=str(repo_root),
+            capture_output=True,
+            text=True,
+        )
+        completed = _log()
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "cannot determine Authorized-Task declarations: "
+            f"`git log {base}..HEAD` failed: {completed.stderr.strip()}. "
+            "Check out with fetch-depth: 0 for this assertion to be meaningful."
+        )
     return sorted(set(re.findall(r"^Authorized-Task:\s*(\S+)\s*$", completed.stdout, re.MULTILINE)))
 
 

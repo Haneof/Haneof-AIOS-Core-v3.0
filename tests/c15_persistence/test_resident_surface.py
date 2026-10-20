@@ -59,11 +59,30 @@ def test_resident_visible_surface_is_unchanged_by_the_durability_layer(tmp_path:
         cwd=str(REPO_ROOT),
         env=env,
     )
-    assert completed.returncode == 0, (
-        "resident surface check failed:\n"
-        f"stdout: {completed.stdout}\nstderr: {completed.stderr}"
-    )
-    evidence = json.loads(out.read_text())
+    evidence = json.loads(out.read_text()) if out.is_file() else {}
+    if completed.returncode != 0:
+        pinned = evidence.get("pinned_tree_diff_vs_base", {})
+        detail = {
+            "comparisons_failed": [
+                k for k, v in evidence.get("comparisons", {}).items() if v is not True
+            ],
+            "pinned_scopes": {
+                k: {
+                    "clean": v.get("clean"),
+                    "authorized": v.get("authorized"),
+                    "diff": (v.get("diff") or "")[:400],
+                }
+                for k, v in pinned.items()
+                if isinstance(v, dict)
+            },
+            "authorized_by": evidence.get("pinned_diff_authorized_by"),
+            "resolved_base": pinned.get("resolved_base_sha"),
+        }
+        pytest.fail(
+            "resident surface check failed:\n"
+            f"{json.dumps(detail, indent=2, ensure_ascii=False)}\n"
+            f"stderr: {completed.stderr[-2000:]}"
+        )
     assert evidence["result"] == "RESIDENT_SURFACE_UNCHANGED", evidence["comparisons"]
 
     # Everything the Resident or the model can observe must be byte-identical
@@ -156,8 +175,33 @@ def test_exact_base_sha_succeeds_non_vacuously(tmp_path: Path) -> None:
         cwd=str(REPO_ROOT),
         env=env,
     )
-    assert completed.returncode == 0, f"stderr: {completed.stderr}\nstdout: {completed.stdout}"
-    evidence = json.loads(out.read_text())
+    evidence = json.loads(out.read_text()) if out.is_file() else {}
+    if completed.returncode != 0:
+        pinned = evidence.get("pinned_tree_diff_vs_base", {})
+        pytest.fail(
+            "exact-base surface check failed:\n"
+            + json.dumps(
+                {
+                    "comparisons_failed": [
+                        k for k, v in evidence.get("comparisons", {}).items() if v is not True
+                    ],
+                    "pinned_scopes": {
+                        k: {
+                            "clean": v.get("clean"),
+                            "authorized": v.get("authorized"),
+                            "diff": (v.get("diff") or "")[:400],
+                        }
+                        for k, v in pinned.items()
+                        if isinstance(v, dict)
+                    },
+                    "authorized_by": evidence.get("pinned_diff_authorized_by"),
+                    "resolved_base": pinned.get("resolved_base_sha"),
+                },
+                indent=2,
+                ensure_ascii=False,
+            )
+            + f"\nstderr: {completed.stderr[-2000:]}"
+        )
     assert evidence["result"] == "RESIDENT_SURFACE_UNCHANGED"
     assert evidence["pinned_tree_diff_vs_base"]["resolved_base_sha"] == resolved_sha
 

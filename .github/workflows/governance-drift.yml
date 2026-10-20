@@ -52,17 +52,5 @@ jobs:
         if: always()
         run: |
           if [ -f drift-report.json ]; then
-            python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
-import json
-r = json.load(open("drift-report.json"))
-print("### 基线漂移检查\n")
-print(f"- pinned: `{r['pinned_sha'][:12]}`")
-print(f"- head: `{r['head'][:12]}`")
-print(f"- 期望任务: `{r['expected_task']}`")
-print(f"- 找到的授权: {r['authorized_tasks_found'] or '(none)'}")
-print(f"- 受保护路径变更: {len(r['authorized_protected_changes']) + len(r['unauthorized_protected_changes'])}")
-print(f"- 未授权变更: {len(r['unauthorized_protected_changes'])}")
-print(f"- 凭证命中: {len(r['secret_findings'])}")
-print(f"\n**裁决: {r['verdict']}**")
-PY
+            python -c "import json;r=json.load(open('drift-report.json'));print('### Baseline drift');print();print('- pinned: '+r['pinned_sha'][:12]);print('- head: '+r['head'][:12]);print('- expected task: '+r['expected_task']);print('- declarations found: '+str(r['authorized_tasks_found']));print('- protected changes: '+str(len(r['authorized_protected_changes'])+len(r['unauthorized_protected_changes'])));print('- undeclared protected changes: '+str(len(r['unauthorized_protected_changes'])));print('- secret findings: '+str(len(r['secret_findings'])));print();print('**Verdict: '+r['verdict']+'**')" >> "$GITHUB_STEP_SUMMARY"
           fi
