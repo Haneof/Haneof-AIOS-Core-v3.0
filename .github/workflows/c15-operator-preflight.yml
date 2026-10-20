@@ -59,7 +59,10 @@ jobs:
         run: python -m pytest -o addopts='' -q tests/preflight --junitxml=preflight-results.xml
       - name: Relevant existing Core regressions (synthetic Worlds)
         run: |
-          python -m pytest -o addopts='' -q --junitxml=regression-results.xml \
+          # -m "not live": live-provider tests require an external endpoint and are
+          # skipped by default; the receipt below asserts skipped == 0, so they must
+          # be excluded rather than counted as skips.
+          python -m pytest -o addopts='' -q -m "not live" --junitxml=regression-results.xml \
             tests/runtime \
             tests/integration/test_v3_fused_turn_runtime.py \
             tests/integration/test_v3_conversation_world_ingest.py \

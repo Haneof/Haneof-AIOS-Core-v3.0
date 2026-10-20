@@ -63,6 +63,15 @@ live_only = pytest.mark.skipif(
 )
 
 
+def live(fn):
+    """Mark a test as needing a real endpoint, and skip it unless opted in.
+
+    The ``live`` marker also lets CI exclude these tests explicitly (``-m "not
+    live"``) in suites that assert a zero-skip receipt.
+    """
+    return pytest.mark.live(live_only(fn))
+
+
 @pytest.fixture
 def grok_provider() -> GrokStreamingProvider:
     return GrokStreamingProvider(
@@ -285,7 +294,7 @@ def test_05b_missing_api_key_fails_closed():
 # ---------------------------------------------------------------------------
 
 
-@live_only
+@live
 def test_01_live_grok_streaming_chat(grok_provider: GrokStreamingProvider):
     """Verify live HTTP 200 SSE streaming chat against grok-4.7."""
     messages = [
@@ -308,7 +317,7 @@ def test_01_live_grok_streaming_chat(grok_provider: GrokStreamingProvider):
     assert usage.total_tokens >= usage.input_tokens + usage.output_tokens
 
 
-@live_only
+@live
 def test_02_live_grok_model_handler_directive(grok_provider: GrokStreamingProvider):
     """Verify as_model_handler returns valid ModelDirective with token usage and provenance."""
     handler = grok_provider.as_model_handler(model="grok-4.7")
@@ -331,7 +340,7 @@ def test_02_live_grok_model_handler_directive(grok_provider: GrokStreamingProvid
     assert directive.provenance.model == "grok-4.7"
 
 
-@live_only
+@live
 def test_04_cross_model_continuity_and_immutability(
     grok_provider: GrokStreamingProvider, clean_world
 ):
