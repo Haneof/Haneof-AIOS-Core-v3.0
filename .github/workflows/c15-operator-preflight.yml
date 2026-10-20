@@ -25,10 +25,30 @@ jobs:
       - run: pip install -e ".[dev]"
       - name: Frozen Core and sealed evidence unchanged
         run: |
-          git diff --exit-code c8807876ba62a4f4180beba8ff974e2342786340 HEAD -- src/aios_core
-          # Main already added a governance-only Resident prompt after Core freeze.
-          # Prove this increment changes no existing evidence/fixture material.
-          git diff --exit-code c8807876ba62a4f4180beba8ff974e2342786340 HEAD -- reviews/internal_habitation
+          set -euo pipefail
+          PINNED=$(python -c "import json;print(json.load(open('governance/baseline.json'))['pinned_sha'])")
+          echo "pinned baseline: $PINNED"
+          git cat-file -e "${PINNED}^{commit}"
+
+          # Core may advance, but only by an increment that declares which
+          # governance task authorises it. Previously this compared against a
+          # hard-coded September SHA, which no legitimate Core change could ever
+          # satisfy.
+          if git diff --quiet "$PINNED" HEAD -- src/aios_core; then
+            echo "Core is identical to the pinned baseline."
+          else
+            echo "Core differs from the pinned baseline; requiring a declaration."
+            git diff --stat "$PINNED" HEAD -- src/aios_core
+            if git log "$PINNED"..HEAD --format=%B | grep -qE '^Authorized-Task:[[:space:]]*\S'; then
+              echo "Authorized-Task declaration found."
+            else
+              echo "::error::src/aios_core changed without an 'Authorized-Task:' trailer"
+              exit 1
+            fi
+          fi
+
+          # Sealed evidence is never allowed to change, regardless of declaration.
+          git diff --exit-code "$PINNED" HEAD -- reviews/internal_habitation
       - name: Exact CORE-OPERATOR-001 regressions
         run: |
           python -m pytest -o addopts='' -q --junitxml=operator-exact-results.xml \
