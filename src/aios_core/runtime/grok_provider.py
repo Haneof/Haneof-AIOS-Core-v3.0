@@ -218,12 +218,33 @@ class GrokStreamingProvider:
         request_id = captured_id or f"grok-{int(time.time()*1000)}"
 
         # Compute usage
+        # reasoning_tokens 语义：None = 上游未报告（fallback 估算分支不得瞎猜）；
+        # 0 = 上游已报告且确无思考消耗；>0 = 显式记录的思考开销。
         if raw_usage:
             prompt_tokens = int(raw_usage.get("prompt_tokens", 0))
             completion_tokens = int(raw_usage.get("completion_tokens", 0))
             total_tokens = int(raw_usage.get("total_tokens", prompt_tokens + completion_tokens))
-            if total_tokens < prompt_tokens + completion_tokens:
-                total_tokens = prompt_tokens + completion_tokens
+
+            # 思考模型（如 Gemini 3 系列）的 total_tokens 含 reasoning 消耗，而
+            # completion_tokens 只计最终可见输出。优先采用厂商给出的明细字段，
+            # 缺失时用 total - input - output 反推，避免这部分开销被静默吞掉。
+            details = (
+                raw_usage.get("completion_tokens_details")
+                or raw_usage.get("output_tokens_details")
+                or {}
+            )
+            reported_reasoning = (
+                details.get("reasoning_tokens") if isinstance(details, Mapping) else None
+            )
+            if reported_reasoning is not None:
+                reasoning_tokens: int | None = int(reported_reasoning)
+            else:
+                inferred = total_tokens - prompt_tokens - completion_tokens
+                reasoning_tokens = inferred if inferred > 0 else 0
+
+            billed_floor = prompt_tokens + completion_tokens + reasoning_tokens
+            if total_tokens < billed_floor:
+                total_tokens = billed_floor
         else:
             # Fallback estimation if endpoint omitted usage block
             est_input = max(1, sum(len(m.get("content", "")) for m in messages) // 4)
@@ -231,6 +252,8 @@ class GrokStreamingProvider:
             prompt_tokens = est_input
             completion_tokens = est_output
             total_tokens = est_input + est_output
+            # 估算分支无法得知思考开销，显式留空而不是编造数字。
+            reasoning_tokens = None
 
         provenance = ModelCallProvenance(
             provider="grok",
@@ -242,6 +265,7 @@ class GrokStreamingProvider:
             total_tokens=total_tokens,
             input_tokens=prompt_tokens,
             output_tokens=completion_tokens,
+            reasoning_tokens=reasoning_tokens,
             provider="grok",
             model=chosen_model,
             request_id=request_id,
