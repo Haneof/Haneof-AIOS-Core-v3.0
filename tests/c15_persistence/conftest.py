@@ -37,8 +37,19 @@ import pytest
 
 
 def pytest_collection_modifyitems(config: Any, items: list[Any]) -> None:
-    if sys.platform == "win32":
-        for item in items:
+    """Skip only THIS package's tests on Windows.
+
+    ``pytest_collection_modifyitems`` is a global hook: it receives every
+    collected item, not just the ones under this directory. The previous
+    implementation therefore skipped the *entire* suite on win32, which made
+    ``pytest tests`` look green locally while covering nothing at all.
+    """
+    if sys.platform != "win32":
+        return
+    package_root = Path(__file__).resolve().parent
+    for item in items:
+        item_path = Path(str(getattr(item, "path", item.fspath))).resolve()
+        if package_root in item_path.parents:
             item.add_marker(
                 pytest.mark.skip(
                     reason="c15_persistence harness requires Linux container/mount/fcntl support"
