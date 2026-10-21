@@ -56,8 +56,32 @@ def _json_value(raw: str) -> Any:
     return json.loads(raw)
 
 
-def _emit(value: Any, *, stream: Any = sys.stdout) -> None:
+def _emit(value: Any, *, stream: Any = None) -> None:
+    # Resolve sys.stdout at call time (not import time) so stream redirection —
+    # including pytest's capsys — is honoured.
+    if stream is None:
+        stream = sys.stdout
     print(json.dumps(value, ensure_ascii=False, sort_keys=True, default=str), file=stream)
+
+
+def _summarize_dimension_result(value: Any) -> Any:
+    """Return a compact, stable JSON shape for a dimension-summary result.
+
+    ``None`` means the caller skipped dimension summaries; a dict is the
+    "handler not configured" skip note; otherwise ``value`` is the scheduler's
+    ``SummaryScheduleResult`` and only its counts are exposed.
+    """
+    if value is None:
+        return None
+    if isinstance(value, dict):
+        return dict(value)
+    return {
+        "attempted": len(getattr(value, "attempted_jobs", ())),
+        "commits": len(getattr(value, "commits", ())),
+        "skipped_unchanged": len(getattr(value, "skipped_unchanged", ())),
+        "skipped_empty": len(getattr(value, "skipped_empty", ())),
+        "truncated": bool(getattr(value, "truncated", False)),
+    }
 
 
 def _global_parser() -> argparse.ArgumentParser:
@@ -148,7 +172,32 @@ def _global_parser() -> argparse.ArgumentParser:
     due.add_argument("--at", help="Aware ISO-8601 processing time; defaults to now.")
     due.add_argument("--max-wakes", type=int, default=8)
     due.add_argument("--skip-periodic-review", action="store_true")
+    due.add_argument("--skip-dimension-summaries", action="store_true")
     due.add_argument("--token-budget", type=int)
+
+    serve = sub.add_parser(
+        "serve",
+        help=(
+            "Run the maintenance scheduler loop: dispatch due wakes, run periodic "
+            "review and semantic dimension summaries on a fixed interval."
+        ),
+    )
+    serve.add_argument(
+        "--interval",
+        type=float,
+        default=300.0,
+        help="Seconds to sleep between maintenance cycles (default: 300).",
+    )
+    serve.add_argument(
+        "--max-cycles",
+        type=int,
+        default=0,
+        help="Stop after N cycles; 0 (default) runs until interrupted.",
+    )
+    serve.add_argument("--max-wakes", type=int, default=8)
+    serve.add_argument("--skip-periodic-review", action="store_true")
+    serve.add_argument("--skip-dimension-summaries", action="store_true")
+    serve.add_argument("--token-budget", type=int)
 
     inspect_turn = sub.add_parser(
         "inspect-turn",
@@ -247,6 +296,64 @@ def _build_core(args: argparse.Namespace) -> HeadlessCore:
     )
 
 
+def _run_serve(core: HeadlessCore, args: argparse.Namespace) -> dict[str, Any]:
+    """Run the maintenance loop until interrupted or ``--max-cycles`` is reached.
+
+    Each cycle dispatches due wakes, runs periodic review and (unless skipped)
+    the semantic dimension-summary ladder. One line of JSON is emitted per cycle
+    so a supervisor (systemd / Task Scheduler / cron wrapper) can follow progress.
+    """
+    import time
+
+    cycles = 0
+    total_wakes = 0
+    total_reviews = 0
+    total_dimension_commits = 0
+    interrupted = False
+    try:
+        while True:
+            if args.max_cycles and cycles >= args.max_cycles:
+                break
+            moment = datetime.now(timezone.utc)
+            result = core.process_due_work(
+                now=moment,
+                max_wakes=args.max_wakes,
+                include_periodic_review=not args.skip_periodic_review,
+                include_dimension_summaries=not args.skip_dimension_summaries,
+                token_budget=args.token_budget,
+            )
+            cycles += 1
+            total_wakes += len(result.wakes)
+            if result.periodic_review is not None:
+                total_reviews += 1
+            dimension = _summarize_dimension_result(result.dimension_summaries)
+            if isinstance(dimension, dict):
+                total_dimension_commits += int(dimension.get("commits", 0) or 0)
+            _emit(
+                {
+                    "status": "serve_cycle",
+                    "cycle": cycles,
+                    "at": moment.isoformat(),
+                    "wakes": len(result.wakes),
+                    "periodic_review": result.periodic_review is not None,
+                    "dimension_summaries": dimension,
+                }
+            )
+            if args.max_cycles and cycles >= args.max_cycles:
+                break
+            time.sleep(max(float(args.interval), 0.0))
+    except KeyboardInterrupt:
+        interrupted = True
+    return {
+        "status": "serve_stopped",
+        "interrupted": interrupted,
+        "cycles": cycles,
+        "total_wakes": total_wakes,
+        "total_periodic_reviews": total_reviews,
+        "total_dimension_commits": total_dimension_commits,
+    }
+
+
 def _run(args: argparse.Namespace) -> dict[str, Any]:
     if args.command in {"recovery-status", "rebuild-index", "backup", "restore"}:
         config = _build_recovery_config(args)
@@ -264,6 +371,9 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
     with core:
         if args.command == "status":
             return core.status()
+
+        if args.command == "serve":
+            return _run_serve(core, args)
 
         if args.command == "turn":
             result = core.submit_user_turn(
@@ -304,6 +414,7 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
                 now=_iso_time(args.at),
                 max_wakes=args.max_wakes,
                 include_periodic_review=not args.skip_periodic_review,
+                include_dimension_summaries=not args.skip_dimension_summaries,
                 token_budget=args.token_budget,
             )
             wakes = [
@@ -340,6 +451,9 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
                 "status": "due_processed",
                 "wakes": wakes,
                 "periodic_review": review,
+                "dimension_summaries": _summarize_dimension_result(
+                    result.dimension_summaries
+                ),
                 "world_revision": status["world_revision"],
                 "index_watermark": status["index_watermark"],
             }
