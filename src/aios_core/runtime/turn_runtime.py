@@ -4025,6 +4025,8 @@ class FusedTurnRuntime:
             limit=effective_recommendation_limit,
             history_needed=topic_state.history_may_help,
             antecedent_fallback=topic_state.antecedent_recall_needed,
+            memory_directive_reference=topic_state.memory_directive_reference,
+            current_utterance=user_input,
             as_of=occurred_at,
         )
 

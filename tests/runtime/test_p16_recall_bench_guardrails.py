@@ -415,21 +415,23 @@ def test_compliance_verdict_pass_when_gate_open_within_limits() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_exhaustion_probe_loses_topic_inheritance_after_eviction(tmp_path: Path) -> None:
-    """主题继承探针 —— 把「上下文耗尽后指代型追问丢失主题继承」固化为可见信号。
+def test_exhaustion_probe_resolves_memory_directive_after_eviction(tmp_path: Path) -> None:
+    """主题继承探针 —— 耗尽后指代型追问必须仍有一条可解析的路径。
 
-    宪法 3.2（主题来源）：上一轮讨论某话题、下一轮用户只说指代型追问时，
-    只要会话连续性仍然明确，当前主题仍应保持。P16 exhaustion 场景把 anchor
-    挤出上下文后用指代型追问（RECALL_QUESTION）探测主题是否仍然继承。
+    历史：本测试原名 ``test_exhaustion_probe_loses_topic_inheritance_after_eviction``，
+    当时断言的是**真实缺口**（topic_inherited=False、history_not_needed、0 张卡片），
+    作为「行为一变即报警」的探针。2026-10-21 修掉第 3 层后该断言按设计变红，
+    因此在这里改为断言修复后的契约。
 
-    真实观测（2026-10-20 hermetic 复跑）：anchor 被挤出后，指代型追问解析出的
-    current_topic 就是追问本身，与 anchor 话题无关 ——
-    topic_inherited=False、topic_state_reason="current_utterance_topic:
-    history_not_needed"、continued_from_recent_turn=False、本轮 0 张记忆卡片。
-    即「上下文耗尽后指代型追问丢失主题继承」是真实缺口。
+    修复后的契约（宪法 3.2 + 十四-9）：
+    - Core **不**把 current_topic 改写成猜测的 anchor 话题（topic_inherited 仍为
+      False）——指代对象由模型判断，Core 不替它认定；
+    - 但 Core 必须暴露有界候选，让模型不必先盲搜：``antecedent_recall_needed=True``、
+      ``memory_cards_count >= 1``、reason 同时含 ``antecedent_candidate_recall``
+      与 ``memory_directive``。
 
-    本测试是观测断言、不是要求它通过：一旦被测行为改变（无论修好还是回归），
-    这里会红，从而逼出人工复核 —— 这正是固化成测试的目的。
+    本测试仍是观测断言：无论「又退回 0 卡片」还是「Core 开始擅自改写主题」，
+    这里都会红，逼出人工复核。
     """
     runtime = _build_hermetic_world(tmp_path, recent_turn_limit=3)
     session_id = "p16_guardrail_topic_probe"
@@ -451,13 +453,17 @@ def test_exhaustion_probe_loses_topic_inheritance_after_eviction(tmp_path: Path)
     assert topic_probe["reason"] is None
     assert probe_obs.observation_error is None
 
-    # 观测断言（真实缺口，详见 docstring）。
+    # Core 不猜指代对象：主题仍是用户这句本身。
     assert topic_probe["topic_inherited"] is False
     assert topic_probe["continued_from_recent_turn"] is False
-    assert probe_obs.topic_state_reason is not None
-    assert "history_not_needed" in probe_obs.topic_state_reason
-    assert probe_obs.memory_cards_count == 0
     assert probe_obs.topic_gate_open is True
+
+    # 但必须留下可解析路径：门开、有界候选、原因可审计。
+    assert probe_obs.topic_state_reason is not None
+    assert "antecedent_candidate_recall" in probe_obs.topic_state_reason
+    assert "memory_directive" in probe_obs.topic_state_reason
+    assert probe_obs.memory_cards_count >= 1
+    assert probe_obs.memory_cards_count <= 3  # recent_turn_limit=3 的上界
 
 
 # ---------------------------------------------------------------------------

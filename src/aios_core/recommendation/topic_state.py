@@ -21,6 +21,7 @@ class TopicState(BaseModel):
     reason: str
     continued_from_recent_turn: bool = False
     antecedent_recall_needed: bool = False
+    memory_directive_reference: bool = False
 
 
 _SOCIAL_ONLY = {
@@ -49,6 +50,24 @@ _DEICTIC_CUES = (
     "那天", "那次", "那个时候", "那件事", "那趟", "那场", "那个安排", "那个计划", "当时",
     "that day", "that time", "that trip", "that meeting", "that event", "that plan",
     "the other day", "back then",
+)
+
+# Meta-discourse reference to a prior *memory act* ("我刚才让你记住的那句话").
+#
+# Such an utterance names the act of remembering, never the remembered content, so
+# it can never be resolved by lexical overlap with the current sentence: the words
+# the user says ("城市/产品") and the words of the anchor ("杭州/手环") do not
+# intersect at all. Treating it as ordinary topic text is why the anchor used to be
+# unreachable once it slid out of the recent-turn window.
+#
+# The test is compositional on purpose — one memory-act token AND one prior-reference
+# token. A flat list of longer phrases would keep missing natural paraphrases, while a
+# single act token alone would open recall for self-contained sentences such as
+# "请记住这句话：X" or "我记住了". Composition keeps ordinary memory directives out.
+_MEMORY_ACT_CUES = ("记住", "记下", "记一下", "记下来", "记的", "记过", "remember")
+_PRIOR_REFERENCE_CUES = (
+    "刚才", "刚刚", "之前", "上次", "前面", "让你", "叫你", "我让", "我说过", "我说的话",
+    "那句", "那条", "那个话", "earlier", "before",
 )
 
 
@@ -103,6 +122,19 @@ def _has_same_session_continuation_cue(value: str) -> bool:
     )
 
 
+def _has_memory_directive_reference(value: str) -> bool:
+    """Detect a reference to a prior memory act, not to remembered content.
+
+    "我刚才让你记住的那句话" contains neither the anchor's entity nor its topic; it
+    only points at the act of remembering. Core may therefore expose a bounded
+    candidate set for the resident model to resolve, but must not guess the referent.
+    """
+
+    if not any(cue in value for cue in _MEMORY_ACT_CUES):
+        return False
+    return any(cue in value for cue in _PRIOR_REFERENCE_CUES)
+
+
 class TopicStateService:
     def resolve(
         self,
@@ -128,6 +160,7 @@ class TopicStateService:
         same_session_continuation_cue = _has_same_session_continuation_cue(lower)
         cross_session_continuation_cue = _has_discourse_continuation_cue(lower)
         deictic_cue = any(cue in lower for cue in _DEICTIC_CUES)
+        memory_directive_reference = _has_memory_directive_reference(lower)
         explicit = _clean(explicit_topic)
 
         continued = bool(previous and same_session_continuation_cue)
@@ -136,6 +169,7 @@ class TopicStateService:
         # reason to expose a small, auditable cross-session candidate set.
         antecedent_recall_needed = bool(
             deictic_cue
+            or memory_directive_reference
             or (cross_session_continuation_cue and previous is None)
         )
 
@@ -163,6 +197,8 @@ class TopicStateService:
         )
         if antecedent_recall_needed:
             reason = f"{reason}:antecedent_candidate_recall"
+            if memory_directive_reference:
+                reason = f"{reason}:memory_directive"
         if structured_history_signal and structured_signal_reason:
             reason = f"{reason}:{structured_signal_reason.strip()}"
         return TopicState(
@@ -172,4 +208,5 @@ class TopicStateService:
             reason=reason if history_may_help else f"{reason}:history_not_needed",
             continued_from_recent_turn=continued,
             antecedent_recall_needed=antecedent_recall_needed,
+            memory_directive_reference=memory_directive_reference,
         )
