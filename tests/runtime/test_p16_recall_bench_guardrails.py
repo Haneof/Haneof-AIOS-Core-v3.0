@@ -559,3 +559,110 @@ def test_measured_rounds_still_judge_when_one_observation_failed() -> None:
     assert compliance["measured_rounds"] == 1
     assert compliance["unmeasured_rounds"] == 1
     assert compliance["violations"] == []
+
+
+# ---------------------------------------------------------------------------
+# 第 7 项：round-summary 链必须真的落盘（tzdata / 时区契約）
+# ---------------------------------------------------------------------------
+
+
+def test_round_summary_chain_actually_persists(tmp_path: Path) -> None:
+    """轮总结链必须真的把 SUMMARY 对象写进世界库，而不是静默丢失。
+
+    这是一次真实事故的回归锁：Windows 不附带 IANA 时区数据库，而
+    ``zoneinfo`` 在无数据库时对**任何**时区名都抛 ZoneInfoNotFoundError
+    （连 ``Asia/Shanghai`` 也一样）。AIOS 在 ``src/aios_core/context/
+    continuity.py`` 等处显式构造 ``TemporalExtent(timezone_name="UTC")``，
+    于是在缺 tzdata 的机器上，每轮总结都在写库前抛 ValidationError，
+    ``round_summary_handler`` 照常被调用、返回值照常生成，但 SUMMARY 对象
+    一条都落不了盘 —— 失败只记在 ``continuity_summary_error``，主流程无感。
+
+    后果：分层记忆（轮总结 → 日/周/月/季…）在最需要它的长会话里整体失效，
+    而 Linux CI 因自带系统时区库全程绿灯，缺陷永远不上 CI。
+
+    本测试不假设触发轮数（与 summary_chunk_turns / token 门槛相关），
+    只驱动到"出现 SUMMARY 为止"，并设上限防止永远等不到。
+    """
+    from aios_core.contracts.enums import ObjectType
+
+    runtime = _build_hermetic_world(tmp_path, recent_turn_limit=8)
+    session_id = "p16_guardrail_summary_chain"
+
+    # 让总结内容可辨识，便于断言真的来自 handler 而不是别处。
+    seen: list[str] = []
+
+    def _summary_handler(_request: Any) -> str:
+        text = "（总结）用户此前要求记住 23cm 柔性屏手环与杭州。"
+        seen.append(text)
+        return text
+
+    runtime.round_summary_handler = _summary_handler
+
+    store = runtime.store
+    summary_count = 0
+    first_at: int | None = None
+    last_error: str | None = None
+
+    max_turns = 40  # 触发点由 chunk/token 门槛决定，留足余量但不无限等。
+    for turn_index in range(1, max_turns + 1):
+        if turn_index == 1:
+            user_input = f"请记住这句话：{bench.ANCHOR_FACT}"
+        else:
+            user_input = bench.FILLER_QUESTIONS[(turn_index - 2) % len(bench.FILLER_QUESTIONS)]
+        result = runtime.run_turn(
+            session_id=session_id,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=_FIXED_NOW,
+        )
+        if result.continuity_summary_error:
+            last_error = result.continuity_summary_error
+        summary_count = len(
+            store.list_payloads(object_type=ObjectType.SUMMARY, subject_id="user_1")
+        )
+        if summary_count:
+            first_at = turn_index
+            break
+
+    assert not last_error, (
+        f"总结链在写库前失败（tzdata/时区問題的典型信号）：{last_error}"
+    )
+    assert seen, "round_summary_handler 从未被调用，总结链根本没触发"
+    assert first_at is not None, (
+        f"跑了 {max_turns} 轮仍无 SUMMARY 落盘，总结链疑似整体失效"
+    )
+    assert summary_count >= 1
+
+
+def test_tzdata_is_a_declared_runtime_dependency() -> None:
+    """``tzdata`` 必须留在正式依赖里。
+
+    ``zoneinfo`` 在 Windows 上没有系统时区库可读，必须靠 tzdata 包提供 IANA
+    数据库。上一项测试锁的是行为，本项锁的是**别让依赖被删掉** —— 否则行为
+    测试会在有系统库的机器上继续绿，而在用户机器上复发。
+    """
+    pyproject = Path(__file__).resolve().parents[2] / "pyproject.toml"
+    assert pyproject.is_file(), f"找不到 pyproject.toml：{pyproject}"
+    text = pyproject.read_text(encoding="utf-8")
+
+    # 只检查 dependencies 段，避免 optional/dev 依赖造成误判。
+    in_dependencies = False
+    declared = False
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if line.startswith("dependencies"):
+            in_dependencies = True
+            continue
+        if in_dependencies:
+            if line.startswith("]"):
+                break
+            if line.startswith("#") or not line:
+                continue
+            if line.strip("\"' ,").startswith("tzdata"):
+                declared = True
+                break
+
+    assert declared, (
+        "pyproject.toml 的 [project].dependencies 未声明 tzdata。"
+        "缺它会导致 zoneinfo 在 Windows 上不可用，总结链静默失效。"
+    )
