@@ -206,6 +206,144 @@ def _render_standing_constraints(identity: Any) -> str:
     return "\n".join(lines)
 
 
+def _render_turn_grounding(task_context: Any) -> str:
+    """Render what this turn can cite and which history routes exist.
+
+    Two things lived here and never reached the model:
+
+    1. ``current_user_observation_ref`` — the exact evidence reference a cognition
+       writeback must cite. Without it the resident had to search first, or guess,
+       before it could persist anything. That is a mechanical reason "records nothing"
+       looked like "understands nothing".
+    2. ``conversation_continuity`` — the names of the summary index, summary search
+       and raw drill-down routes. A model that does not know it can look something up
+       answers "I don't remember"; one that does, looks it up.
+
+    Deliberately excluded: ``topic_state`` and ``cognitive_policy_context``. Those are
+    Core's own gating decisions and policy parameters — audit material, not facts the
+    model should be reasoning over, and showing them invites it to argue with the gate.
+    """
+    if not isinstance(task_context, Mapping) or not task_context:
+        return ""
+
+    lines: list[str] = []
+
+    observation = task_context.get("current_user_observation_ref")
+    if isinstance(observation, Mapping):
+        object_id = str(observation.get("object_id") or "").strip()
+        revision = observation.get("revision")
+        if object_id and revision is not None:
+            lines.append(
+                "current user observation: "
+                f"{{object_id: {object_id}, revision: {revision}}} "
+                "— cite this as evidence when you persist a durable claim this turn"
+            )
+
+    continuity = task_context.get("conversation_continuity")
+    if isinstance(continuity, Mapping):
+        recent = continuity.get("recent_turn_count")
+        summaries = continuity.get("round_summary_count")
+        routes = [
+            f"{label}={continuity[key]}"
+            for key, label in (
+                ("summary_index_capability", "list"),
+                ("summary_search_capability", "search"),
+                ("raw_drill_down_capability", "exact words"),
+            )
+            if continuity.get(key)
+        ]
+        counts = []
+        if recent is not None:
+            counts.append(f"{recent} verbatim turns in view")
+        if summaries is not None:
+            counts.append(f"{summaries} round summaries")
+        detail = ", ".join(counts)
+        if routes:
+            lines.append(
+                "history available: "
+                + (f"{detail}; " if detail else "")
+                + "use "
+                + ", ".join(routes)
+                + " — check before saying you do not remember"
+            )
+        elif detail:
+            lines.append("history available: " + detail)
+
+    anchors = task_context.get("related_execution_anchors")
+    if isinstance(anchors, (list, tuple)) and anchors:
+        rendered: list[str] = []
+        for anchor in anchors[:5]:
+            if not isinstance(anchor, Mapping):
+                continue
+            label = (
+                str(anchor.get("title") or anchor.get("content") or anchor.get("object_id") or "")
+                .strip()
+            )
+            if label:
+                rendered.append(f"- {label[:200]}")
+        if rendered:
+            lines.append("work already in flight on this topic:\n" + "\n".join(rendered))
+
+    return "\n".join(lines)
+
+
+def _render_world_map(world_map: Any, *, max_dimensions: int = 12) -> str:
+    """Render the L0 world directory: what exists, never what it means.
+
+    The cockpit carried a dimension directory every turn and the model never saw it,
+    so it had no idea how large the world it could search actually was, or which
+    dimensions were active. The map is structure only (``directory_only: true``,
+    ``semantic_conclusions: false``); the meaning stays in the objects, behind search.
+    """
+    if not isinstance(world_map, Mapping) or not world_map:
+        return ""
+    dimensions = world_map.get("dimensions")
+    if not isinstance(dimensions, (list, tuple)) or not dimensions:
+        return ""
+
+    lines: list[str] = []
+    for dimension in dimensions[:max_dimensions]:
+        if not isinstance(dimension, Mapping):
+            continue
+        key = str(dimension.get("dimension") or "").strip()
+        if not key:
+            continue
+        count = dimension.get("current_object_count")
+        kinds = dimension.get("object_types")
+        kind_text = (
+            "/".join(str(item) for item in kinds[:3])
+            if isinstance(kinds, (list, tuple)) and kinds
+            else ""
+        )
+        name = str(dimension.get("name") or "").strip()
+        label = f"{name} ({key})" if name else key
+        detail = []
+        if count is not None:
+            detail.append(f"{count} objects")
+        if kind_text:
+            detail.append(kind_text)
+        lines.append(f"- {label}" + (f": {', '.join(detail)}" if detail else ""))
+
+    if not lines:
+        return ""
+
+    total = world_map.get("dimension_count")
+    header = (
+        f"{total} active dimensions" if total is not None else f"{len(lines)} active dimensions"
+    )
+    if world_map.get("truncated"):
+        header += " (directory truncated)"
+
+    expand = world_map.get("expand_capabilities")
+    if isinstance(expand, Mapping) and expand:
+        routes = ", ".join(
+            f"{purpose}={capability}" for purpose, capability in list(expand.items())[:6]
+        )
+        lines.append("expand with: " + routes)
+
+    return header + "\n" + "\n".join(lines)
+
+
 def _render_conversation_summaries(
     summaries: Any, *, max_chars: int = _MAX_SUMMARY_CHARS
 ) -> str:
@@ -509,11 +647,25 @@ class GrokStreamingProvider:
                 ]
             )
 
+            grounding = _render_turn_grounding(snapshot.cockpit.get("task_context"))
+            if grounding:
+                system_sections.append(
+                    "THIS TURN — GROUNDING (what you can cite, and how to reach the "
+                    "rest of the history):\n" + grounding
+                )
+
+            world_map = _render_world_map(snapshot.cockpit.get("world_map"))
+            if world_map:
+                system_sections.append(
+                    "WORLD MAP (L0 directory — what exists, not what it means; open a "
+                    "dimension only when the turn needs it):\n" + world_map
+                )
+
             if snapshot.cockpit:
                 # Scalars only. Structured blocks (recent_turns / memory_cards /
-                # conversation_summaries / ai_identity) are rendered explicitly
-                # below; identity keys are excluded here so they cannot appear as
-                # a duplicated, unreferenced scalar dump.
+                # conversation_summaries / ai_identity / world_map / task_context)
+                # are rendered explicitly above or below; identity keys are excluded
+                # here so they cannot appear as a duplicated, unreferenced dump.
                 summary_items = []
                 for k, v in snapshot.cockpit.items():
                     if (
