@@ -478,3 +478,42 @@ def test_headless_restart_keeps_fix001_historical_knowledge_cut(tmp_path):
         assert probe.calls == 2
     finally:
         restarted.stop()
+
+
+# ---------------------------------------------------------------------------
+# 分层记忆降级必须可见（宪法对齐审计 2026-10-21 / P0-3）
+# ---------------------------------------------------------------------------
+
+
+def test_missing_summary_handlers_are_announced_not_silent(capsys):
+    """总结 handler 缺省时必须显式告警，不允许分层记忆静默空转。
+
+    事故背景：``round_summary_handler`` / ``dimension_summary_handler`` 默认
+    为 None，而分层记忆（轮总结 → 日/周/月/季/半年/年 → 3年/5年/10年，见
+    ``summaries/scheduler.py`` 的 ``SummaryScale``）完全由它们驱动。缺省时
+    Core 安静地不产生任何 SUMMARY：``recent_turns`` 滑出窗口后，模型既看不到
+    原始对话、也没有总结可读，长会话连续性直接断档 —— 表现就是「AI 记不住」，
+    而使用者无从判断是模型不行还是根本没配。
+
+    Core 允许 None 是架构自由（不绑定具体模型），但生产入口必须把降级说出来。
+    """
+    from aios_core.headless.cli import _warn_on_missing_summary_handlers
+
+    # 两个都缺：必须同时点名两项
+    _warn_on_missing_summary_handlers(None, None)
+    err = capsys.readouterr().err
+    assert "--round-summary-handler" in err
+    assert "--dimension-summary-handler" in err
+    assert "分层记忆" in err
+
+    # 只缺维度总结：只点名缺的那一项
+    _warn_on_missing_summary_handlers(lambda _req: "x", None)
+    err = capsys.readouterr().err
+    assert "--dimension-summary-handler" in err
+    assert "--round-summary-handler" not in err
+
+    # 都提供：不得有任何噪音
+    _warn_on_missing_summary_handlers(lambda _req: "x", lambda _req: "y")
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    assert captured.out == ""
