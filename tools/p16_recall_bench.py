@@ -611,15 +611,24 @@ def _evaluate_constitutional_compliance(
     - no_full_load_every_turn（十四-3 / 十四-4 / 十四-8）：单轮卡片数
       超过推荐上限或超过 recent_turn_limit，即「每轮全量加载」迹象。
 
-    拿不到观测数据（轮次异常或运行时未暴露）的轮次不计入判定；
-    全部轮次都拿不到时整体标 NOT_MEASURED，不伪装成 PASS。
+    拿不到观测数据（轮次异常、观测提取失败或运行时未暴露）的轮次不计入
+    判定；全部轮次都拿不到时整体标 NOT_MEASURED，不伪装成 PASS。
+
+    注意：``observation_error`` 必须与字段缺失同等对待。否则一轮观测提取
+    失败、但残留了部分非 None 字段时，该轮会被误判为「已测量」，从而把
+    观测失败洗成绿灯 —— 这与 NOT_MEASURED 的设计目的直接冲突。
     """
     violations: list[dict[str, Any]] = []
     measured = 0
     unmeasured = 0
     for sess in sessions:
         for r in sess.rounds:
-            if r.error is not None or r.memory_cards_count is None or r.topic_gate_open is None:
+            if (
+                r.error is not None
+                or r.observation_error is not None
+                or r.memory_cards_count is None
+                or r.topic_gate_open is None
+            ):
                 unmeasured += 1
                 continue
             measured += 1
