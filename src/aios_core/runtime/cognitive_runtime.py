@@ -26,12 +26,16 @@ class ModelUsage:
     total_tokens: int
     input_tokens: int | None = None
     output_tokens: int | None = None
+    # 思考模型（如 Gemini 3 系列）的 total_tokens 含 reasoning 消耗，而
+    # completion_tokens 只计最终可见输出。若这里留空，思考开销会被静默吞掉，
+    # 成本核算严重低估。默认 None 表示上游未报告，保持向后兼容。
+    reasoning_tokens: int | None = None
     provider: str | None = None
     model: str | None = None
     request_id: str | None = None
 
     def __post_init__(self) -> None:
-        for field_name in ("total_tokens", "input_tokens", "output_tokens"):
+        for field_name in ("total_tokens", "input_tokens", "output_tokens", "reasoning_tokens"):
             value = getattr(self, field_name)
             if value is None:
                 continue
@@ -40,10 +44,11 @@ class ModelUsage:
         if (
             self.input_tokens is not None
             and self.output_tokens is not None
-            and self.total_tokens < self.input_tokens + self.output_tokens
+            and self.total_tokens
+            < self.input_tokens + self.output_tokens + int(self.reasoning_tokens or 0)
         ):
             raise ValueError(
-                "total_tokens must cover reported input_tokens + output_tokens"
+                "total_tokens must cover reported input_tokens + output_tokens + reasoning_tokens"
             )
         for field_name in ("provider", "model", "request_id"):
             value = getattr(self, field_name)

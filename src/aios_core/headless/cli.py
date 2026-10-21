@@ -175,6 +175,42 @@ def _build_recovery_config(args: argparse.Namespace) -> HeadlessConfig:
     )
 
 
+def _warn_on_missing_summary_handlers(
+    round_summary_handler: Any,
+    dimension_summary_handler: Any,
+) -> None:
+    """总结 handler 缺省时显式告警，不允许分层记忆静默空转。
+
+    分层记忆（轮总结 → 日/周/月/季/半年/年 → 3年/5年/10年，见
+    ``summaries/scheduler.py`` 的 ``SummaryScale`` 阶梯）完全由这两个 handler
+    驱动。二者为 None 时 Core 会安静地不产生任何 SUMMARY：
+
+    * ``recent_turns`` 只保留最近 ``recent_turn_limit`` 轮，滑出后模型看不到原话；
+    * 又没有总结可看，于是「上下文耗尽后靠上层总结接上」的连续性直接断掉。
+
+    Core 允许 None 是合理的架构自由（不绑定具体模型），但**生产入口**必须把
+    这个降级说出来。否则表现就是「AI 记不住」，而使用者无从判断是模型不行、
+    还是根本没配。属于观测缺失，不是功能缺失。
+    """
+
+    missing: list[str] = []
+    if round_summary_handler is None:
+        missing.append("--round-summary-handler")
+    if dimension_summary_handler is None:
+        missing.append("--dimension-summary-handler")
+    if not missing:
+        return
+
+    print(
+        "[aios-core] WARNING: 未提供 "
+        + " / ".join(missing)
+        + "，分层记忆将不会产生任何 SUMMARY。"
+        "recent_turns 滑出窗口后，模型既看不到原始对话、也没有总结可读，"
+        "长会话连续性会断档。若这是有意的轻量运行，可忽略本提示。",
+        file=sys.stderr,
+    )
+
+
 def _build_core(args: argparse.Namespace) -> HeadlessCore:
     if not args.world:
         raise HeadlessConfigurationError(
@@ -195,6 +231,9 @@ def _build_core(args: argparse.Namespace) -> HeadlessCore:
         if not args.dimension_summary_handler
         else load_model_handler(args.dimension_summary_handler)
     )
+
+    _warn_on_missing_summary_handlers(round_summary, dimension_summary)
+
     return HeadlessCore(
         config=HeadlessConfig(
             world_path=Path(args.world),

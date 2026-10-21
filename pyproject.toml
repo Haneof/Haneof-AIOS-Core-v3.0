@@ -10,6 +10,13 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
   "pydantic>=2.10,<3",
+  # Windows 不附带 IANA 时区数据库，而 `zoneinfo` 在无数据库时对任何时区名
+  # 都抛 ZoneInfoNotFoundError。AIOS 内部多处构造 `TemporalExtent` 时显式写下
+  # timezone_name="UTC"（src/aios_core/context/continuity.py 等），缺了 tzdata
+  # 会让这些构造全部失败。典型事故：round-summary 链在 Windows 上逐轮抛
+  # ValidationError 并静默丢失全部总结，而 Linux CI 因自带系统时区库全绿，
+  # 缺陷因此永远不上 CI。按官方建议把 tzdata 列为正式依赖。
+  "tzdata>=2024.1",
 ]
 
 [project.optional-dependencies]

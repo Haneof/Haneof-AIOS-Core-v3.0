@@ -39,7 +39,12 @@ from aios_core.contracts.enums import SourceClass, WakePriority
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
 from aios_core.query.search import WorldSearchIndex
-from aios_core.runtime.cognitive_runtime import ModelDirective, RuntimeSnapshot
+from aios_core.runtime.cognitive_runtime import (
+    ModelCallProvenance,
+    ModelDirective,
+    ModelUsage,
+    RuntimeSnapshot,
+)
 from aios_core.runtime.edge_model_scheduler import (
     ModelTier,
     create_production_edge_scheduler,
@@ -289,6 +294,92 @@ def test_05b_missing_api_key_fails_closed():
         provider.stream_chat([{"role": "user", "content": "hi"}], model="grok-4.7")
 
 
+class _ReasoningSSEStubHandler(BaseHTTPRequestHandler):
+    """Emits a thinking-model usage block: total >> input + visible output.
+
+    Gemini 3 系列的 usage 里 total_tokens 含思考消耗，completion_tokens 只算
+    最终可见输出。这里用实测数据（16 / 8 / 312）复现该形态，验证 288 个思考
+    token 被显式记录而不是被静默吞掉。
+    """
+
+    protocol_version = "HTTP/1.0"
+
+    def do_POST(self):  # noqa: N802 - http.server API
+        length = int(self.headers.get("Content-Length") or 0)
+        if length:
+            self.rfile.read(length)
+
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+
+        chunks = [
+            {"id": "chatcmpl-reasoning-001", "choices": [{"delta": {"content": "OK"}}]},
+            {
+                "id": "chatcmpl-reasoning-001",
+                "choices": [],
+                "usage": {
+                    "prompt_tokens": 16,
+                    "completion_tokens": 8,
+                    "total_tokens": 312,
+                },
+            },
+        ]
+        for chunk in chunks:
+            self.wfile.write(f"data: {json.dumps(chunk)}\n\n".encode("utf-8"))
+            self.wfile.flush()
+        self.wfile.write(b"data: [DONE]\n\n")
+        self.wfile.flush()
+
+    def log_message(self, *args):  # silence test output
+        return
+
+
+@pytest.fixture
+def reasoning_sse_stub_server():
+    server = ThreadingHTTPServer(("127.0.0.1", 0), _ReasoningSSEStubHandler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield server
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
+def test_05c_reasoning_tokens_are_recorded_not_swallowed(reasoning_sse_stub_server):
+    """思考模型的 reasoning 消耗必须显式落在 ModelUsage 上（hermetic，无网络）。
+
+    旧行为把 output_tokens 记为 8，288 个思考 token 凭空消失，而
+    ``total >= input + output`` 恰好成立，因此没有任何告警，成本低估约 20 倍。
+    """
+    port = reasoning_sse_stub_server.server_address[1]
+    provider = GrokStreamingProvider(
+        GrokProviderConfig(
+            base_url=f"http://127.0.0.1:{port}/v1",
+            api_key="stub-key-for-tests",
+            timeout_seconds=10.0,
+        )
+    )
+
+    text, usage, _ = provider.stream_chat(
+        [{"role": "user", "content": "Think hard."}],
+        model="gemini-3-pro",
+    )
+
+    assert text == "OK"
+    assert usage.input_tokens == 16
+    assert usage.output_tokens == 8
+    assert usage.reasoning_tokens == 288
+    assert usage.total_tokens == 312
+    assert (
+        usage.total_tokens
+        >= usage.input_tokens + usage.output_tokens + usage.reasoning_tokens
+    )
+
+
 # ---------------------------------------------------------------------------
 # Live provider tests (opt-in, requires AIOS_LIVE_PROVIDER=1 + reachable endpoint)
 # ---------------------------------------------------------------------------
@@ -430,3 +521,76 @@ def test_04_cross_model_continuity_and_immutability(
         stored_payload["value"]
         == "用户在杭州设立了AIOS端侧硬件心智实验室，重点研发23cm柔性屏手环。"
     )
+
+
+# ---------------------------------------------------------------------------
+# Hermetic: prompt assembly must not drop the conversation
+# ---------------------------------------------------------------------------
+
+
+def test_model_handler_includes_recent_conversation_in_prompt():
+    """The system prompt must carry verbatim recent turns.
+
+    Regression guard: the prompt builder used to keep only scalar cockpit values,
+    so `recent_turns` (a list) never reached the model. The assistant then told
+    users it could not remember something it had just been told, and burned tool
+    rounds re-retrieving it.
+    """
+    provider = GrokStreamingProvider(GrokProviderConfig(api_key="prompt-test-key"))
+    captured: dict[str, object] = {}
+
+    def fake_stream_chat(messages, model=None):
+        captured["messages"] = messages
+        return (
+            "OK",
+            ModelUsage(
+                total_tokens=3,
+                input_tokens=2,
+                output_tokens=1,
+                provider="grok",
+                model="test-model",
+                request_id="req-test",
+            ),
+            ModelCallProvenance(provider="grok", model="test-model", request_id="req-test"),
+        )
+
+    provider.stream_chat = fake_stream_chat  # type: ignore[method-assign]
+
+    snapshot = RuntimeSnapshot(
+        user_input="我刚才让你记住的那句话里，我在哪个城市？",
+        wake_reason="user_explicit",
+        cockpit={
+            "current_topic": "recall",
+            "token_budget": 3400,
+            "estimated_tokens": 120,
+            "truncated": False,
+            "recent_turns": [
+                {
+                    "turn_index": 1,
+                    "user": {"text": "请记住：我在杭州做 23cm 柔性屏手环项目。"},
+                    "assistant": {"text": "已记录。"},
+                }
+            ],
+            "memory_cards": [
+                {
+                    "object_type": "observation",
+                    "dimension": "dim_work",
+                    "excerpt": "杭州 23cm 柔性屏手环项目",
+                }
+            ],
+        },
+        capability_catalog=(),
+        capability_history=(),
+        round_index=0,
+        remaining_tool_rounds=2,
+    )
+
+    provider.as_model_handler(model="test-model")(snapshot)
+    messages = captured["messages"]
+    system_prompt = messages[0]["content"]
+
+    assert "RECENT CONVERSATION" in system_prompt
+    assert "杭州" in system_prompt, "prior user turn was dropped from the prompt"
+    assert "[turn 1] user:" in system_prompt
+    assert "RELEVANT WORLD MEMORY" in system_prompt
+    assert "token_budget" not in system_prompt, "bookkeeping keys must not consume prompt budget"

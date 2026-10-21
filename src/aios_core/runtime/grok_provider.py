@@ -44,6 +44,57 @@ DEFAULT_API_KEY = os.environ.get("AIOS_GROK_API_KEY", "")
 DEFAULT_MODEL_PRIMARY = os.environ.get("AIOS_GROK_MODEL_PRIMARY", "grok-4.7")
 DEFAULT_MODEL_SECONDARY = os.environ.get("AIOS_GROK_MODEL_SECONDARY", "grok-4.5")
 
+# Cockpit keys that are bookkeeping rather than context; they only waste budget.
+_COCKPIT_SCALAR_SKIP = frozenset({"token_budget", "estimated_tokens", "truncated", "user_input"})
+_MAX_RECENT_CHARS = 6000
+_MAX_CARD_CHARS = 2000
+
+
+def _render_recent_turns(turns: Any, *, max_chars: int = _MAX_RECENT_CHARS) -> str:
+    """Render verbatim recent dialogue for the system prompt.
+
+    The cockpit carries ``recent_turns`` as a list of dicts. The scalar-only
+    filter that used to build the prompt dropped it entirely, so the model never
+    saw the conversation it was supposed to be continuing.
+    """
+    if not isinstance(turns, (list, tuple)) or not turns:
+        return ""
+    lines: list[str] = []
+    for turn in turns:
+        if not isinstance(turn, dict):
+            continue
+        idx = turn.get("turn_index")
+        user = turn.get("user") or {}
+        assistant = turn.get("assistant") or {}
+        user_text = str(user.get("text", "")).strip() if isinstance(user, dict) else ""
+        ai_text = str(assistant.get("text", "")).strip() if isinstance(assistant, dict) else ""
+        if user_text:
+            lines.append(f"[turn {idx}] user: {user_text}")
+        if ai_text:
+            lines.append(f"[turn {idx}] assistant: {ai_text}")
+    text = "\n".join(lines)
+    if len(text) > max_chars:
+        text = "…(earlier turns trimmed)…\n" + text[-max_chars:]
+    return text
+
+
+def _render_memory_cards(cards: Any, *, max_chars: int = _MAX_CARD_CHARS) -> str:
+    """Render proactively recommended world objects for the system prompt."""
+    if not isinstance(cards, (list, tuple)) or not cards:
+        return ""
+    lines: list[str] = []
+    for card in cards:
+        if not isinstance(card, dict):
+            continue
+        excerpt = str(card.get("excerpt", "")).strip()
+        if not excerpt:
+            continue
+        obj_type = card.get("object_type", "object")
+        dimension = card.get("dimension", "")
+        lines.append(f"- [{obj_type}/{dimension}] {excerpt[:400]}")
+    text = "\n".join(lines)
+    return text[-max_chars:] if len(text) > max_chars else text
+
 
 @dataclass(frozen=True)
 class GrokProviderConfig:
@@ -167,12 +218,33 @@ class GrokStreamingProvider:
         request_id = captured_id or f"grok-{int(time.time()*1000)}"
 
         # Compute usage
+        # reasoning_tokens 语义：None = 上游未报告（fallback 估算分支不得瞎猜）；
+        # 0 = 上游已报告且确无思考消耗；>0 = 显式记录的思考开销。
         if raw_usage:
             prompt_tokens = int(raw_usage.get("prompt_tokens", 0))
             completion_tokens = int(raw_usage.get("completion_tokens", 0))
             total_tokens = int(raw_usage.get("total_tokens", prompt_tokens + completion_tokens))
-            if total_tokens < prompt_tokens + completion_tokens:
-                total_tokens = prompt_tokens + completion_tokens
+
+            # 思考模型（如 Gemini 3 系列）的 total_tokens 含 reasoning 消耗，而
+            # completion_tokens 只计最终可见输出。优先采用厂商给出的明细字段，
+            # 缺失时用 total - input - output 反推，避免这部分开销被静默吞掉。
+            details = (
+                raw_usage.get("completion_tokens_details")
+                or raw_usage.get("output_tokens_details")
+                or {}
+            )
+            reported_reasoning = (
+                details.get("reasoning_tokens") if isinstance(details, Mapping) else None
+            )
+            if reported_reasoning is not None:
+                reasoning_tokens: int | None = int(reported_reasoning)
+            else:
+                inferred = total_tokens - prompt_tokens - completion_tokens
+                reasoning_tokens = inferred if inferred > 0 else 0
+
+            billed_floor = prompt_tokens + completion_tokens + reasoning_tokens
+            if total_tokens < billed_floor:
+                total_tokens = billed_floor
         else:
             # Fallback estimation if endpoint omitted usage block
             est_input = max(1, sum(len(m.get("content", "")) for m in messages) // 4)
@@ -180,6 +252,8 @@ class GrokStreamingProvider:
             prompt_tokens = est_input
             completion_tokens = est_output
             total_tokens = est_input + est_output
+            # 估算分支无法得知思考开销，显式留空而不是编造数字。
+            reasoning_tokens = None
 
         provenance = ModelCallProvenance(
             provider="grok",
@@ -191,6 +265,7 @@ class GrokStreamingProvider:
             total_tokens=total_tokens,
             input_tokens=prompt_tokens,
             output_tokens=completion_tokens,
+            reasoning_tokens=reasoning_tokens,
             provider="grok",
             model=chosen_model,
             request_id=request_id,
@@ -224,6 +299,10 @@ class GrokStreamingProvider:
             system_sections = [
                 "You are the AIOS 3.0 symbiotic mind on an ultra-compact wearable band.",
                 "CONSTITUTIONAL RULES:",
+                "0. The RECENT CONVERSATION block below is the verbatim dialogue. "
+                "If the answer is already visible there, answer from it directly — "
+                "never claim you cannot remember something that is in front of you, "
+                "and do not spend a tool round retrieving what you can already read.",
                 "1. If no response or action is warranted, output exactly '<AIOS_SILENCE>'.",
                 "2. If you need to invoke a registered capability, output a JSON block:",
                 "```json",
@@ -233,12 +312,27 @@ class GrokStreamingProvider:
             ]
 
             if snapshot.cockpit:
+                # Scalars only. Structured blocks (recent_turns / memory_cards /
+                # conversation_summaries) are lists and were silently dropped by
+                # this filter, which is why the model could not answer follow-up
+                # questions about things it had just been told.
                 summary_items = []
                 for k, v in snapshot.cockpit.items():
-                    if isinstance(v, (str, int, float, bool)):
+                    if isinstance(v, (str, int, float, bool)) and k not in _COCKPIT_SCALAR_SKIP:
                         summary_items.append(f"{k}: {v}")
                 if summary_items:
                     system_sections.append("ACTIVE COCKPIT CONTEXT:\n" + "\n".join(summary_items[:8]))
+
+            recent = _render_recent_turns(snapshot.cockpit.get("recent_turns"))
+            if recent:
+                system_sections.append(
+                    "RECENT CONVERSATION (verbatim, newest last — this is the real "
+                    "dialogue, treat it as ground truth):\n" + recent
+                )
+
+            cards = _render_memory_cards(snapshot.cockpit.get("memory_cards"))
+            if cards:
+                system_sections.append("RELEVANT WORLD MEMORY:\n" + cards)
 
             if snapshot.capability_catalog:
                 cat_desc = [
