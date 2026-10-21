@@ -517,3 +517,104 @@ def test_missing_summary_handlers_are_announced_not_silent(capsys):
     captured = capsys.readouterr()
     assert captured.err == ""
     assert captured.out == ""
+
+
+def test_due_work_runs_dimension_summaries_when_handler_configured(tmp_path):
+    """``due`` 维护周期必须真的驱动维度总结阶梯，而不是只有个空按钮。
+
+    事故背景：``run_due_dimension_summaries`` 存在但零调用方，``process_due_work``
+    只串了 wake dispatch + periodic review。结果「日/周/月/季/半年/年」这套
+    分层总结永远不跑 —— 这正是 owner 感觉「系统不会自己总结」的直接原因。
+    """
+    from aios_core.summaries.scheduler import SummaryScheduleResult
+
+    cfg = config(tmp_path)
+    core = HeadlessCore(
+        config=cfg,
+        model_handler=deterministic_model_handler,
+        dimension_summary_handler=lambda _req: "dimension summary text",
+    ).start()
+    try:
+        due = core.process_due_work(
+            now=T2,
+            max_wakes=0,
+            include_periodic_review=False,
+            include_dimension_summaries=True,
+        )
+        assert isinstance(due.dimension_summaries, SummaryScheduleResult)
+        assert not isinstance(due.dimension_summaries, dict)
+    finally:
+        core.stop()
+
+
+def test_due_work_skips_dimension_summaries_gracefully_without_handler(tmp_path):
+    """未配置维度总结 handler 时，due 周期必须给出可见的 skip，而不是整体崩溃。
+
+    轻量运行允许不配 handler（Core 的架构自由），但维护周期不能因此抛错，
+    否则 wake dispatch / periodic review 也被一起带崩。
+    """
+    cfg = config(tmp_path)
+    core = HeadlessCore(config=cfg, model_handler=deterministic_model_handler).start()
+    try:
+        due = core.process_due_work(
+            now=T2,
+            max_wakes=0,
+            include_periodic_review=False,
+            include_dimension_summaries=True,
+        )
+        assert isinstance(due.dimension_summaries, dict)
+        assert due.dimension_summaries.get("skipped") is True
+        assert "dimension_summary_handler" in due.dimension_summaries.get("reason", "")
+    finally:
+        core.stop()
+
+    # 显式跳过时必须返回 None，而不是 skip 记录。
+    core2 = HeadlessCore(config=cfg, model_handler=deterministic_model_handler).start()
+    try:
+        due2 = core2.process_due_work(
+            now=T2,
+            max_wakes=0,
+            include_periodic_review=False,
+            include_dimension_summaries=False,
+        )
+        assert due2.dimension_summaries is None
+    finally:
+        core2.stop()
+
+
+def test_serve_loop_runs_bounded_cycles_and_stops(capsys):
+    """``serve`` 就是「点火装置」：必须按 ``--max-cycles`` 跑完并干净停止。"""
+    from argparse import Namespace
+
+    from aios_core.headless.cli import _run_serve
+    from aios_core.headless.core import DueWorkResult
+
+    class StubCore:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def process_due_work(self, **kwargs):
+            self.calls += 1
+            return DueWorkResult(
+                wakes=(),
+                periodic_review=None,
+                dimension_summaries={"skipped": True, "reason": "stub"},
+            )
+
+    stub = StubCore()
+    args = Namespace(
+        interval=0.0,
+        max_cycles=2,
+        max_wakes=4,
+        skip_periodic_review=False,
+        skip_dimension_summaries=False,
+        token_budget=None,
+    )
+    summary = _run_serve(stub, args)
+    assert summary["status"] == "serve_stopped"
+    assert summary["cycles"] == 2
+    assert stub.calls == 2
+    assert summary["interrupted"] is False
+    lines = [ln for ln in capsys.readouterr().out.strip().splitlines() if ln]
+    assert len(lines) == 2
+    assert all('"serve_cycle"' in ln for ln in lines)

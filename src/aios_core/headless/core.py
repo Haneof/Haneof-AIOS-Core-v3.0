@@ -202,6 +202,11 @@ class _WriterLease:
 class DueWorkResult:
     wakes: tuple[WakeDispatchRunResult, ...]
     periodic_review: PeriodicReviewRunResult | None
+    # Semantic dimension summaries (DAY/WEEK/MONTH/... ladder). ``None`` when the
+    # caller asked to skip them; a small ``{"skipped": ...}`` mapping when the
+    # runtime has no ``dimension_summary_handler`` configured. Otherwise this is
+    # the scheduler's ``SummaryScheduleResult``.
+    dimension_summaries: Any | None = None
 
 
 class HeadlessCore:
@@ -333,6 +338,7 @@ class HeadlessCore:
         now: datetime,
         max_wakes: int = 8,
         include_periodic_review: bool = True,
+        include_dimension_summaries: bool = True,
         token_budget: int | None = None,
     ) -> DueWorkResult:
         if type(max_wakes) is not int or max_wakes < 0:
@@ -353,4 +359,18 @@ class HeadlessCore:
             if include_periodic_review
             else None
         )
-        return DueWorkResult(wakes=tuple(wakes), periodic_review=review)
+        dimension_summaries: Any | None = None
+        if include_dimension_summaries:
+            # ``run_due_dimension_summaries`` raises RuntimeError when no
+            # dimension_summary_handler is configured (lightweight runs). That is
+            # an expected configuration state, not a maintenance failure: record
+            # it as a visible skip instead of crashing the whole due cycle.
+            try:
+                dimension_summaries = runtime.run_due_dimension_summaries(now=moment)
+            except RuntimeError as exc:
+                dimension_summaries = {"skipped": True, "reason": str(exc)}
+        return DueWorkResult(
+            wakes=tuple(wakes),
+            periodic_review=review,
+            dimension_summaries=dimension_summaries,
+        )
