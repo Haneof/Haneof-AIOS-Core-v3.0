@@ -15,6 +15,14 @@ from aios_core.ingest.conversation import INTERACTION_DIMENSION
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
+# Index lookup tokens for a memory *act*. Each must be a single discriminative token
+# after CJK bi-gram tokenization — "记一下" would decompose into "记一/一下" and pull
+# in every sentence containing "一下", so it is only a validator, never a lookup key.
+_MEMORY_ACT_LOOKUP_TOKENS = ("记住", "记下", "remember")
+# The candidate must itself carry a directive, not merely mention remembering.
+_MEMORY_DIRECTIVE_MARKERS = ("记住", "记下", "记一下", "记下来", "remember")
+_MEMORY_DIRECTIVE_ANCHOR_LIMIT = 2
+
 
 class MemoryCard(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -55,6 +63,93 @@ class ProactiveMemoryRecommender:
         self.store = store
         self.default_limit = default_limit
 
+    def _memory_directive_anchors(
+        self,
+        *,
+        subject_id: str | None,
+        as_of: datetime | None,
+        limit: int,
+        current_utterance: str | None = None,
+    ) -> tuple[MemoryCard, ...]:
+        """Resolve "the sentence I asked you to remember" to the directive turn.
+
+        The referring sentence and the remembered sentence usually share no
+        vocabulary, so topic matching cannot find the anchor. What the reference does
+        name is the memory *act*. Look that act up as an index marker over durable user
+        dialogue and return the most recent bounded candidates. Core exposes, the
+        resident model still decides.
+        """
+
+        # The current user turn is already durable when recommendation runs, and it
+        # itself contains the memory-act words. It is never its own antecedent.
+        excluded_text = " ".join(str(current_utterance or "").split())
+
+        found: list[tuple[str, MemoryCard]] = []
+        seen: set[tuple[str, int]] = set()
+        for token in _MEMORY_ACT_LOOKUP_TOKENS:
+            page = self.index.recall_candidates(
+                token,
+                subject=subject_id,
+                object_types=(ObjectType.OBSERVATION.value,),
+                as_of=as_of,
+                limit=40,
+            )
+            for hit in page.hits:
+                ref = (hit.object_id, hit.revision)
+                if ref in seen:
+                    continue
+                try:
+                    payload = self.store.get_payload(
+                        hit.object_id, revision=hit.revision
+                    )
+                except StoreError as exc:
+                    if exc.code is not ErrorCode.NOT_FOUND:
+                        raise
+                    continue
+
+                metadata = payload.get("metadata")
+                if not isinstance(metadata, dict):
+                    metadata = {}
+                dimension = str(metadata.get("dimension") or "")
+                source_kind = str(payload.get("source_kind") or "").strip().casefold()
+                is_dialogue = (
+                    dimension == INTERACTION_DIMENSION
+                    or source_kind in {"conversation", "user_ai_interaction"}
+                )
+                # Only a user turn can carry a memory directive; assistant echoes and
+                # external observations are never the antecedent of "I asked you".
+                if not is_dialogue or str(metadata.get("role") or "") != "user":
+                    continue
+                text = str(payload.get("value") or "").casefold()
+                if not any(marker in text for marker in _MEMORY_DIRECTIVE_MARKERS):
+                    continue
+                if excluded_text and " ".join(str(payload.get("value") or "").split()) == excluded_text:
+                    continue
+
+                seen.add(ref)
+                occurred = payload.get("occurred")
+                started = ""
+                if isinstance(occurred, dict):
+                    started = str(occurred.get("start") or "")
+                found.append(
+                    (
+                        started,
+                        MemoryCard(
+                            object_id=hit.object_id,
+                            revision=hit.revision,
+                            object_type=hit.object_type,
+                            dimension=hit.dimension,
+                            excerpt=hit.excerpt,
+                            retrieval_score=hit.score,
+                            match_reason="explicit_memory_directive_anchor",
+                        ),
+                    )
+                )
+
+        # "刚才/上次" implies recency: most recent directive first, then stable id.
+        found.sort(key=lambda item: (item[0], item[1].object_id), reverse=True)
+        return tuple(card for _, card in found[:limit])
+
     def recommend(
         self,
         *,
@@ -64,6 +159,8 @@ class ProactiveMemoryRecommender:
         limit: int | None = None,
         history_needed: bool | None = None,
         antecedent_fallback: bool = False,
+        memory_directive_reference: bool = False,
+        current_utterance: str | None = None,
         as_of: datetime | None = None,
     ) -> RecommendationBundle:
         topic = (current_topic or "").strip()
@@ -98,7 +195,33 @@ class ProactiveMemoryRecommender:
         )
 
         cards: list[MemoryCard] = []
+        used: set[tuple[str, int]] = set()
+        directive_resolved = False
+        if memory_directive_reference:
+            # Reference resolution, not content retrieval: the current sentence and the
+            # anchor share no vocabulary, but the anchor is the only durable turn that
+            # carries a memory directive. Expose those first, bounded and auditable.
+            for card in self._memory_directive_anchors(
+                subject_id=subject_id,
+                as_of=as_of,
+                limit=_MEMORY_DIRECTIVE_ANCHOR_LIMIT,
+                current_utterance=current_utterance,
+            ):
+                ref = (card.object_id, card.revision)
+                if ref in used:
+                    continue
+                cards.append(card)
+                used.add(ref)
+                directive_resolved = True
+                if len(cards) >= take:
+                    break
+
         for hit in page.hits:
+            if len(cards) >= take:
+                break
+            ref = (hit.object_id, hit.revision)
+            if ref in used:
+                continue
             try:
                 payload = self.store.get_payload(hit.object_id, revision=hit.revision)
             except StoreError as exc:
@@ -140,10 +263,10 @@ class ProactiveMemoryRecommender:
                     retrieval_score=hit.score,
                 )
             )
+            used.add(ref)
             if len(cards) >= take:
                 break
 
-        used = {(card.object_id, card.revision) for card in cards}
         antecedent_added = False
         if antecedent_fallback and len(cards) < take:
             # Deictic/elliptical follow-ups can have zero lexical overlap with the
@@ -245,7 +368,13 @@ class ProactiveMemoryRecommender:
                 if len(cards) >= take:
                     break
 
-        if antecedent_added:
+        if directive_resolved:
+            reason = (
+                "memory_directive_reference_resolved_with_antecedent_candidates"
+                if antecedent_added
+                else "memory_directive_reference_resolved"
+            )
+        elif antecedent_added:
             reason = (
                 "topic_matched_history_with_antecedent_candidates"
                 if any(card.retrieval_score > 0 for card in cards)
