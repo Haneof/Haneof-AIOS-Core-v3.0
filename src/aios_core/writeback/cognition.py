@@ -101,6 +101,54 @@ class CognitionWritebackService:
             allowed_subject_ids=tuple(self.evidence_subject_ids),
         )
 
+    def _existing_revision(self, object_id: str) -> int | None:
+        """Return the current durable revision for an object id, or None if absent."""
+
+        try:
+            payload = self.store.get_payload(object_id)
+        except StoreError as exc:
+            if exc.code is not ErrorCode.NOT_FOUND:
+                raise
+            return None
+        return int(payload.get("revision") or 1)
+
+    def _reusable_evidence_revision(
+        self,
+        evidence_set_id: str,
+        pinned: Sequence[ObjectRef],
+    ) -> int | None:
+        """Return the durable revision when an identical evidence set already exists.
+
+        Evidence-set identity is content-addressed over (subject, dimension, members,
+        learned time). Two claims persisted in the same turn about the same dimension
+        from the same evidence therefore derive the *same* id. Writing the second one
+        used to attempt revision 1 again and fail with a version conflict, so a user
+        sentence carrying several durable facts ("I'm Lao Wang, I build 23cm bands,
+        drop the honorifics") could only persist one fact per dimension per turn.
+
+        The set is the same object, so the correct move is to reuse it rather than
+        mint a new revision: an evidence set is defined by its members, and identical
+        members mean identical support.
+        """
+
+        try:
+            payload = self.store.get_payload(evidence_set_id)
+        except StoreError as exc:
+            if exc.code is not ErrorCode.NOT_FOUND:
+                raise
+            return None
+
+        durable_members = {
+            (str(item.get("object_id")), int(item.get("revision") or 0))
+            for item in payload.get("member_refs") or ()
+        }
+        requested_members = {(ref.object_id, int(ref.revision)) for ref in pinned}
+        if durable_members != requested_members:
+            # Same id, different support: never silently reuse. Fall through to the
+            # normal write path so the conflict stays visible.
+            return None
+        return int(payload.get("revision") or 1)
+
     def commit_claim(
         self,
         request: ClaimWriteRequest,
@@ -247,8 +295,15 @@ class CognitionWritebackService:
                 "writeback_kind": "cognition_evidence",
             },
         )
-        evidence_ref = ObjectRef(object_id=evidence_set_id, revision=1)
-        objects_to_commit: list[Any] = [evidence_set]
+        # Reuse an identical evidence set written earlier in the same turn instead of
+        # attempting revision 1 twice (see _reusable_evidence_revision).
+        reusable_revision = self._reusable_evidence_revision(evidence_set_id, pinned)
+        if reusable_revision is not None:
+            evidence_ref = ObjectRef(object_id=evidence_set_id, revision=reusable_revision)
+            objects_to_commit: list[Any] = []
+        else:
+            evidence_ref = ObjectRef(object_id=evidence_set_id, revision=1)
+            objects_to_commit: list[Any] = [evidence_set]
 
         counter_evidence_ref = None
         if counter_evidence_set_id is not None:
@@ -277,8 +332,18 @@ class CognitionWritebackService:
                     "writeback_kind": "cognition_counter_evidence",
                 },
             )
-            counter_evidence_ref = ObjectRef(object_id=counter_evidence_set_id, revision=1)
-            objects_to_commit.append(counter_evidence_set)
+            counter_reusable = self._reusable_evidence_revision(
+                counter_evidence_set_id, counter_pinned
+            )
+            if counter_reusable is not None:
+                counter_evidence_ref = ObjectRef(
+                    object_id=counter_evidence_set_id, revision=counter_reusable
+                )
+            else:
+                counter_evidence_ref = ObjectRef(
+                    object_id=counter_evidence_set_id, revision=1
+                )
+                objects_to_commit.append(counter_evidence_set)
 
         counter_evidence_set_refs = (
             [counter_evidence_ref] if counter_evidence_ref is not None else []
@@ -362,7 +427,14 @@ class CognitionWritebackService:
                     )
                 )
 
-        objects_to_commit.extend(dependency_objects)
+        # Dependency edges are content-addressed as well. When the evidence set was
+        # reused, its member edges already exist; writing them again would attempt
+        # revision 1 a second time and abort the whole atomic bundle.
+        objects_to_commit.extend(
+            dep
+            for dep in dependency_objects
+            if self._existing_revision(dep.object_id) is None
+        )
 
         op_key = _stable_id("write", claim_id, evidence_set_id)
         operation = OperationRequest(

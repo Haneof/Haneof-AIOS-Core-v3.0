@@ -48,6 +48,32 @@ DEFAULT_MODEL_SECONDARY = os.environ.get("AIOS_GROK_MODEL_SECONDARY", "grok-4.5"
 _COCKPIT_SCALAR_SKIP = frozenset({"token_budget", "estimated_tokens", "truncated", "user_input"})
 _MAX_RECENT_CHARS = 6000
 _MAX_CARD_CHARS = 2000
+_MAX_IDENTITY_CHARS = 1600
+_MAX_SUMMARY_CHARS = 1800
+
+# AI-world domains that carry durable "who we are" evidence. Order is deliberate:
+# the relationship frames how to read the user, the user facts frame the work, and
+# the self view frames the continuity of the assistant.
+_IDENTITY_DOMAINS = (
+    ("relationship", "relationship"),
+    ("user_understanding", "user"),
+    ("self", "self"),
+)
+# Structural identity keys that are rendered explicitly, not as generic scalars.
+_IDENTITY_STRUCTURAL_KEYS = frozenset(
+    {
+        "user_understanding",
+        "relationship",
+        "self",
+        "symbiotic_posture",
+        "rapport_score",
+        "rapport_tier",
+        "active_promise_count",
+        "outstanding_promises",
+        "ethical_invariants",
+        "ai_self_subject",
+    }
+)
 
 
 def _render_recent_turns(turns: Any, *, max_chars: int = _MAX_RECENT_CHARS) -> str:
@@ -76,6 +102,132 @@ def _render_recent_turns(turns: Any, *, max_chars: int = _MAX_RECENT_CHARS) -> s
     if len(text) > max_chars:
         text = "…(earlier turns trimmed)…\n" + text[-max_chars:]
     return text
+
+
+def _render_identity(identity: Any, *, max_chars: int = _MAX_IDENTITY_CHARS) -> str:
+    """Render the durable continuity anchor: who we are, and where we left off.
+
+    This is the block that has to survive context exhaustion. Everything here comes
+    from the world store or from Core's own runtime counters — no persona prose is
+    invented. Claims keep their object reference so the model can weigh and cite
+    them rather than absorb an unverifiable script.
+
+    The previous implementation dropped this whole block: ``ai_identity`` is a
+    mapping, and the prompt builder kept only scalars, so the model was handed a
+    factory identity every turn no matter how long the relationship had run.
+    """
+    if not isinstance(identity, Mapping) or not identity:
+        return ""
+
+    lines: list[str] = []
+
+    for domain_key, label in _IDENTITY_DOMAINS:
+        items = identity.get(domain_key)
+        if not isinstance(items, (list, tuple)):
+            continue
+        for item in items:
+            if not isinstance(item, Mapping):
+                continue
+            statement = str(item.get("statement") or "").strip()
+            if not statement:
+                continue
+            ref = str(item.get("object_id") or "").strip()
+            revision = item.get("revision")
+            suffix = f" [{ref}@{revision}]" if ref and revision is not None else ""
+            lines.append(f"- ({label}) {statement}{suffix}")
+
+    posture = identity.get("symbiotic_posture")
+    rapport = identity.get("rapport_score")
+    tier = identity.get("rapport_tier")
+    if posture or rapport is not None:
+        parts = []
+        if posture:
+            parts.append(f"posture={posture}")
+        if rapport is not None:
+            parts.append(f"rapport={rapport}")
+        if tier:
+            parts.append(f"tier={tier}")
+        lines.append("- self-state: " + ", ".join(parts))
+
+    promises = identity.get("outstanding_promises")
+    if isinstance(promises, (list, tuple)) and promises:
+        lines.append(f"- open promises ({len(promises)}):")
+        for promise in promises:
+            if not isinstance(promise, Mapping):
+                continue
+            desc = str(promise.get("desc") or promise.get("description") or "").strip()
+            if not desc:
+                continue
+            due = str(promise.get("due") or "").strip()
+            lines.append(f"  - {desc}" + (f" (due {due})" if due and due != "None" else ""))
+    else:
+        count = identity.get("active_promise_count")
+        if isinstance(count, int) and count > 0:
+            lines.append(f"- open promises: {count}")
+
+    # Any remaining scalar identity fields (future additions) stay visible.
+    extras = [
+        f"{key}={value}"
+        for key, value in identity.items()
+        if key not in _IDENTITY_STRUCTURAL_KEYS
+        and isinstance(value, (str, int, float, bool))
+        and str(value).strip()
+    ]
+    if extras:
+        lines.append("- also: " + ", ".join(extras))
+
+    text = "\n".join(lines)
+    if not text:
+        return ""
+    return text[-max_chars:] if len(text) > max_chars else text
+
+
+def _render_standing_constraints(identity: Any) -> str:
+    """Render invariant behavioural constraints that must not drift across sessions.
+
+    These are not memories and not user preferences; they are the terms the
+    assistant holds itself to. They are kept out of the budgeted pool so a long
+    conversation can never squeeze them out.
+    """
+    if not isinstance(identity, Mapping):
+        return ""
+    invariants = identity.get("ethical_invariants")
+    if not isinstance(invariants, (list, tuple)):
+        return ""
+    lines = [f"- {str(item).strip()}" for item in invariants if str(item).strip()]
+    return "\n".join(lines)
+
+
+def _render_conversation_summaries(
+    summaries: Any, *, max_chars: int = _MAX_SUMMARY_CHARS
+) -> str:
+    """Render same-session round summaries as compressed earlier history.
+
+    Round summaries were already committed, already budgeted into the cockpit, and
+    still never reached the model: there was no renderer for them. The model could
+    only recover them by spending a tool round on ``list_conversation_summaries``,
+    which rule 0 of the prompt actively discourages. They belong in the prompt as
+    an index, with the exact-wording route named.
+    """
+    if not isinstance(summaries, (list, tuple)) or not summaries:
+        return ""
+    lines: list[str] = []
+    for summary in summaries:
+        if not isinstance(summary, Mapping):
+            continue
+        content = str(summary.get("content") or "").strip()
+        if not content:
+            continue
+        start = summary.get("turn_start")
+        end = summary.get("turn_end")
+        span = (
+            f"turns {start}-{end}"
+            if start is not None and end is not None
+            else "earlier turns"
+        )
+        lines.append(f"- {span}: {content}")
+    text = "\n".join(lines)
+    return text[-max_chars:] if len(text) > max_chars else text
 
 
 def _render_memory_cards(cards: Any, *, max_chars: int = _MAX_CARD_CHARS) -> str:
@@ -296,32 +448,83 @@ class GrokStreamingProvider:
 
         def _handler(snapshot: RuntimeSnapshot) -> ModelDirective:
             # 1. Build rich system prompt with context cockpit and capability declarations
+            identity = snapshot.cockpit.get("ai_identity")
             system_sections = [
                 "You are the AIOS 3.0 symbiotic mind on an ultra-compact wearable band.",
-                "CONSTITUTIONAL RULES:",
-                "0. The RECENT CONVERSATION block below is the verbatim dialogue. "
-                "If the answer is already visible there, answer from it directly — "
-                "never claim you cannot remember something that is in front of you, "
-                "and do not spend a tool round retrieving what you can already read.",
-                "1. If no response or action is warranted, output exactly '<AIOS_SILENCE>'.",
-                "2. If you need to invoke a registered capability, output a JSON block:",
-                "```json",
-                '{"call": "<capability_name>", "arguments": { ... }}',
-                "```",
-                "3. Otherwise, provide a concise, high-value natural language response.",
             ]
+
+            # Standing constraints come before everything else and are never
+            # budgeted away. A long conversation must not let the assistant drift
+            # into a different character.
+            standing = _render_standing_constraints(identity)
+            if standing:
+                system_sections.append(
+                    "STANDING CONSTRAINTS (invariant — these do not change with "
+                    "topic, session, model or context length):\n" + standing
+                )
+
+            # The continuity anchor is what makes a resumed conversation feel like
+            # the same assistant rather than a fresh instance.
+            anchor = _render_identity(identity)
+            if anchor:
+                system_sections.append(
+                    "CONTINUITY ANCHOR (durable world-store evidence about this "
+                    "user and this relationship — evidence, not a script; you still "
+                    "decide what it means):\n" + anchor
+                )
+
+            system_sections.extend(
+                [
+                    "DURABLE MEMORY DISCIPLINE:",
+                    "- Anything that stays true beyond this conversation — who the user "
+                    "is, their long-running work, standing preferences, agreed ways of "
+                    "working, promises you made — survives only if you persist it with "
+                    'commit_ai_world_claim (domain user_understanding / relationship / '
+                    'self, tags ["core_context"]). Claims without that tag will not '
+                    "appear in your continuity anchor on a later turn.",
+                    "- Persist once, when it is first stated or first changed. Do not "
+                    "re-persist what the anchor already says, and do not promote passing "
+                    "remarks into durable facts.",
+                    "- The claim is a pointer, not a replacement: drill_down_conversation "
+                    "still holds the user's exact words.",
+                    "CONSTITUTIONAL RULES:",
+                    "0. The RECENT CONVERSATION block below is the verbatim dialogue. "
+                    "If the answer is already visible there, answer from it directly — "
+                    "never claim you cannot remember something that is in front of you, "
+                    "and do not spend a tool round retrieving what you can already read.",
+                    "1. If no response or action is warranted, output exactly '<AIOS_SILENCE>'.",
+                    "2. If you need to invoke a registered capability, output a JSON block:",
+                    "```json",
+                    '{"call": "<capability_name>", "arguments": { ... }}',
+                    "```",
+                    "3. Otherwise, provide a concise, high-value natural language response.",
+                ]
+            )
 
             if snapshot.cockpit:
                 # Scalars only. Structured blocks (recent_turns / memory_cards /
-                # conversation_summaries) are lists and were silently dropped by
-                # this filter, which is why the model could not answer follow-up
-                # questions about things it had just been told.
+                # conversation_summaries / ai_identity) are rendered explicitly
+                # below; identity keys are excluded here so they cannot appear as
+                # a duplicated, unreferenced scalar dump.
                 summary_items = []
                 for k, v in snapshot.cockpit.items():
-                    if isinstance(v, (str, int, float, bool)) and k not in _COCKPIT_SCALAR_SKIP:
+                    if (
+                        isinstance(v, (str, int, float, bool))
+                        and k not in _COCKPIT_SCALAR_SKIP
+                    ):
                         summary_items.append(f"{k}: {v}")
                 if summary_items:
                     system_sections.append("ACTIVE COCKPIT CONTEXT:\n" + "\n".join(summary_items[:8]))
+
+            covered = _render_conversation_summaries(
+                snapshot.cockpit.get("conversation_summaries")
+            )
+            if covered:
+                system_sections.append(
+                    "WHAT WE ALREADY COVERED (compressed earlier turns of this "
+                    "session — an index, not verbatim truth; use "
+                    "drill_down_conversation when exact wording matters):\n" + covered
+                )
 
             recent = _render_recent_turns(snapshot.cockpit.get("recent_turns"))
             if recent:
