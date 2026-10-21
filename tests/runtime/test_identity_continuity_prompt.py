@@ -200,6 +200,38 @@ def test_identity_keys_are_not_duplicated_into_scalar_cockpit() -> None:
     assert "posture=comrade" in prompt
 
 
+def test_oversized_anchor_keeps_the_relationship_entries() -> None:
+    """Trimming must drop the tail, not the head.
+
+    Relationship entries come first because they frame how everything else is read.
+    Truncating from the tail (the previous behaviour) would have kept the status line
+    and discarded the relationship, which is exactly backwards.
+    """
+
+    prompt = _run(
+        _snapshot(
+            {
+                "user_input": "继续",
+                "ai_identity": {
+                    "relationship": [
+                        _claim("relationship", "用户要求不用敬语、直接说结论", "clm_rel_head")
+                    ],
+                    "user_understanding": [
+                        _claim("user_understanding", f"用户细节条目 {i} " + "填充" * 40, f"clm_u{i}")
+                        for i in range(20)
+                    ],
+                    "symbiotic_posture": "old_friend",
+                },
+                "recent_turns": [],
+            }
+        )
+    )
+
+    assert "clm_rel_head@1" in prompt
+    assert "不用敬语" in prompt
+    assert "further anchor entries omitted" in prompt
+
+
 def _build_runtime(tmp_path: Path, capture: _PromptCapture) -> tuple[FusedTurnRuntime, dict]:
     store = SQLiteWorldStore(str(tmp_path / "world.sqlite"))
     index = WorldSearchIndex(str(tmp_path / "index.sqlite"), store=store)

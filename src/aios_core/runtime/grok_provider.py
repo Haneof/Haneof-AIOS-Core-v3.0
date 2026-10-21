@@ -49,6 +49,7 @@ _COCKPIT_SCALAR_SKIP = frozenset({"token_budget", "estimated_tokens", "truncated
 _MAX_RECENT_CHARS = 6000
 _MAX_CARD_CHARS = 2000
 _MAX_IDENTITY_CHARS = 1600
+_MAX_IDENTITY_STATEMENT_CHARS = 240
 _MAX_SUMMARY_CHARS = 1800
 
 # AI-world domains that carry durable "who we are" evidence. Order is deliberate:
@@ -131,6 +132,8 @@ def _render_identity(identity: Any, *, max_chars: int = _MAX_IDENTITY_CHARS) -> 
             statement = str(item.get("statement") or "").strip()
             if not statement:
                 continue
+            if len(statement) > _MAX_IDENTITY_STATEMENT_CHARS:
+                statement = statement[:_MAX_IDENTITY_STATEMENT_CHARS].rstrip() + "…"
             ref = str(item.get("object_id") or "").strip()
             revision = item.get("revision")
             suffix = f" [{ref}@{revision}]" if ref and revision is not None else ""
@@ -179,7 +182,12 @@ def _render_identity(identity: Any, *, max_chars: int = _MAX_IDENTITY_CHARS) -> 
     text = "\n".join(lines)
     if not text:
         return ""
-    return text[-max_chars:] if len(text) > max_chars else text
+    if len(text) > max_chars:
+        # Keep the head, not the tail: relationship frames the user, then user facts,
+        # then self-state and promises. Dropping the head would discard exactly the
+        # entries that make the anchor an identity rather than a status line.
+        text = text[:max_chars].rstrip() + "\n…(further anchor entries omitted)"
+    return text
 
 
 def _render_standing_constraints(identity: Any) -> str:
