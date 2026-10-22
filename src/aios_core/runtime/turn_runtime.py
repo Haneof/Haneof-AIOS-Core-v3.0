@@ -1984,7 +1984,7 @@ class FusedTurnRuntime:
         as_of: datetime,
         *,
         per_domain: int = 3,
-    ) -> dict[str, list[dict[str, Any]]]:
+    ) -> dict[str, Any]:
         return self._ai_world_reader(as_of).core_context(per_domain=per_domain)
 
     def _ai_world_snapshot(
@@ -4038,7 +4038,19 @@ class FusedTurnRuntime:
         mind_summary = self.ai_self_tracker.get_mind_summary()
         continuity_context.setdefault("symbiotic_posture", mind_summary["posture"])
         continuity_context.setdefault("rapport_score", mind_summary["rapport_score"])
-        continuity_context.setdefault("active_promise_count", len(mind_summary["outstanding_promises"]))
+        continuity_context.setdefault("rapport_tier", mind_summary["rapport_tier"])
+        continuity_context.setdefault(
+            "active_promise_count", len(mind_summary["outstanding_promises"])
+        )
+        # Open promises and invariant constraints are part of the identity anchor,
+        # not bookkeeping: they are how a resumed conversation knows what this
+        # assistant already committed to and what it will not become.
+        continuity_context.setdefault(
+            "outstanding_promises", list(mind_summary["outstanding_promises"])
+        )
+        continuity_context.setdefault(
+            "ethical_invariants", list(mind_summary["ethical_invariants"])
+        )
 
         current_task_context = dict(task_context or {})
         current_task_context["topic_state"] = topic_state.model_dump(mode="json")
