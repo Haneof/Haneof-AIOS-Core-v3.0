@@ -171,6 +171,55 @@ _C14_COGNITIVE_SIDE_EFFECT_ALLOWLIST = frozenset(
 )
 _C14_SEMANTIC_TERMINATIONS = frozenset({"responded", "silence"})
 
+# The writes whose silent failure loses continuity. These are the capabilities the
+# standing prompt instructions already tell the model to call; if their required
+# argument names are not stated, the model has to invent them, and an invented
+# argument name fails closed — nothing is persisted and the continuity anchor stays
+# empty. Other side-effecting capabilities are left names-only: a wrong call there
+# fails loudly inside the same turn and can be retried.
+_CONTINUITY_WRITE_CAPABILITIES = frozenset(
+    {
+        "commit_ai_world_claim",
+        "commit_claim",
+        "revise_claim",
+        "retract_claim",
+        "record_ai_promise",
+        "propose_goal",
+        "create_task",
+    }
+)
+
+# Long structural types are abbreviated only for display. The kernel still
+# validates against the full schema; this is the prompt's shorthand, not the contract.
+_ARGUMENT_TYPE_SHORTHANDS = {
+    "array[{object_id:string,revision:integer}]": "[{object_id,revision}]",
+    "{object_id:string,revision:integer}": "{object_id,revision}",
+}
+
+
+def _required_arguments(input_schema: Any) -> dict[str, str]:
+    """Return ``{name: short_type}`` for required arguments only.
+
+    Optional arguments are omitted on purpose: they can be left out and the call
+    still succeeds. Required ones cannot, and an unknown required name is exactly
+    what makes a write fail.
+    """
+
+    if not isinstance(input_schema, Mapping):
+        return {}
+    required: dict[str, str] = {}
+    for name, type_text in input_schema.items():
+        # Some schemas append guidance after a semicolon ("object?; use mode=...").
+        # The type is the part before it; the rest is instruction, not a type.
+        text = str(type_text).split(";")[0].strip()
+        if text.endswith("?"):
+            continue
+        short = _ARGUMENT_TYPE_SHORTHANDS.get(text)
+        if short is None:
+            short = text if len(text) <= 24 else text[:21] + "..."
+        required[str(name)] = short
+    return required
+
 
 @dataclass(frozen=True, slots=True)
 class FusedTurnResult:
@@ -1694,20 +1743,32 @@ class FusedTurnRuntime:
     def _cockpit_capability_catalog(self) -> tuple[dict[str, Any], ...]:
         """Compact capability awareness for context budgeting.
 
-        CognitiveRuntime already supplies the full schemas/descriptions separately in
-        RuntimeSnapshot.capability_catalog. Repeating the full tool schema inside the
-        cockpit wastes context budget and can evict memory/continuity. The cockpit only
-        needs enough information to tell the model which named abilities exist.
+        The cockpit deliberately does not repeat the full tool schema: that wastes
+        budget and can evict memory/continuity. It carries enough for the prompt to
+        name every ability, plus the required arguments of the small set of writes
+        whose silent failure loses continuity.
+
+        That second part is not decoration. A capability the model is *instructed*
+        to call, but whose argument names are never stated, is a capability the
+        model has to guess at. Guessing produces a failed write, the failed write
+        produces no claim, and the missing claim produces an empty continuity
+        anchor — a live local model reproduced exactly that chain: it emitted
+        ``commit_ai_world_claim`` with ``claim_text``/``evidence`` and no
+        ``confidence``, the call was rejected, and nothing durable existed by the
+        end of the conversation.
         """
 
-        return tuple(
-            {
+        catalog: list[dict[str, Any]] = []
+        for item in self.registry.catalog():
+            entry: dict[str, Any] = {
                 "name": item["name"],
                 "kind": item["kind"],
                 "side_effecting": bool(item.get("side_effecting", False)),
             }
-            for item in self.registry.catalog()
-        )
+            if item["name"] in _CONTINUITY_WRITE_CAPABILITIES:
+                entry["required_args"] = _required_arguments(item.get("input_schema"))
+            catalog.append(entry)
+        return tuple(catalog)
 
     def _search_world(self, query: str, limit: int = 8) -> list[dict[str, Any]]:
         page = self.index.recall_candidates(

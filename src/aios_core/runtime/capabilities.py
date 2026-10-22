@@ -68,6 +68,39 @@ class _RegisteredCapability:
     handler: Callable[..., Any]
 
 
+def _argument_error_message(
+    call: CapabilityCall,
+    spec: CapabilitySpec,
+    exc: TypeError,
+) -> str:
+    """Explain an argument mismatch in terms the model can act on.
+
+    ``got an unexpected keyword argument 'claim'`` is true and useless: it says
+    what was rejected, never what is accepted. A live model called
+    ``commit_ai_world_claim`` with ``claim`` instead of ``statement`` three rounds
+    in a row, because each rejection told it nothing it could correct. The schema
+    was available the whole time; this puts it where the model is actually looking
+    — the error it just received.
+    """
+
+    schema = spec.input_schema or {}
+    required: list[str] = []
+    optional: list[str] = []
+    for name, type_text in schema.items():
+        (optional if str(type_text).endswith("?") else required).append(str(name))
+
+    unexpected = sorted(key for key in call.arguments if key not in schema)
+
+    parts = [str(exc)]
+    if unexpected:
+        parts.append(f"unrecognized argument(s): {', '.join(unexpected)}")
+    if required:
+        parts.append(f"required arguments: {', '.join(required)}")
+    if optional:
+        parts.append(f"optional arguments: {', '.join(optional)}")
+    return ". ".join(parts)
+
+
 class CapabilityRegistry:
     """Registry + execution boundary for model-callable capabilities."""
 
@@ -122,7 +155,7 @@ class CapabilityRegistry:
                 name=call.name,
                 ok=False,
                 error_code="CAPABILITY_ARGUMENT_ERROR",
-                error_message=str(exc),
+                error_message=_argument_error_message(call, item.spec, exc),
                 call_id=call.call_id,
             )
         except Exception as exc:  # handler errors become structured tool evidence
