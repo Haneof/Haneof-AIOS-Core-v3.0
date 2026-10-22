@@ -23,15 +23,21 @@ import pytest
 
 from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime.cognitive_runtime import ModelDirective
-from aios_core.runtime.grok_provider import _render_capabilities, _render_capability_result
+from aios_core.runtime.grok_provider import (
+    GrokProviderConfig,
+    GrokStreamingProvider,
+    _render_capabilities,
+    _render_capability_result,
+)
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 
-def _real_catalog(tmp_path: Path) -> tuple[dict, ...]:
+def _snapshot(tmp_path: Path):
     captured: dict = {}
 
     def handler(snapshot):  # type: ignore[no-untyped-def]
+        captured.setdefault("snapshot", snapshot)
         captured.update(snapshot.cockpit)
         return ModelDirective(response="ok")
 
@@ -51,7 +57,20 @@ def _real_catalog(tmp_path: Path) -> tuple[dict, ...]:
         user_input="hi",
         occurred_at=datetime(2026, 10, 22, 10, tzinfo=timezone.utc),
     )
-    return captured["capability_catalog"]
+    return captured["snapshot"]
+
+
+def _real_catalog(tmp_path: Path) -> tuple[dict, ...]:
+    """The catalog the provider actually renders.
+
+    Not ``snapshot.cockpit["capability_catalog"]``: that is a separate, slimmer copy
+    built for budgeting. An earlier fix computed ``required_args`` into the cockpit
+    copy while the renderer read this one, so every assertion below passed against a
+    catalog no model ever saw, and the live prompt still showed names with no
+    signatures.
+    """
+
+    return _snapshot(tmp_path).capability_catalog
 
 
 def test_every_capability_is_named_not_just_the_first_ten(tmp_path: Path) -> None:
@@ -185,3 +204,30 @@ def test_successful_call_reports_its_data() -> None:
     )
     assert "ok=True" in rendered
     assert '"count": 3' in rendered
+
+
+def test_the_prompt_a_provider_sends_states_write_arguments(tmp_path: Path) -> None:
+    """The composition is what matters, not the renderer in isolation.
+
+    Everything above renders a catalog by hand. This one builds the actual system
+    message a provider would POST, because the defect being guarded against was a
+    wiring mistake: the signatures existed, in the wrong catalog.
+    """
+
+    snapshot = _snapshot(tmp_path)
+    provider = GrokStreamingProvider(
+        GrokProviderConfig(base_url="http://127.0.0.1:9/v1", api_key="k", default_model="m")
+    )
+    sent: dict = {}
+
+    def fake_stream_chat(messages, model=None, **kwargs):  # type: ignore[no-untyped-def]
+        sent["messages"] = messages
+        return "ok", None, None
+
+    provider.stream_chat = fake_stream_chat  # type: ignore[method-assign]
+    provider.as_model_handler(model="m")(snapshot)
+
+    system = sent["messages"][0]["content"]
+    assert "commit_ai_world_claim(domain:" in system
+    assert "evidence_refs:[{object_id,revision}]" in system
+    assert "example (copy this shape)" in system

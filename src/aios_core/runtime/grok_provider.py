@@ -752,11 +752,18 @@ class GrokStreamingProvider:
                     "never claim you cannot remember something that is in front of you, "
                     "and do not spend a tool round retrieving what you can already read.",
                     "1. If no response or action is warranted, output exactly '<AIOS_SILENCE>'.",
-                    "2. If you need to invoke a registered capability, output a JSON block:",
+                    "2. To invoke a registered capability, output a JSON block:",
                     "```json",
                     '{"call": "<capability_name>", "arguments": { ... }}',
                     "```",
-                    "3. Otherwise, provide a concise, high-value natural language response.",
+                    "   A call ends the round, not the turn. The kernel runs it and calls "
+                    "you again with the result, and you answer the user in that round. "
+                    "Persisting something therefore never costs you the reply — never skip "
+                    "a durable write because you also want to say something. A frontier "
+                    "model with the full write signature in view still produced four "
+                    "replies and zero writes, reading this rule as 'either call or answer'.",
+                    "3. If no capability is needed, provide a concise, high-value natural "
+                    "language response.",
                 ]
             )
 

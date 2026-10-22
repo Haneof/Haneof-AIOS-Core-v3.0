@@ -115,7 +115,13 @@ from .background_attempt import (
     BackgroundModelResponseStaging,
 )
 from .budget_gate import BackgroundBudgetDecision, BackgroundBudgetGate
-from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
+from .capabilities import (
+    CONTINUITY_WRITE_CAPABILITIES,
+    CapabilityKind,
+    CapabilityRegistry,
+    CapabilitySpec,
+    required_arguments,
+)
 from .cognitive_runtime import (
     CognitiveRuntime,
     ModelDirective,
@@ -177,17 +183,11 @@ _C14_SEMANTIC_TERMINATIONS = frozenset({"responded", "silence"})
 # argument name fails closed — nothing is persisted and the continuity anchor stays
 # empty. Other side-effecting capabilities are left names-only: a wrong call there
 # fails loudly inside the same turn and can be retried.
-_CONTINUITY_WRITE_CAPABILITIES = frozenset(
-    {
-        "commit_ai_world_claim",
-        "commit_claim",
-        "revise_claim",
-        "retract_claim",
-        "record_ai_promise",
-        "propose_goal",
-        "create_task",
-    }
-)
+#
+# The classification and the argument computation both live in ``capabilities`` so
+# that the registry catalog (which the provider renders) and the cockpit copy (which
+# only budgets) cannot disagree about them.
+_CONTINUITY_WRITE_CAPABILITIES = CONTINUITY_WRITE_CAPABILITIES
 
 # Long structural types are abbreviated only for display. The kernel still
 # validates against the full schema; this is the prompt's shorthand, not the contract.
@@ -197,28 +197,9 @@ _ARGUMENT_TYPE_SHORTHANDS = {
 }
 
 
-def _required_arguments(input_schema: Any) -> dict[str, str]:
-    """Return ``{name: short_type}`` for required arguments only.
-
-    Optional arguments are omitted on purpose: they can be left out and the call
-    still succeeds. Required ones cannot, and an unknown required name is exactly
-    what makes a write fail.
-    """
-
-    if not isinstance(input_schema, Mapping):
-        return {}
-    required: dict[str, str] = {}
-    for name, type_text in input_schema.items():
-        # Some schemas append guidance after a semicolon ("object?; use mode=...").
-        # The type is the part before it; the rest is instruction, not a type.
-        text = str(type_text).split(";")[0].strip()
-        if text.endswith("?"):
-            continue
-        short = _ARGUMENT_TYPE_SHORTHANDS.get(text)
-        if short is None:
-            short = text if len(text) <= 24 else text[:21] + "..."
-        required[str(name)] = short
-    return required
+# Kept as a module-local alias: call sites and tests in this module predate the move
+# to ``capabilities``, and one implementation is enough.
+_required_arguments = required_arguments
 
 
 @dataclass(frozen=True, slots=True)

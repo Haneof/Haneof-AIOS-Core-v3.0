@@ -19,6 +19,58 @@ class CapabilityKind(StrEnum):
     RESPONSE = "response"
 
 
+# Writes whose silent failure costs continuity. Every one of them has to be called
+# with the right argument names the first time: the turn ends, so there is no
+# second attempt, and a rejected write leaves nothing durable behind.
+#
+# This set lives next to the registry rather than next to the prompt renderer
+# because it classifies capabilities, not presentation. Both catalog copies (the
+# full one a provider renders and the compact one in the cockpit) read it from
+# here, so they cannot drift apart again — the drift was the bug: the compact copy
+# carried `required_args` while the rendered copy did not, and the prompt showed
+# names with no signatures at all.
+CONTINUITY_WRITE_CAPABILITIES = frozenset(
+    {
+        "commit_ai_world_claim",
+        "commit_claim",
+        "revise_claim",
+        "retract_claim",
+        "record_ai_promise",
+        "propose_goal",
+        "create_task",
+    }
+)
+
+_ARGUMENT_TYPE_SHORTHANDS = {
+    "array[{object_id:string,revision:integer}]": "[{object_id,revision}]",
+    "{object_id:string,revision:integer}": "{object_id,revision}",
+}
+
+
+def required_arguments(input_schema: Any) -> dict[str, str]:
+    """Return ``{name: short_type}`` for required arguments only.
+
+    Optional arguments are omitted on purpose: they can be left out and the call
+    still succeeds. Required ones cannot, and an unknown required name is exactly
+    what makes a write fail.
+    """
+
+    if not isinstance(input_schema, Mapping):
+        return {}
+    required: dict[str, str] = {}
+    for name, type_text in input_schema.items():
+        # Some schemas append guidance after a semicolon ("object?; use mode=...").
+        # The type is the part before it; the rest is instruction, not a type.
+        text = str(type_text).split(";")[0].strip()
+        if text.endswith("?"):
+            continue
+        short = _ARGUMENT_TYPE_SHORTHANDS.get(text)
+        if short is None:
+            short = text if len(text) <= 24 else text[:21] + "..."
+        required[str(name)] = short
+    return required
+
+
 @dataclass(frozen=True)
 class CapabilitySpec:
     name: str
@@ -124,9 +176,15 @@ class CapabilityRegistry:
             raise KeyError(f"unknown capability: {name}") from None
 
     def catalog(self) -> list[dict[str, Any]]:
-        """Return model-facing capability metadata without leaking Python handlers."""
-        return [
-            {
+        """Return model-facing capability metadata without leaking Python handlers.
+
+        Continuity writes also carry ``required_args``. The prompt renderer only has
+        this catalog, so a signature computed anywhere else never reaches the model.
+        """
+
+        entries: list[dict[str, Any]] = []
+        for _, item in sorted(self._items.items()):
+            entry = {
                 "name": item.spec.name,
                 "description": item.spec.description,
                 "kind": item.spec.kind.value,
@@ -134,8 +192,10 @@ class CapabilityRegistry:
                 "hard_boundary": item.spec.hard_boundary,
                 "side_effecting": item.spec.side_effecting,
             }
-            for _, item in sorted(self._items.items())
-        ]
+            if item.spec.name in CONTINUITY_WRITE_CAPABILITIES:
+                entry["required_args"] = required_arguments(item.spec.input_schema)
+            entries.append(entry)
+        return entries
 
     def invoke(self, call: CapabilityCall) -> CapabilityResult:
         item = self._items.get(call.name)
