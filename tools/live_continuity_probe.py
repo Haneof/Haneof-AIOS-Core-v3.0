@@ -92,6 +92,22 @@ def _section(text: str, header: str, *, limit: int = 900) -> str:
     return text[index : index + limit]
 
 
+def _attribute_failures(outcomes: Sequence[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    """Split capability failures by who has to fix them.
+
+    A model that cannot fill in a schema is not a kernel bug, and treating it as
+    one means loosening evidence semantics for every caller. Keeping the two
+    buckets separate is what stops the test rig from shaping the product.
+    """
+
+    model_side = [o for o in outcomes if not o["ok"] and o["error_code"] == "CAPABILITY_ARGUMENT_ERROR"]
+    kernel_side = [
+        o for o in outcomes if not o["ok"] and o["error_code"] not in {"CAPABILITY_ARGUMENT_ERROR", None}
+    ]
+    succeeded = [o for o in outcomes if o["ok"]]
+    return {"succeeded": succeeded, "model_side": model_side, "kernel_side": kernel_side}
+
+
 def run(args: argparse.Namespace) -> int:
     tmp = Path(tempfile.mkdtemp(prefix="aios-live-"))
     store = SQLiteWorldStore(str(tmp / "world.sqlite"))
@@ -131,8 +147,23 @@ def run(args: argparse.Namespace) -> int:
     replies: list[str] = []
     prompts: list[str] = []
     labels: list[str] = []
+    outcomes: list[dict[str, Any]] = []
 
     def handler(snapshot):  # type: ignore[no-untyped-def]
+        # Results of the previous round's capability calls arrive here. Recording
+        # them is what separates "this model cannot fill in the schema" from "the
+        # kernel broke" — a distinction that decides whether anything in src/ should
+        # be touched at all.
+        for result in getattr(snapshot, "capability_history", ()) or ():
+            outcomes.append(
+                {
+                    "name": getattr(result, "name", ""),
+                    "ok": bool(getattr(result, "ok", False)),
+                    "error_code": getattr(result, "error_code", None),
+                    "error_message": str(getattr(result, "error_message", "") or "")[:200],
+                }
+            )
+
         directive = inner(snapshot)
         system = sent[0]["content"] if sent else ""
         prompts.append(system)
@@ -219,6 +250,28 @@ def run(args: argparse.Namespace) -> int:
             statement = row.get("statement") or row.get("title") or row.get("summary") or ""
             print(f"     - {str(statement)[:150]}", flush=True)
 
+    print("\n=== failure attribution ===", flush=True)
+    buckets = _attribute_failures(outcomes)
+    model_side = buckets["model_side"]
+    kernel_side = buckets["kernel_side"]
+    succeeded = buckets["succeeded"]
+    print(f"capability calls executed : {len(outcomes)} (ok={len(succeeded)})", flush=True)
+    print(f"model-side (bad arguments): {len(model_side)}", flush=True)
+    print(f"kernel-side (raised)      : {len(kernel_side)}", flush=True)
+    if model_side:
+        print(
+            "  -> the schema was not followed. Fixing this in the kernel means accepting\n"
+            "     shapes the model should not be producing; that is a tolerance decision,\n"
+            "     not a bug fix. A stronger model usually needs no such tolerance.",
+            flush=True,
+        )
+        for outcome in model_side[:3]:
+            print(f"     {outcome['name']}: {outcome['error_message'][:160]}", flush=True)
+    if kernel_side:
+        print("  -> these are real defects in src/, not model weakness:", flush=True)
+        for outcome in kernel_side[:3]:
+            print(f"     {outcome['name']}: {outcome['error_code']} {outcome['error_message'][:160]}", flush=True)
+
     # The last call of the last turn is not always a reply: a turn can end on a
     # capability round trip. The user-visible answer is the last non-empty one.
     final_reply = next((text for text in reversed(replies) if text.strip()), "")
@@ -245,6 +298,7 @@ def run(args: argparse.Namespace) -> int:
         "model_call_seconds": call_seconds,
         "turn_failures": failures,
         "capability_calls": calls_by_turn,
+        "capability_outcomes": outcomes,
         "replies": replies,
         "prompt_chars": [len(p) for p in prompts],
         "durable_counts": counts,

@@ -1,16 +1,25 @@
-# 本地模型接入（llama.cpp / Ollama / vLLM）
 
-这份文档回答一个问题：**怎么让 AIOS 跑在你自己机器上的模型上**，以及接上之后立刻会暴露什么。
+
+
+
+# 端点接入与本地测试台（llama.cpp / Ollama / vLLM / 云 API）
+
+**先说清楚定位：本地模型是测试台，不是运行环境。** 正式跑的是大模型的 API；本地模型的唯一用途是在拿不到 API 的时候，能对真实端点跑真实对话，把「打桩测不出来」的问题逼出来。
+
+这个区别决定了两件事：
+
+1. **不要为迁就弱模型去改内核。** 本地 27B 量化模型会写出不合 schema 的参数。把它「容错」进内核，等于用测试台的缺陷去污染产品语义。
+2. **同一套工具要能指向任何端点。** 本地、云 API、换厂商，只改 `--base-url` 和 `--api-key`。等真 API 到了，验证据理应当在几分钟内跑完，而不是重写一套。
 
 ## 一、为什么需要一层适配器
 
 内核不肯把「用哪个模型」写死：headless 进程只接受 `--model-handler module:attribute`，加载一个 `RuntimeSnapshot -> ModelDirective` 的可调用对象。这是对的——provider 不该变成宪法的一部分——但代价是每次接一个真实端点，都得先写一个模块。
 
-`aios_core.runtime.live_handler` 就是那个模块。
+`aios_core.runtime.live_handler` 就是那个模块。它对端点一视同仁：llama.cpp、Ollama、vLLM、LM Studio、任何 OpenAI 兼容的云 API。
 
-## 二、一条命令
+## 二、接一个端点
 
-以 llama.cpp 的 `llama-server` 为例（本机实测配置）：
+### 本地测试台（llama.cpp）
 
 ```bash
 llama-server.exe -m Qwen3.8-27B-...gguf -ngl 28 -c 20480 \
@@ -34,22 +43,34 @@ aios-core-headless \
 
 Ollama 用 `http://127.0.0.1:11434/v1`，vLLM / LM Studio 同理——只要说 OpenAI 的 chat-completions 方言、支持 SSE 流式即可。
 
+### 云 API（正式运行环境）
+
+同一个 handler，换三行：
+
+```bash
+export AIOS_LIVE_BASE_URL=https://<vendor>/v1
+export AIOS_LIVE_MODEL=<model-id>
+export AIOS_LIVE_API_KEY=<key>          # 远程端点必填，留空直接拒绝
+```
+
+这里没有任何本地专用逻辑。本地能跑通的东西，换到云 API 上不需要改代码。
+
 ### 环境变量
 
-| 变量 | 默认 | 说明 |
-|---|---|---|
-| `AIOS_LIVE_BASE_URL` | `http://127.0.0.1:8080/v1` | 端点，需含 `/v1` |
-| `AIOS_LIVE_MODEL` | `grok-4.7` | 模型名，取端点 `/v1/models` 里的 id |
-| `AIOS_LIVE_API_KEY` | 空 | 回环地址可留空；远程地址留空会直接拒绝 |
-| `AIOS_LIVE_TIMEOUT_SECONDS` | `300` | 本地小模型很慢，60 秒不够 |
-| `AIOS_LIVE_MAX_OUTPUT_TOKENS` | `4096` | 见下面第三节的坑 |
-| `AIOS_LIVE_TEMPERATURE` | `0.6` | |
+| 变量                            | 默认                         | 说明                          |
+| ----------------------------- | -------------------------- | --------------------------- |
+| `AIOS_LIVE_BASE_URL`          | `http://127.0.0.1:8080/v1` | 端点，需含 `/v1`                 |
+| `AIOS_LIVE_MODEL`             | `grok-4.7`                 | 模型名，取端点 `/v1/models` 里的 id  |
+| `AIOS_LIVE_API_KEY`           | 空                          | 回环地址可留空；远程地址留空会直接拒绝         |
+| `AIOS_LIVE_TIMEOUT_SECONDS`   | `300`                      | 本地小模型很慢，60 秒不够；云 API 可降到 60 |
+| `AIOS_LIVE_MAX_OUTPUT_TOKENS` | `4096`                     | 见下面第三节的坑                    |
+| `AIOS_LIVE_TEMPERATURE`       | `0.6`                      |                             |
 
 **回环可以不带 key，远程不行。** `llama-server` 和 Ollama 不校验凭据，所以 `127.0.0.1` / `localhost` / `[::1]` 允许空 key（内部填一个占位符）。对远程端点空 key 会抛错——宁可失败，也不发一个无凭据的请求出去等对方裁决。
 
-## 三、接上之后立刻暴露的三件事
+## 三、测试台逼出来的三件事
 
-这三条都是本机实测出来的，不是推演。
+这三条都是本机实测出来的，不是推演。**它们全部是内核缺陷，与模型强弱无关**——本地模型只是那个把缺陷撞出来的锤子。换成云 API 同样会踩，只是不一定踩得这么响。
 
 ### 1. 模型想写认知，但不知道参数叫什么
 
@@ -103,12 +124,30 @@ python tools/live_continuity_probe.py \
 
 关键判据不是「最后一个回答对不对」，而是 `what became durable` 里的计数。回答对可能是运气——比如模型自己吐出来的 JSON 文本恰好留在了最近几轮里，被下一轮读到了，那不是记忆，是回声。
 
-## 五、本机实测吞吐（Qwen3.8-27B Q3，-ngl 28）
+## 五、失败归属：改内核，还是换模型
 
-| 指标 | 实测 |
-|---|---|
-| 预填充 | ~118 tok/s |
-| 生成 | ~1.6 tok/s |
-| 单轮耗时（回复 100–300 token） | 40–90 秒 |
+探针会打印一段归属统计，这是它最重要的输出：
 
-这个速度不足以支撑手环上的实时对话。接本地模型适合做**取证和回归**，不适合当产品默认端点——除非换更小的量化或更多层卸载到 GPU。
+```
+=== failure attribution ===
+capability calls executed : 5 (ok=0)
+model-side (bad arguments): 5
+kernel-side (raised)      : 0
+```
+
+- **model-side**（`CAPABILITY_ARGUMENT_ERROR`）：模型没按 schema 填参数。**不要去改内核迁就它**——那是把测试台的缺陷写进产品语义。换更强的模型通常就好了。
+- **kernel-side**（其余 `error_code`）：内核自己抛了。这才是 `src/` 里的真缺陷。
+
+实测记录：修完「渲染 schema + 给样例」之后，本地模型参数名从 `claim`/`evidence` 改成了 `statement`/`evidence_refs`/`confidence`，但把 `evidence_refs` 写成了字符串化的裸 id 列表。**这属于 model-side**，所以内核没有为它放宽证据格式——放宽带宽的是所有调用方的证据语义，代价远大于收益。
+
+## 六、测试台的成本（不是产品结论）
+
+| 指标                     | 实测         |
+| ---------------------- | ---------- |
+| 预填充                    | ~118 tok/s |
+| 生成                     | ~1.6 tok/s |
+| 单轮耗时（回复 100–300 token） | 23–230 秒   |
+
+这组数字只说明一件事：**本地跑一轮取证要 5–8 分钟**，所以测试脚本要设计得省——轮次少、输出预算够用就好、别指望跑几十轮。
+
+它不构成对产品性能的任何判断：产品跑的是云 API，那是另一个数量级。
