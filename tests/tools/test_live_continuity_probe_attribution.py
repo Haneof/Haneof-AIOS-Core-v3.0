@@ -66,3 +66,37 @@ def test_mixed_failures_land_in_both_buckets() -> None:
     )
     assert [o["name"] for o in buckets["model_side"]] == ["a"]
     assert [o["name"] for o in buckets["kernel_side"]] == ["b"]
+
+
+class _Result:
+    def __init__(self, name: str, ok: bool, code: str | None = None, message: str = "") -> None:
+        self.name = name
+        self.ok = ok
+        self.error_code = code
+        self.error_message = message
+
+
+def test_cumulative_history_is_not_double_counted() -> None:
+    """Each round re-delivers every earlier result; counting them again inflates the verdict."""
+
+    first = _Result("commit_ai_world_claim", False, "CAPABILITY_ARGUMENT_ERROR", "bad")
+    second = _Result("commit_ai_world_claim", False, "CAPABILITY_ARGUMENT_ERROR", "bad again")
+
+    # Round 1: history has one result.
+    assert len(probe._new_outcomes((first,), 0)) == 1
+    # Round 2: history is cumulative — only the new one counts.
+    assert len(probe._new_outcomes((first, second), 1)) == 1
+    # Round 3: nothing new.
+    assert probe._new_outcomes((first, second), 2) == []
+
+
+def test_outcome_shape_matches_what_attribution_reads() -> None:
+    recorded = probe._new_outcomes((_Result("x", False, "CAPABILITY_EXECUTION_ERROR", "boom"),), 0)
+    assert recorded == [
+        {
+            "name": "x",
+            "ok": False,
+            "error_code": "CAPABILITY_EXECUTION_ERROR",
+            "error_message": "boom",
+        }
+    ]

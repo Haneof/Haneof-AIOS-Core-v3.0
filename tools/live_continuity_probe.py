@@ -92,6 +92,27 @@ def _section(text: str, header: str, *, limit: int = 900) -> str:
     return text[index : index + limit]
 
 
+def _new_outcomes(history: Sequence[Any], already_recorded: int) -> list[dict[str, Any]]:
+    """Return the capability results this probe has not seen yet.
+
+    ``capability_history`` is cumulative within a turn, so every round re-delivers
+    all earlier results. Without the offset, one failed call is counted once per
+    remaining round and the failure attribution silently multiplies.
+    """
+
+    fresh: list[dict[str, Any]] = []
+    for result in history[already_recorded:]:
+        fresh.append(
+            {
+                "name": getattr(result, "name", ""),
+                "ok": bool(getattr(result, "ok", False)),
+                "error_code": getattr(result, "error_code", None),
+                "error_message": str(getattr(result, "error_message", "") or "")[:200],
+            }
+        )
+    return fresh
+
+
 def _attribute_failures(outcomes: Sequence[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
     """Split capability failures by who has to fix them.
 
@@ -148,21 +169,20 @@ def run(args: argparse.Namespace) -> int:
     prompts: list[str] = []
     labels: list[str] = []
     outcomes: list[dict[str, Any]] = []
+    recorded = {"count": 0}
 
     def handler(snapshot):  # type: ignore[no-untyped-def]
         # Results of the previous round's capability calls arrive here. Recording
         # them is what separates "this model cannot fill in the schema" from "the
         # kernel broke" — a distinction that decides whether anything in src/ should
         # be touched at all.
-        for result in getattr(snapshot, "capability_history", ()) or ():
-            outcomes.append(
-                {
-                    "name": getattr(result, "name", ""),
-                    "ok": bool(getattr(result, "ok", False)),
-                    "error_code": getattr(result, "error_code", None),
-                    "error_message": str(getattr(result, "error_message", "") or "")[:200],
-                }
-            )
+        #
+        # capability_history is cumulative within a turn, so each round re-delivers
+        # every earlier result. Record only the tail, or one failed call is counted
+        # once per remaining round.
+        history = tuple(getattr(snapshot, "capability_history", ()) or ())
+        outcomes.extend(_new_outcomes(history, recorded["count"]))
+        recorded["count"] = len(history)
 
         directive = inner(snapshot)
         system = sent[0]["content"] if sent else ""
