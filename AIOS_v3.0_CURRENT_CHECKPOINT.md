@@ -1,3 +1,14 @@
+## 2026-10-26 — OWNER GOVERNANCE RECONCILIATION / SECURITY GATE HARDENED
+
+- Owner 裁决（本次会话）：允许密钥提交仓库、就一个能用的模型测试、推进治理。
+- STOP 裁决：Issue #396 的 `STOP / REVALIDATION_REQUIRED` → `RESOLVED_BY_OWNER`（授权链已登记、凭证处置为 owner 例外、CI 失败 triage 已说明）。独立 R1–R9 复核仍为后续可选任务，不冒充独立 Reviewer。
+- 授权链登记：`6ecfb1b9..b81635c` 共 8 提交，5 个 feature 提交带 trailer（P16×4 + P17×1），2 个 merge，1 个 owner 例外（写死 key）。详见 `governance/AIOS_AUTHORIZATION_LEDGER_RECONCILIATION_2026-10-26.md`。
+- baseline 推进：`pinned_sha` → `b81635c`，`task_id` → `PM-GOVERNANCE-SECURITY-GATE-001`，`secret_scan_paths` 纳入 `src/`，新增 `secret_allowlist`（owner 密钥例外）。
+- 安全门修复：`check_baseline.py` 增加 `nvapi-` 识别、逐提交+逐路径授权、allowlist 例外；回归测试 `tests/audit/test_check_baseline.py` 4 passed。
+- 下一任务：T2' 记忆抽取轮（确定性抽取 + 真实端点验证 durable claim > 0），见 `reviews/AIOS_PM_PLAN_GAP_ANALYSIS_2026-10-26.md`。
+
+---
+
 ## 2026-10-19 — CURRENT PM CHECKPOINT / Evidence & Core-Impact Review Pending
 
 - Current dispatch authority: `governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md`, newest CURRENT PM CONTROL block; effective only after normal governance integration into main.

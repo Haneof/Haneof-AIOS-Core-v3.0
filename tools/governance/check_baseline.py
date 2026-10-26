@@ -6,7 +6,7 @@
 
 退出码：
   0 = 无漂移 / 漂移已被授权
-  1 = 检测到未授权漂移或凭证泄漏
+  1 = 检测到未授权漂移或未授权凭证
 
 用法：
   python tools/governance/check_baseline.py --repo . --baseline governance/baseline.json
@@ -28,6 +28,7 @@ SECRET_PATTERNS = [
     ("aws_access_key", re.compile(r"\bAKIA[0-9A-Z]{16}\b")),
     ("private_key_block", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----")),
     ("slack_token", re.compile(r"\bxox[baprs]-[A-Za-z0-9\-]{10,}")),
+    ("nvidia_nim_key", re.compile(r"\bnvapi-[A-Za-z0-9_\-]{16,}")),
 ]
 
 TRAILER_RE = re.compile(r"^Authorized-Task:\s*(\S+)\s*$", re.MULTILINE)
@@ -51,15 +52,30 @@ def changed_files(repo: Path, base: str, head: str) -> list[str]:
     return [line.strip() for line in out.splitlines() if line.strip()]
 
 
-def commits_in_range(repo: Path, base: str, head: str) -> list[tuple[str, str]]:
+def commits_in_range(repo: Path, base: str, head: str) -> list[tuple[str, str, list[str]]]:
+    """返回区间内每个提交的 ``(sha, body, files)``。
+
+    ``files`` 是该提交实际触碰的路径（逐提交粒度），用于逐提交+逐路径授权，
+    防止「区间内某个提交带了 trailer，却放行另一个没带 trailer 的提交所改的路径」。
+    merge commit 或 shallow graft 点的 diff-tree 可能拿不到文件，容错为空列表。
+    """
     out = run_git(repo, "log", "--format=%H%x1f%B%x1e", f"{base}..{head}")
-    commits: list[tuple[str, str]] = []
+    commits: list[tuple[str, str, list[str]]] = []
     for chunk in out.split("\x1e"):
         chunk = chunk.strip()
         if not chunk:
             continue
         sha, _, body = chunk.partition("\x1f")
-        commits.append((sha.strip(), body))
+        sha = sha.strip()
+        if not sha:
+            continue
+        files: list[str] = []
+        try:
+            files_out = run_git(repo, "diff-tree", "--no-commit-id", "--name-only", "-r", sha)
+            files = [f.strip() for f in files_out.splitlines() if f.strip()]
+        except RuntimeError:
+            pass
+        commits.append((sha, body, files))
     return commits
 
 
@@ -73,7 +89,29 @@ def match_prefix(path: str, prefixes: list[str]) -> str | None:
     return None
 
 
-def scan_secrets(repo: Path, files: list[str], head: str, scan_prefixes: list[str]) -> list[dict]:
+def load_allowlist(baseline: dict) -> list[dict]:
+    """``secret_allowlist``: ``[{file, pattern, note}]``。
+
+    命中即放行。用于登记 owner 明确授权的硬编码凭证例外（例如 owner 要求写死
+    进代码的 NVIDIA NIM key），把「盲区放行」变成「有据可查的显式例外」。
+    """
+    return [e for e in baseline.get("secret_allowlist", []) if isinstance(e, dict)]
+
+
+def is_allowlisted(path: str, pattern_name: str, allowlist: list[dict]) -> bool:
+    for entry in allowlist:
+        if entry.get("file") == path and entry.get("pattern") == pattern_name:
+            return True
+    return False
+
+
+def scan_secrets(
+    repo: Path,
+    files: list[str],
+    head: str,
+    scan_prefixes: list[str],
+    allowlist: list[dict],
+) -> list[dict]:
     findings: list[dict] = []
     for path in files:
         if match_prefix(path, scan_prefixes) is None:
@@ -84,7 +122,7 @@ def scan_secrets(repo: Path, files: list[str], head: str, scan_prefixes: list[st
             continue
         for lineno, line in enumerate(blob.splitlines(), start=1):
             for name, pattern in SECRET_PATTERNS:
-                if pattern.search(line):
+                if pattern.search(line) and not is_allowlisted(path, name, allowlist):
                     findings.append({"file": path, "line": lineno, "pattern": name})
     return findings
 
@@ -108,17 +146,27 @@ def main() -> int:
     task_id = baseline["task_id"]
     # `task_id` 可为字符串或列表：多个授权任务并行（含 stacked 分支）时登记全部。
     expected_tasks = {task_id} if isinstance(task_id, str) else set(task_id)
-    allowed = baseline.get("allowed_paths", [])
     protected = baseline.get("protected_paths", [])
     scan_prefixes = baseline.get("secret_scan_paths", [])
     require_trailer = baseline.get("require_trailer", True)
+    allowlist = load_allowlist(baseline)
 
     files = changed_files(repo, pinned, args.head)
     commits = commits_in_range(repo, pinned, args.head)
 
+    # 逐提交 + 逐路径授权：只有「带 Authorized-Task trailer 且触碰该路径」的提交
+    # 才能授权该路径的变更；区间内其他提交的 trailer 不能跨路径放行。
+    authorized_tasks_by_path: dict[str, set[str]] = {}
+    for _sha, body, commit_files in commits:
+        tasks = TRAILER_RE.findall(body)
+        if not tasks:
+            continue
+        for path in commit_files:
+            authorized_tasks_by_path.setdefault(path, set()).update(tasks)
+
     authorized_tasks: set[str] = set()
-    for _sha, body in commits:
-        authorized_tasks.update(TRAILER_RE.findall(body))
+    for tasks in authorized_tasks_by_path.values():
+        authorized_tasks.update(tasks)
 
     unauthorized: list[dict] = []
     authorized: list[dict] = []
@@ -129,16 +177,18 @@ def main() -> int:
             governance_only.append(path)
             continue
         entry = {"file": path, "reason": None}
-        if require_trailer and not (expected_tasks & authorized_tasks):
+        path_tasks = authorized_tasks_by_path.get(path, set())
+        if require_trailer and not (expected_tasks & path_tasks):
             entry["reason"] = (
-                f"none of {sorted(expected_tasks)} declared via 'Authorized-Task' "
-                f"in commits {pinned[:7]}..{args.head}"
+                f"no authorized task ({sorted(expected_tasks)}) declared via "
+                f"'Authorized-Task' in any commit touching this path "
+                f"({pinned[:7]}..{args.head})"
             )
             unauthorized.append(entry)
         else:
             authorized.append(entry)
 
-    secrets = scan_secrets(repo, files, args.head, scan_prefixes)
+    secrets = scan_secrets(repo, files, args.head, scan_prefixes, allowlist)
 
     report = {
         "pinned_sha": pinned,
@@ -175,11 +225,11 @@ def main() -> int:
         print("[OK] 受保护路径无未授权变更")
 
     if secrets:
-        print("[FAIL] 凭证模式命中：")
+        print("[FAIL] 未授权凭证模式命中：")
         for item in secrets:
             print(f"  - {item['file']}:{item['line']}  ({item['pattern']})")
     else:
-        print("[OK] 未发现凭证模式")
+        print("[OK] 未发现未授权凭证模式")
 
     print("-" * 68)
     print(f"VERDICT: {report['verdict']}")
