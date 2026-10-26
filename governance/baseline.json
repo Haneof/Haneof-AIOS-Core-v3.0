@@ -5,7 +5,10 @@
   "pinned_by": "owner",
   "task_id": [
     "PM-GOVERNANCE-SECURITY-GATE-001",
-    "PM-DURABLE-MEMORY-EXTRACTION-001"
+    "PM-DURABLE-MEMORY-EXTRACTION-001",
+    "P16-MEMORY-DIRECTIVE-001",
+    "P16-IDENTITY-CONTINUITY-001",
+    "P16-LIVE-MODEL-001"
   ],
   "allowed_paths": [
     "governance/",

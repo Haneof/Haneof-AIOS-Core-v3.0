@@ -350,6 +350,119 @@ def _render_world_map(world_map: Any, *, max_dimensions: int = 12) -> str:
     return header + "\n" + "\n".join(lines)
 
 
+def _render_capabilities(catalog: Any, *, max_names_chars: int = 1600) -> str:
+    """Render the capability catalog for the prompt.
+
+    Two rules, both learned from a live model that could not persist anything:
+
+    1. **Name every capability.** The old renderer printed the first ten entries of
+       an alphabetically sorted list, so half the tools were invisible while the
+       prompt still referred to them by name ("use list=list_conversation_summaries")
+       — an instruction to call something the model could not see.
+    2. **State required arguments where a wrong call is unrecoverable.** A write
+       that persists understanding has to be called with the right argument names
+       first time. Guessing is not recoverable by retrying, because the turn ends.
+    """
+
+    if not isinstance(catalog, (list, tuple)) or not catalog:
+        return ""
+
+    names: list[str] = []
+    signatures: list[str] = []
+    for cap in catalog:
+        if not isinstance(cap, Mapping):
+            continue
+        name = str(cap.get("name") or "").strip()
+        if not name:
+            continue
+        names.append(name)
+        required = cap.get("required_args")
+        if isinstance(required, Mapping) and required:
+            rendered = ", ".join(
+                f"{key}:{value}" if value else str(key) for key, value in required.items()
+            )
+            signatures.append(f"- {name}({rendered})")
+
+    if not names:
+        return ""
+
+    blocks = ["named: " + ", ".join(names)[:max_names_chars]]
+    if signatures:
+        blocks.append(
+            "write path — required arguments, optional ones may be omitted:\n"
+            + "\n".join(signatures)
+        )
+        example = _render_capability_example(catalog)
+        if example:
+            blocks.append(example)
+    return "\n".join(blocks)
+
+
+# A single worked example is worth more than a schema to a small model: a local
+# 27B reproduced the same malformed call four rounds running while the argument
+# names were stated in prose, and only started emitting the right shape once the
+# shape itself was shown. One example teaches the JSON form; the signatures above
+# teach the names for the rest.
+_PRIMARY_WRITE_CAPABILITY = "commit_ai_world_claim"
+
+_PLACEHOLDERS = (
+    ("[{object_id,revision}]", [{"object_id": "<observation object_id>", "revision": 1}]),
+    ("{object_id,revision}", {"object_id": "<object_id>", "revision": 1}),
+    ("[string]", ["<text>"]),
+    ("string", "<text>"),
+    ("number[0,1]", 0.9),
+)
+
+
+def _example_value(short_type: str) -> Any:
+    for needle, value in _PLACEHOLDERS:
+        if short_type == needle:
+            return value
+    if "|" in short_type:
+        # An enum. The first branch is a legal value; the model only needs the form.
+        return short_type.split("|")[0].strip()
+    return "<value>"
+
+
+def _render_capability_example(catalog: Any) -> str:
+    for cap in catalog:
+        if not isinstance(cap, Mapping) or cap.get("name") != _PRIMARY_WRITE_CAPABILITY:
+            continue
+        required = cap.get("required_args")
+        if not isinstance(required, Mapping) or not required:
+            return ""
+        arguments = {key: _example_value(str(value)) for key, value in required.items()}
+        payload = {"call": _PRIMARY_WRITE_CAPABILITY, "arguments": arguments}
+        return "example (copy this shape):\n" + json.dumps(payload, ensure_ascii=False)
+    return ""
+
+
+def _render_capability_result(result: Any) -> str:
+    """Render one capability result for the model's next round.
+
+    A rejected call must say *why* it was rejected. Reporting only ``ok=False``
+    tells the model that something failed and nothing about what to change, so its
+    next attempt repeats the same mistake — observed live: a local model called
+    ``commit_ai_world_claim`` with ``claim``/``evidence`` instead of
+    ``statement``/``evidence_refs``, was told ``ok=False``, and retried with the
+    same wrong names. The kernel knew the required arguments were missing; it just
+    did not say so.
+    """
+
+    name = getattr(result, "name", "capability")
+    ok = bool(getattr(result, "ok", False))
+    if ok:
+        return f"Result of {name}: ok=True, data={json.dumps(getattr(result, 'data', None), ensure_ascii=False, default=str)}"
+
+    error_code = getattr(result, "error_code", None)
+    error_message = getattr(result, "error_message", None)
+    detail = ", ".join(
+        part for part in (str(error_code or "").strip(), str(error_message or "").strip()) if part
+    )
+    suffix = f", error={detail}" if detail else ""
+    return f"Result of {name}: ok=False{suffix}. Fix the arguments and call again, or answer without it."
+
+
 def _render_conversation_summaries(
     summaries: Any, *, max_chars: int = _MAX_SUMMARY_CHARS
 ) -> str:
@@ -865,11 +978,18 @@ class GrokStreamingProvider:
                     "never claim you cannot remember something that is in front of you, "
                     "and do not spend a tool round retrieving what you can already read.",
                     "1. If no response or action is warranted, output exactly '<AIOS_SILENCE>'.",
-                    "2. If you need to invoke a registered capability, output a JSON block:",
+                    "2. To invoke a registered capability, output a JSON block:",
                     "```json",
                     '{"call": "<capability_name>", "arguments": { ... }}',
                     "```",
-                    "3. Otherwise, provide a concise, high-value natural language response.",
+                    "   A call ends the round, not the turn. The kernel runs it and calls "
+                    "you again with the result, and you answer the user in that round. "
+                    "Persisting something therefore never costs you the reply — never skip "
+                    "a durable write because you also want to say something. A frontier "
+                    "model with the full write signature in view still produced four "
+                    "replies and zero writes, reading this rule as 'either call or answer'.",
+                    "3. If no capability is needed, provide a concise, high-value natural "
+                    "language response.",
                 ]
             )
 
@@ -962,6 +1082,11 @@ class GrokStreamingProvider:
             if cards:
                 system_sections.append("RELEVANT WORLD MEMORY:\n" + cards)
 
+            if snapshot.capability_catalog:
+                system_sections.append(
+                    "AVAILABLE CAPABILITIES:\n" + _render_capabilities(snapshot.capability_catalog)
+                )
+
             # Dynamic: it depends on this turn's budget arithmetic, so it must stay
             # out of the byte-stable cacheable prefix that ends with the capability
             # catalogue.
@@ -987,25 +1112,12 @@ class GrokStreamingProvider:
 
             # Ingest previous capability results in current turn if any
             if snapshot.capability_history:
-                history_lines: list[str] = []
-                for r in snapshot.capability_history:
-                    if r.ok:
-                        history_lines.append(
-                            f"Result of {r.name}: ok=True, data={json.dumps(r.data, ensure_ascii=False, default=str)}"
-                        )
-                    else:
-                        # Failures must tell the model *why*, so it can correct the
-                        # call instead of blindly retrying the same bad arguments
-                        # (C15 issue #403).
-                        err_code = getattr(r, "error_code", None) or "UNKNOWN_ERROR"
-                        err_msg = getattr(r, "error_message", None) or ""
-                        history_lines.append(
-                            f"Result of {r.name}: ok=False, error_code={err_code}, "
-                            f"error_message={err_msg}"
-                        )
+                history_text = "\n".join(
+                    _render_capability_result(r) for r in snapshot.capability_history
+                )
                 messages.append({
                     "role": "assistant",
-                    "content": "Capability execution feedback:\n" + "\n".join(history_lines)
+                    "content": "Capability execution feedback:\n" + history_text
                 })
 
             user_content = snapshot.user_input
