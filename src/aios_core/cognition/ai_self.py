@@ -22,6 +22,7 @@ from typing import Any, Sequence
 from aios_core.contracts.enums import (
     ClaimType,
     KnowledgeState,
+    MaintenanceClass,
     ObjectType,
     SourceClass,
 )
@@ -111,6 +112,12 @@ class AISelfMindTracker:
                 name="AI承诺负债与兑现账本",
                 description="复式记账法记录AI向用户做出的承诺与红字冲销记录",
                 data_shape="text",
+                # FIX-DIMENSION-SEED-NOT-VISIBLE: `_world_map_context` keys
+                # definitions by `metadata["dimension_key"]` and skips those without
+                # one, so a seed dimension written with empty metadata never appears
+                # in the WORLD MAP the resident model reads. The AI then cannot see
+                # an axis it is expected to feed.
+                metadata={"dimension_key": "dim:ai_promises_ledger"},
             )
             d2 = DimensionDefinition(
                 object_id="dim:ai_rapport_depth",
@@ -122,6 +129,7 @@ class AISelfMindTracker:
                 name="共生羁绊深度与默契历程",
                 description="AI与用户的互信、履约率与共生默契度量",
                 data_shape="scalar",
+                metadata={"dimension_key": "dim:ai_rapport_depth"},
             )
             try:
                 op = OperationRequest(
@@ -132,6 +140,42 @@ class AISelfMindTracker:
                     source_class=SourceClass.AI_COGNITION,
                 )
                 self.store.commit([d1, d2], op)
+            except Exception:
+                pass
+
+        # FIX-DIMENSION-SEED-NOT-VISIBLE backfill: worlds bootstrapped before the
+        # metadata fix already hold these definitions with `metadata == {}`, and the
+        # creation branch above is skipped for them. Without a backfill those worlds
+        # permanently keep a WORLD MAP that omits both axes. Repair in place, keeping
+        # one revision of audit history, and never overwrite a key that is already set.
+        for key in ("dim:ai_promises_ledger", "dim:ai_rapport_depth"):
+            try:
+                payload = self.store.get_payload(key)
+            except Exception:
+                continue
+            metadata = payload.get("metadata")
+            if isinstance(metadata, dict) and metadata.get("dimension_key"):
+                continue
+            definition = DimensionDefinition.model_validate(
+                {
+                    **payload,
+                    "metadata": {**(metadata or {}), "dimension_key": key},
+                    "revision": int(payload["revision"]) + 1,
+                }
+            )
+            try:
+                self.store.commit(
+                    [definition],
+                    OperationRequest(
+                        operation_name="ai_self.backfill_dimension_key",
+                        arguments={"dimension_key": key},
+                        expected_world_revision=self.store.current_world_revision(),
+                        reason="expose seed dimension in the resident WORLD MAP",
+                        idempotency_key=f"backfill-dimension-key:{key}",
+                        source_class=SourceClass.MAINTENANCE,
+                        maintenance_class=MaintenanceClass.INDEX_META,
+                    ),
+                )
             except Exception:
                 pass
 

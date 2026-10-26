@@ -1,0 +1,11 @@
+{
+  "scenario_id": "dimension-discovery-v1",
+  "scenario_version": "1",
+  "seed": 20260926,
+  "subject_id": "synthetic-user-003",
+  "resident_stream": "resident/dimension_discovery_v1.jsonl",
+  "evaluator_oracle": "oracle/dimension_discovery_v1.json",
+  "purpose": "Four weeks of a factory process engineer's life. One durable fact class (nocturnal acid reflux, 8 occurrences across note/conversation channels) recurs but fits none of the existing source-channel dimensions and no existing semantic axis, because it is a recurring body-condition signal coupled to meal timing and workload. Tests whether the resident AI autonomously proposes a new observation axis instead of filing it under an unrelated dimension.",
+  "rule": "Each model receives the resident stream in a fresh AIOS world. The oracle is evaluator-only.",
+  "end_at": "2026-06-25T00:00:00+08:00"
+}

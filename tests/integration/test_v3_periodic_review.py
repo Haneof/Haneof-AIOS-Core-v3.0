@@ -748,8 +748,66 @@ def test_periodic_review_budget_exhaustion_stays_running_and_can_resume(tmp_path
     assert second.wake.revision == 4
 
 
+def test_periodic_review_never_converging_terminates_after_bounded_resumes(tmp_path):
+    """FIX-PERIODIC-REVIEW-RESUME-BOUND.
+
+    A review whose model keeps spending the whole capability budget without ever
+    emitting a final answer used to be resumed forever: every due cycle advanced
+    the continuation index and left the Wake RUNNING. Reproduced on a real provider
+    (``model_round_index`` reached 16 on a five-observation world). The review must
+    reach a terminal state instead of looping.
+    """
+    store, index, _, _, _ = _seed_real_outcome(tmp_path)
+    policy = ReviewSchedulePolicy(
+        interval_hours=0.001,
+        lookback_hours=1000.0,
+        max_runtime_incomplete_attempts=3,
+    )
+
+    def never_converging_model(snapshot):
+        return ModelDirective(
+            capability_calls=(
+                CapabilityCall(
+                    name="read_periodic_review_anchors",
+                    arguments={"offset": 0, "limit": 1},
+                ),
+            )
+        )
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=never_converging_model,
+        max_tool_rounds=0,
+    )
+
+    states: list[str] = []
+    rounds: list[int] = []
+    moment = NOW
+    for _ in range(8):
+        moment += timedelta(minutes=1)
+        result = runtime.run_periodic_review(now=moment, policy=policy)
+        if result is None:
+            break
+        states.append(result.wake.state)
+        if result.runtime is not None:
+            rounds.append(result.runtime.model_rounds)
+        if result.wake.state == "suppressed":
+            break
+
+    assert states[-1] == "suppressed", states
+    assert states.count("running") == 3, states
+    payload = store.get_payload(result.wake.wake_id)
+    assert payload["wake_state"] == "suppressed"
+    reasons = payload["metadata"]["budget_suppress_reasons"]
+    assert any("did not converge" in item for item in reasons)
+    # Exactly the bounded number of provider calls, then no more.
+    assert len(rounds) == 3
+    # A later cycle must not resurrect the suppressed review.
+    assert runtime.run_periodic_review(now=moment + timedelta(hours=1), policy=policy) is None
+
+
 def test_cg001_resumed_periodic_review_uses_original_start_as_read_cut(tmp_path):
-    """A resumed review must not read T2 facts while model writeback remains at T1."""
     store, index, original_observation, _, _ = _seed_real_outcome(tmp_path)
     t1 = NOW
     t2 = NOW + timedelta(minutes=5)

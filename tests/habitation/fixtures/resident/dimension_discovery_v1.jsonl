@@ -1,0 +1,16 @@
+{"event_id":"e1-work-baseline","occurred_at":"2026-06-02T09:10:00+08:00","channel":"conversation","payload":"新产线的注塑模具刚开好，第一批就打样了，尺寸还在调。","metadata":{"source":"chat","session":"w1"}}
+{"event_id":"e2-care-reflux-night","occurred_at":"2026-06-03T23:40:00+08:00","channel":"note","payload":"凌晨两点被反酸呛醒，喉咙火烧一样，坐起来半小时才压下去。这几天晚饭都吃得晚。","metadata":{"source":"notes","session":"w1"}}
+{"event_id":"e3-work-mold-tweak","occurred_at":"2026-06-04T18:20:00+08:00","channel":"conversation","payload":"模具改了第三版，缩水率还是不达标，师傅说明天再试。","metadata":{"source":"chat","session":"w1"}}
+{"event_id":"e4-care-reflux-after-late-meal","occurred_at":"2026-06-06T01:15:00+08:00","channel":"note","payload":"又是反酸。今天十点半才吃完夜宵，躺下就顶上来，含了两片药。","metadata":{"source":"notes","session":"w1"}}
+{"event_id":"e5-work-customer-audit","occurred_at":"2026-06-08T15:00:00+08:00","channel":"calendar","payload":{"title":"客户过程审核","start":"2026-06-09T09:30:00+08:00","duration_minutes":240},"metadata":{"source":"calendar","session":"w1"}}
+{"event_id":"e6-care-reflux-coffee","occurred_at":"2026-06-10T22:30:00+08:00","channel":"conversation","payload":"下午连喝三杯浓咖啡顶着，晚上胃又开始往上翻，胸口堵得慌。","metadata":{"source":"chat","session":"w2"}}
+{"event_id":"e7-noise-lunch","occurred_at":"2026-06-11T12:10:00+08:00","channel":"conversation","payload":"楼下新开了家螺蛳粉，味道意外还行。","metadata":{"source":"chat","session":"w2"}}
+{"event_id":"e8-work-line-stop","occurred_at":"2026-06-12T20:00:00+08:00","channel":"note","payload":"下午停机两小时处理模具，客户那边催交期。","metadata":{"source":"notes","session":"w2"}}
+{"event_id":"e9-care-reflux-fourth","occurred_at":"2026-06-14T02:05:00+08:00","channel":"note","payload":"第四次了。躺下就反酸，枕头垫高也没用，早上嘴里发苦。","metadata":{"source":"notes","session":"w2"}}
+{"event_id":"e10-noise-cat","occurred_at":"2026-06-15T19:30:00+08:00","channel":"photo_description","payload":"小区里的三花猫又蹲在车底下，喂了根火腿肠。","metadata":{"source":"gallery_summary","session":"w2"}}
+{"event_id":"e11-care-reflux-shift","occurred_at":"2026-06-17T23:50:00+08:00","channel":"conversation","payload":"最近几乎天天夜里反酸，白天嗓子是哑的，说话多了就疼。","metadata":{"source":"chat","session":"w3"}}
+{"event_id":"e12-work-yield-good","occurred_at":"2026-06-18T16:30:00+08:00","channel":"conversation","payload":"这周良率稳在94%，模具终于调好了，客户审核也过了。","metadata":{"source":"chat","session":"w3"}}
+{"event_id":"e13-care-reflux-persist","occurred_at":"2026-06-20T01:40:00+08:00","channel":"note","payload":"反酸没停，昨晚坐着睡到三点。是不是该去医院查一下了。","metadata":{"source":"notes","session":"w3"}}
+{"event_id":"e14-noise-movie","occurred_at":"2026-06-21T21:00:00+08:00","channel":"conversation","payload":"周末看了个老片子，节奏太慢，看到一半睡着了。","metadata":{"source":"chat","session":"w3"}}
+{"event_id":"e15-work-plan","occurred_at":"2026-06-22T10:00:00+08:00","channel":"note","payload":"下季度要把这条线的节拍压到45秒，得重新排工位。","metadata":{"source":"notes","session":"w3"}}
+{"event_id":"e16-care-reflux-week","occurred_at":"2026-06-24T00:30:00+08:00","channel":"conversation","payload":"这周还是天天夜里反酸，含药也不管用了，白天没精神。","metadata":{"source":"chat","session":"w4"}}

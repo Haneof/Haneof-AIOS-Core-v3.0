@@ -1,0 +1,37 @@
+{
+  "scenario_id": "longitudinal-multiscale-v1",
+  "latent_truth": {
+    "evaluation_only": true,
+    "description": "Across three weeks the resident moves from overtime-driven sleep deprivation and rising stress toward recovered sleep, resolved yield work and lower stress. The health and work dimensions are causally coupled rather than independent: sleep loss and neck pain degrade work efficiency, and the running habit plus SPC/DOE learning restore both. Three unrelated chitchat events must not be read as trends."
+  },
+  "event_annotations": {
+    "d0302-chat": {"role": "work_baseline_low_yield"},
+    "d0304-chat": {"role": "health_baseline_sleep_deprivation"},
+    "d0306-chat": {"role": "emotion_stress_peak_week1"},
+    "d0307-chat": {"role": "noise_unrelated_chitchat"},
+    "d0308-chat": {"role": "week1_close_low_state"},
+    "d0309-chat": {"role": "health_neck_pain_triggered_by_overtime"},
+    "d0310-note": {"role": "cross_dimension_health_degrades_work_efficiency"},
+    "d0311-chat": {"role": "health_checkup_wakeup_call"},
+    "d0312-chat": {"role": "health_intervention_running_start"},
+    "d0314-note": {"role": "noise_unrelated_chitchat"},
+    "d0315-chat": {"role": "week2_transitional_improvement"},
+    "d0317-note": {"role": "learning_spc_doe_course"},
+    "d0318-chat": {"role": "work_turning_point_yield_resolved_via_learning"},
+    "d0319-chat": {"role": "noise_unrelated_chitchat"},
+    "d0320-chat": {"role": "family_reflects_emotion_recovery"},
+    "d0321-chat": {"role": "health_confirmation_hiking"},
+    "d0322-chat": {"role": "week3_close_recovered_state"},
+    "d0322-chat-final": {"role": "cross_week_recall_probe"}
+  },
+  "criteria": [
+    "periodic_cross_week_trend_summary",
+    "cross_dimension_health_work_coupling",
+    "noise_resilience_no_false_pattern"
+  ],
+  "anti_leak_rule": "Evaluator only. Do not place this file in resident context.",
+  "scenario_version": "1",
+  "seed": 20260925,
+  "subject_id": "synthetic-user-002",
+  "evaluation_schema": "aios.p16.oracle.v1"
+}

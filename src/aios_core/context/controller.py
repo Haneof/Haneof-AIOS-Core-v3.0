@@ -7,17 +7,31 @@ empty.
 
 from __future__ import annotations
 
-import json
+import logging
 from typing import Any, Mapping, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from aios_core.context.budget_policy import resolve_context_budget_policy
 from aios_core.recommendation.proactive import MemoryCard, RecommendationBundle
 
+_LOGGER = logging.getLogger(__name__)
 
-def estimate_tokens(value: Any) -> int:
-    text = json.dumps(value, ensure_ascii=False, sort_keys=True, default=str)
-    return max(1, (len(text) + 3) // 4)
+try:
+    # Owned by aios_core.context.tokenization; imported here so the historical
+    # ``from aios_core.context.controller import estimate_tokens`` keeps working.
+    from aios_core.context.tokenization import estimate_tokens
+except ImportError:  # pragma: no cover - tokenization module not landed yet
+    _LOGGER.warning(
+        "aios_core.context.tokenization is unavailable; falling back to the legacy "
+        "len(json)/4 estimator, which under-counts CJK text by ~2.5x."
+    )
+
+    import json
+
+    def estimate_tokens(value: Any) -> int:
+        text = json.dumps(value, ensure_ascii=False, sort_keys=True, default=str)
+        return max(1, (len(text) + 3) // 4)
 
 
 class ModelContextBundle(BaseModel):
@@ -35,6 +49,10 @@ class ModelContextBundle(BaseModel):
     token_budget: int = Field(ge=128)
     estimated_tokens: int = Field(ge=0)
     truncated: bool = False
+    # How many entries were dropped per section, e.g. {"recent_turns": 4}. Without it
+    # truncation is invisible: `truncated` never reaches the prompt, so the model
+    # experiences silent amnesia it cannot explain.
+    dropped_sections: Mapping[str, int] = Field(default_factory=dict)
 
     def as_cockpit(self) -> dict[str, Any]:
         return self.model_dump(mode="python")
@@ -43,10 +61,15 @@ class ModelContextBundle(BaseModel):
 class ContextController:
     """Assemble a bounded context without replacing AI judgment."""
 
-    def __init__(self, *, default_token_budget: int = 3400) -> None:
-        if default_token_budget < 128:
-            raise ValueError("default_token_budget must be >= 128")
-        self.default_token_budget = default_token_budget
+    def __init__(self, *, default_token_budget: int | None = None) -> None:
+        policy = resolve_context_budget_policy(context_token_budget=default_token_budget)
+        budget = policy.context_token_budget
+        if budget < policy.context_min_token_budget:
+            raise ValueError(
+                "default_token_budget must be >= "
+                f"{policy.context_min_token_budget}"
+            )
+        self.default_token_budget = budget
 
     def assemble(
         self,
@@ -65,9 +88,10 @@ class ContextController:
         if not user_input.strip():
             raise ValueError("user_input must be non-blank")
 
+        policy = resolve_context_budget_policy()
         budget = self.default_token_budget if token_budget is None else int(token_budget)
-        if budget < 128:
-            raise ValueError("token_budget must be >= 128")
+        if budget < policy.context_min_token_budget:
+            raise ValueError(f"token_budget must be >= {policy.context_min_token_budget}")
 
         identity = dict(ai_identity or {})
         map_context = dict(world_map or {})
@@ -85,12 +109,15 @@ class ContextController:
         used = estimate_tokens(fixed)
         truncated = used > budget
 
+        dropped: dict[str, int] = {}
+
         selected_turns: list[Mapping[str, Any]] = []
         # Preserve the most recent dialogue first, then restore chronological order.
         for turn in reversed(list(recent_turns)):
             cost = estimate_tokens(turn)
             if used + cost > budget:
                 truncated = True
+                dropped["recent_turns"] = dropped.get("recent_turns", 0) + 1
                 continue
             selected_turns.append(dict(turn))
             used += cost
@@ -103,6 +130,9 @@ class ContextController:
             cost = estimate_tokens(summary)
             if used + cost > budget:
                 truncated = True
+                dropped["conversation_summaries"] = (
+                    dropped.get("conversation_summaries", 0) + 1
+                )
                 continue
             selected_summaries.append(dict(summary))
             used += cost
@@ -113,6 +143,7 @@ class ContextController:
             cost = estimate_tokens(card.model_dump(mode="python"))
             if used + cost > budget:
                 truncated = True
+                dropped["memory_cards"] = dropped.get("memory_cards", 0) + 1
                 continue
             selected_cards.append(card)
             used += cost
@@ -130,4 +161,5 @@ class ContextController:
             token_budget=budget,
             estimated_tokens=used,
             truncated=truncated,
+            dropped_sections=dict(dropped),
         )

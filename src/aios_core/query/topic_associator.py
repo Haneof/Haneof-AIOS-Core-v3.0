@@ -20,6 +20,8 @@ import re
 import time
 from typing import Any, Sequence
 
+from aios_core.context.budget_policy import resolve_context_budget_policy
+from aios_core.context.tokenization import count_text_tokens
 from aios_core.contracts.enums import ObjectType
 from aios_core.contracts.models import ObjectRef
 from aios_core.contracts.time import as_utc
@@ -29,7 +31,34 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 
 def _estimate_tokens(text: str) -> int:
-    return max(1, (len(text) + 3) // 4)
+    """Conservative token estimate shared with the context budget machinery.
+
+    The legacy ``(len(text) + 3) // 4`` formula undercounts Chinese text by roughly
+    2.5x (measured: ~0.636 tokens/char for Chinese vs the 0.25 implied by /4), which
+    let narrative cards silently exceed their stated budget. Delegate to the single
+    source of truth instead of keeping a second, divergent copy here.
+    """
+    return count_text_tokens(text)
+
+
+def _truncate_text_to_tokens(text: str, budget_tokens: int) -> str:
+    """Longest prefix of `text` whose estimate fits `budget_tokens`.
+
+    Binary search relies on `count_text_tokens` being monotonic (longer text never
+    estimates cheaper), which holds for its per-character weighting.
+    """
+    if budget_tokens <= 0:
+        return ""
+    if count_text_tokens(text) <= budget_tokens:
+        return text
+    lo, hi = 0, len(text)
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        if count_text_tokens(text[:mid]) <= budget_tokens:
+            lo = mid
+        else:
+            hi = mid - 1
+    return text[:lo]
 
 
 _STOPWORDS: set[str] = {
@@ -101,9 +130,14 @@ class DynamicTopicAssociator:
         self,
         query: str,
         *,
-        max_tokens: int = 500,
+        max_tokens: int | None = None,
     ) -> AdHocTopicCard:
         """Perform fast multi-path associative retrieval across unified world store in <= 30ms."""
+        # Omitted / non-positive -> policy (also honours AIOS_BUDGET_* overrides);
+        # an explicit argument still wins.
+        max_tokens = resolve_context_budget_policy(
+            narrative_context_tokens=max_tokens
+        ).narrative_context_tokens
         t_start = time.perf_counter()
         clean_query = query.strip()
         keywords = _extract_keywords(clean_query)
@@ -256,18 +290,23 @@ class DynamicTopicAssociator:
         context_text = "\n".join(lines)
         est_tokens = _estimate_tokens(context_text)
 
-        # Budget truncation if exceeds max_tokens
+        # Budget truncation if exceeds max_tokens.
+        # The budget is a HARD bound: the header line alone can already exceed a very
+        # small `max_tokens`, so the surviving body is additionally cut to size instead
+        # of being emitted over budget. Underestimating estimators used to hide this.
         if est_tokens > max_tokens:
-            truncated_lines: list[str] = [lines[0]]
+            suffix = "... (已依据Token预算上限紧凑裁剪)"
+            line_gen = [lines[0]]
             cur_tokens = _estimate_tokens(lines[0])
             for line in lines[1:]:
                 line_tokens = _estimate_tokens(line)
                 if cur_tokens + line_tokens + 8 > max_tokens:
-                    truncated_lines.append("... (已依据Token预算上限紧凑裁剪)")
                     break
-                truncated_lines.append(line)
+                line_gen.append(line)
                 cur_tokens += line_tokens
-            context_text = "\n".join(truncated_lines)
+            body_budget = max(0, max_tokens - _estimate_tokens(suffix))
+            body = _truncate_text_to_tokens("\n".join(line_gen), body_budget)
+            context_text = f"{body}{suffix}" if body else suffix
             est_tokens = _estimate_tokens(context_text)
 
         duration_ms = (time.perf_counter() - t_start) * 1000.0

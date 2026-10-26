@@ -30,12 +30,16 @@ class ModelUsage:
     # completion_tokens 只计最终可见输出。若这里留空，思考开销会被静默吞掉，
     # 成本核算严重低估。默认 None 表示上游未报告，保持向后兼容。
     reasoning_tokens: int | None = None
+    # 上游自动前缀缓存命中的输入 token 数（OpenAI 兼容端点经
+    # prompt_tokens_details.cached_tokens 上报）。None = 上游未报告或未命中。
+    # 缓存命中的部分通常按约一折计价，不记录它就无法核算真实成本。
+    cached_input_tokens: int | None = None
     provider: str | None = None
     model: str | None = None
     request_id: str | None = None
 
     def __post_init__(self) -> None:
-        for field_name in ("total_tokens", "input_tokens", "output_tokens", "reasoning_tokens"):
+        for field_name in ("total_tokens", "input_tokens", "output_tokens", "reasoning_tokens", "cached_input_tokens"):
             value = getattr(self, field_name)
             if value is None:
                 continue

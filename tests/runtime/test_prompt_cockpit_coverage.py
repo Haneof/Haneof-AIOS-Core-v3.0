@@ -44,6 +44,7 @@ SENTINELS: dict[str, str] = {
     "memory_cards": "SENTINEL_memory_cards_9a7",
     "task_context": "SENTINEL_task_context_9a8",
     "capability_catalog": "SENTINEL_capability_catalog_9a9",
+    "dropped_sections": "SENTINEL_dropped_sections_9b1",
 }
 
 
@@ -114,6 +115,9 @@ def _cockpit() -> dict:
         "capability_catalog": [
             {"name": SENTINELS["capability_catalog"], "description": "a capability"}
         ],
+        # A section name the renderer has never seen must still be shown: the
+        # model has to learn that something was cut even for a future section.
+        "dropped_sections": {SENTINELS["dropped_sections"]: 2},
         "token_budget": 3400,
         "estimated_tokens": 120,
         "truncated": False,

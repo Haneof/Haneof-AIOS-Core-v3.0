@@ -128,6 +128,12 @@ class ReviewSchedulePolicy(BaseModel):
     lookback_hours: FiniteFloat = Field(default=72.0, gt=0.0)
     max_candidates: int = Field(default=80, ge=1, le=500)
     max_per_object_type: int = Field(default=20, ge=1, le=100)
+    # Termination bound for the "known-safe continuation point" mechanism. A
+    # runtime-incomplete review keeps its Wake RUNNING and is resumed later; without
+    # a bound, a review the model never converges (e.g. it keeps spending its whole
+    # capability budget on reads and never emits a final answer) is resumed forever.
+    # Documented in docs/fixes/FIX-PERIODIC-REVIEW-RESUME-BOUND.md.
+    max_runtime_incomplete_attempts: int = Field(default=3, ge=1, le=20)
 
 
 class ReviewAnchor(BaseModel):

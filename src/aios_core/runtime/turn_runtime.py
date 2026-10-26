@@ -29,6 +29,7 @@ from aios_core.context.continuity import (
     RoundSummaryRequest,
 )
 from aios_core.context.active_window import ActiveRollingWindow, ActiveTurn
+from aios_core.context.budget_policy import resolve_context_budget_policy
 from aios_core.context.controller import ContextController, ModelContextBundle
 from aios_core.communication import CommunicationExperienceRequest, CommunicationExperienceService
 from aios_core.communication.experience_tracker import ExperienceTracker
@@ -2890,11 +2891,16 @@ class FusedTurnRuntime:
     def _associate_topics(
         self,
         query: str,
-        max_tokens: int = 500,
+        max_tokens: int | None = None,
     ) -> dict[str, Any]:
+        # Omitted / non-positive -> policy (also honours AIOS_BUDGET_* overrides);
+        # an explicit argument still wins.
+        narrative_tokens = resolve_context_budget_policy(
+            narrative_context_tokens=max_tokens
+        ).narrative_context_tokens
         card = self.topic_associator.associate_topic(
             query=str(query),
-            max_tokens=int(max_tokens or 500),
+            max_tokens=narrative_tokens,
         )
         return card.as_context_card()
 
@@ -4152,9 +4158,9 @@ class FusedTurnRuntime:
         self.index.catch_up()
         rolling_window = self.active_rolling_windows.setdefault(
             session,
+            # max_active_turns / max_token_budget omitted: ActiveRollingWindow
+            # resolves them from the shared policy (AIOS_BUDGET_* honoured).
             ActiveRollingWindow(
-                max_active_turns=6,
-                max_token_budget=1500,
                 session_id=session,
                 store=self.store,
             ),
@@ -4985,6 +4991,7 @@ class FusedTurnRuntime:
         any cognition/experience written by model capabilities are the durable audit.
         """
         self.attention_watches.expire_due(now=now)
+        policy = policy or ReviewSchedulePolicy()
         request = self.periodic_review.prepare_due_review(
             now=now,
             policy=policy,
@@ -4993,6 +5000,42 @@ class FusedTurnRuntime:
             return None
 
         review_wake = self.wake_bus.current_wake(request.wake_ref.object_id)
+
+        # FIX-PERIODIC-REVIEW-RESUME-BOUND: a runtime-incomplete review keeps its Wake
+        # RUNNING and is resumed by the next due cycle. The continuation index only
+        # ever grows, so a review whose model never converges would be resumed
+        # indefinitely -- burning a full model+capability budget per cycle and never
+        # reaching a terminal state. Bound the number of resumptions and terminate
+        # the review as SUPPRESSED (the missing summary is visible, not silent).
+        resume_attempts = int(review_wake.metadata.get("runtime_incomplete_attempts") or 0)
+        if (
+            review_wake.metadata.get("runtime_incomplete")
+            and resume_attempts >= policy.max_runtime_incomplete_attempts
+        ):
+            exhausted_wake = self.periodic_review.suppress_review(
+                request,
+                suppressed_at=now,
+                reasons=(
+                    "periodic review did not converge within "
+                    f"{policy.max_runtime_incomplete_attempts} resumptions "
+                    f"(last termination: "
+                    f"{review_wake.metadata.get('runtime_incomplete_reason')})",
+                ),
+            )
+            self.index.catch_up()
+            return PeriodicReviewRunResult(
+                request=request,
+                runtime=None,
+                context=None,
+                wake=exhausted_wake,
+                budget=self.background_budget_gate.evaluate(
+                    review_wake,
+                    now=now,
+                    max_model_rounds=self.cognitive_runtime.max_tool_rounds + 1,
+                    require_full_model_round_budget=True,
+                ),
+            )
+
         budget_decision = self.background_budget_gate.evaluate(
             review_wake,
             now=now,

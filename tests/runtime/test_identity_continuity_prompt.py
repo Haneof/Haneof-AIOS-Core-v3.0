@@ -49,12 +49,12 @@ class _PromptCapture:
         return self.prompts[-1]
 
 
-def _snapshot(cockpit: dict) -> RuntimeSnapshot:
+def _snapshot(cockpit: dict, catalog: tuple = ()) -> RuntimeSnapshot:
     return RuntimeSnapshot(
         user_input=cockpit.get("user_input", "hi"),
         wake_reason="user_explicit",
         cockpit=cockpit,
-        capability_catalog=(),
+        capability_catalog=catalog,
         capability_history=(),
         round_index=0,
         remaining_tool_rounds=2,
@@ -142,8 +142,11 @@ def test_standing_constraints_precede_dialogue_and_are_never_omitted() -> None:
 
     assert "STANDING CONSTRAINTS" in prompt
     assert "反爹味" in prompt
-    assert prompt.index("STANDING CONSTRAINTS") < prompt.index("RECENT CONVERSATION")
-    assert prompt.index("CONTINUITY ANCHOR") < prompt.index("RECENT CONVERSATION")
+    # Match the section HEADING, not the mention of "RECENT CONVERSATION"
+    # inside CONSTITUTIONAL RULES 0 ("The RECENT CONVERSATION block below...").
+    dialogue_heading = "RECENT CONVERSATION (verbatim"
+    assert prompt.index("STANDING CONSTRAINTS") < prompt.index(dialogue_heading)
+    assert prompt.index("CONTINUITY ANCHOR") < prompt.index(dialogue_heading)
 
 
 def test_round_summaries_reach_the_prompt_as_covered_history() -> None:
@@ -317,3 +320,69 @@ def test_identity_survives_context_exhaustion_end_to_end(tmp_path: Path) -> None
     assert "东莞" in prompt
     assert "敬语" in prompt
     assert ref["committed"] is True
+
+
+def test_static_prefix_is_contiguous_and_byte_stable_across_calls() -> None:
+    """CACHE-FRIENDLY SECTION ORDER.
+
+    OpenAI-compatible endpoints only grant automatic prompt-prefix cache hits
+    when the leading bytes of the request are identical across calls. The
+    capability catalog (~2.9k tokens, stable for the process lifetime) used to
+    sit AFTER the world map and recent dialogue, so every dynamic section
+    shattered the cacheable prefix and roughly half of all input tokens were
+    re-billed at full price on every call. Static sections (rules + catalog)
+    must now form one contiguous prefix, and all dynamic world state must come
+    strictly after it.
+    """
+    catalog = (
+        {"name": "commit_ai_world_claim", "description": "persist a durable claim",
+         "input_schema": {"statement": "string", "confidence": "number[0,1]"}},
+        {"name": "propose_dimension", "description": "propose a new axis",
+         "input_schema": {"dimension_key": "string"}},
+    )
+    identity = {
+        "ethical_invariants": ["反爹味、反谄媚，守住平等真诚"],
+        "symbiotic_posture": "old_friend",
+        "user_understanding": [_claim("user_understanding", "用户叫老王", "clm_u1")],
+    }
+
+    prompt_a = _run(
+        _snapshot(
+            {
+                "user_input": "今天怎么样",
+                "ai_identity": identity,
+                "recent_turns": [
+                    {"turn_index": 1, "user": {"text": "早上好"},
+                     "assistant": {"text": "早"}}
+                ],
+            },
+            catalog=catalog,
+        )
+    )
+    prompt_b = _run(
+        _snapshot(
+            {
+                "user_input": "完全不同的一句话",
+                "ai_identity": identity,
+                "recent_turns": [
+                    {"turn_index": 2, "user": {"text": "良率掉到62了"},
+                     "assistant": {"text": "先看失效分布"}}
+                ],
+            },
+            catalog=catalog,
+        )
+    )
+
+    # Static sections form one contiguous block BEFORE any dynamic content.
+    assert prompt_a.index("STANDING CONSTRAINTS") < prompt_a.index(
+        "AVAILABLE CAPABILITIES"
+    ) < prompt_a.index("CONTINUITY ANCHOR") < prompt_a.index(
+        "RECENT CONVERSATION (verbatim"
+    )
+
+    # Everything before the first dynamic section is byte-identical across
+    # calls even though user input and dialogue differ completely.
+    cut = prompt_a.index("CONTINUITY ANCHOR")
+    assert prompt_a[:cut] == prompt_b[:prompt_b.index("CONTINUITY ANCHOR")]
+    # Sanity: the differing part really is the dialogue tail.
+    assert prompt_a != prompt_b

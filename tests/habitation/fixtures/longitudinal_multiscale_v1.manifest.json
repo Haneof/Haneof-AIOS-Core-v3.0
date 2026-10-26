@@ -1,0 +1,11 @@
+{
+  "scenario_id": "longitudinal-multiscale-v1",
+  "scenario_version": "1",
+  "seed": 20260925,
+  "subject_id": "synthetic-user-002",
+  "resident_stream": "resident/longitudinal_multiscale_v1.jsonl",
+  "evaluator_oracle": "oracle/longitudinal_multiscale_v1.json",
+  "purpose": "Three-week multi-dimension life stream (work / health / emotion / learning / family) with periodic day-level and week-level evolution plus noise events",
+  "rule": "Each model receives the resident stream in a fresh AIOS world. The oracle is evaluator-only.",
+  "end_at": "2026-03-23T00:00:00+08:00"
+}

@@ -24,8 +24,9 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Collection, Mapping, Sequence
 
+from aios_core.context.budget_policy import resolve_context_budget_policy
 from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import (
     ModelCallProvenance,
@@ -46,11 +47,16 @@ DEFAULT_MODEL_SECONDARY = os.environ.get("AIOS_GROK_MODEL_SECONDARY", "grok-4.5"
 
 # Cockpit keys that are bookkeeping rather than context; they only waste budget.
 _COCKPIT_SCALAR_SKIP = frozenset({"token_budget", "estimated_tokens", "truncated", "user_input"})
-_MAX_RECENT_CHARS = 6000
-_MAX_CARD_CHARS = 2000
+
+# Injection soft caps. Budgets live in the policy (which also honours
+# ``AIOS_BUDGET_*`` overrides) instead of being re-invented here.
+_BUDGET_POLICY = resolve_context_budget_policy()
+_MAX_RECENT_CHARS = _BUDGET_POLICY.recent_turn_injection_tokens
+_MAX_CARD_CHARS = _BUDGET_POLICY.memory_injection_tokens
 _MAX_IDENTITY_CHARS = 1600
 _MAX_IDENTITY_STATEMENT_CHARS = 240
-_MAX_SUMMARY_CHARS = 1800
+# Round summaries are memory about earlier turns, so they share the memory budget.
+_MAX_SUMMARY_CHARS = _BUDGET_POLICY.memory_injection_tokens
 
 # AI-world domains that carry durable "who we are" evidence. Order is deliberate:
 # the relationship frames how to read the user, the user facts frame the work, and
@@ -394,6 +400,73 @@ def _render_memory_cards(cards: Any, *, max_chars: int = _MAX_CARD_CHARS) -> str
     return text[-max_chars:] if len(text) > max_chars else text
 
 
+# How to name a trimmed section for the model, and which registered capability
+# pulls it back. Keys are the section names ContextController records in
+# ``ModelContextBundle.dropped_sections``; every route here is a real capability
+# registered by the runtime, never an invented one.
+_DROPPED_SECTION_ROUTES: dict[str, tuple[str, tuple[str, ...]]] = {
+    "recent_turns": ("verbatim recent dialogue", ("drill_down_conversation",)),
+    "conversation_summaries": (
+        "round summaries",
+        ("list_conversation_summaries", "search_conversation_summaries"),
+    ),
+    "memory_cards": ("world memory cards", ("search_world", "expand_recall")),
+}
+
+
+def _render_dropped_sections(
+    dropped: Any, *, available_capabilities: Collection[str] = ()
+) -> str:
+    """Tell the model that part of its world was cut for budget, and how to get it back.
+
+    ``truncated`` is excluded from the prompt by ``_COCKPIT_SCALAR_SKIP``, so without
+    this block a budget trim is indistinguishable from forgetting: the model says "I
+    don't remember" about entries that are still in the world store, and neither the
+    user nor the audit trail can tell a retrieval failure from a context cut.
+
+    Rendered only when something was actually dropped, so the common case costs no
+    tokens and does not perturb the prompt.
+    """
+    if not isinstance(dropped, Mapping) or not dropped:
+        return ""
+
+    known = set(available_capabilities)
+    lines: list[str] = []
+    for raw_key, raw_count in dropped.items():
+        try:
+            count = int(raw_count)
+        except (TypeError, ValueError):
+            continue
+        if count <= 0:
+            continue
+        key = str(raw_key)
+        label, routes = _DROPPED_SECTION_ROUTES.get(key, (key, ()))
+        # Only name a capability that is actually registered this turn; otherwise
+        # the model would call a route that returns CAPABILITY_NOT_FOUND.
+        usable = [route for route in routes if route in known]
+        how = (
+            "recover it with " + " / ".join(usable)
+            if usable
+            else "recover it with the recall capabilities listed in AVAILABLE CAPABILITIES"
+        )
+        lines.append(f"- {label} ({key}): {count} cut this turn — {how}")
+
+    if not lines:
+        return ""
+
+    return (
+        "CONTEXT TRIMMED THIS TURN (a budget cut, not missing memory):\n"
+        "Some entries did not fit into this turn's context budget and were left out "
+        "of the prompt above. They were not forgotten and were never absent from the "
+        "world store — they simply did not fit here:\n"
+        + "\n".join(lines)
+        + "\nThey still exist. If the user asks about something you cannot see above, "
+        "call the capability named on its line and check before saying you do not "
+        "remember; say it was cut from this turn's context rather than claiming you "
+        "never knew it, and never fill the gap with an invented answer."
+    )
+
+
 @dataclass(frozen=True)
 class GrokProviderConfig:
     """Configuration for Grok streaming endpoints."""
@@ -404,7 +477,11 @@ class GrokProviderConfig:
     secondary_model: str = DEFAULT_MODEL_SECONDARY
     timeout_seconds: float = 60.0
     temperature: float = 0.6
-    max_output_tokens: int = 4096
+    # Resolved per construction so ``AIOS_BUDGET_MODEL_OUTPUT_TOKENS`` applies
+    # without a code change; an explicit argument still wins.
+    max_output_tokens: int = field(
+        default_factory=lambda: resolve_context_budget_policy().model_output_tokens
+    )
 
 
 class GrokStreamingProvider:
@@ -460,12 +537,24 @@ class GrokStreamingProvider:
             accumulated_chunks = []
             captured_id = None
             raw_usage = None
+            attempt_start = time.perf_counter()
+            # Socket timeout guards a stalled read; an overall deadline additionally
+            # guards a slow-but-alive stream (e.g. a provider dribbling keep-alives
+            # or a long reasoning preamble) from holding a turn forever. It is
+            # intentionally larger than the socket timeout so legitimate slow
+            # completions survive while true hangs still terminate.
+            overall_deadline = self.config.timeout_seconds * 3.0
             try:
                 with urllib.request.urlopen(req, timeout=self.config.timeout_seconds) as resp:
                     if resp.status != 200:
                         raise RuntimeError(f"Grok provider returned HTTP status {resp.status}")
 
                     for raw_line in resp:
+                        if time.perf_counter() - attempt_start > overall_deadline:
+                            raise TimeoutError(
+                                f"Grok stream exceeded overall deadline "
+                                f"{overall_deadline:.0f}s"
+                            )
                         line = raw_line.decode("utf-8", errors="replace").strip()
                         if not line or not line.startswith("data: "):
                             continue
@@ -518,6 +607,7 @@ class GrokStreamingProvider:
         # Compute usage
         # reasoning_tokens 语义：None = 上游未报告（fallback 估算分支不得瞎猜）；
         # 0 = 上游已报告且确无思考消耗；>0 = 显式记录的思考开销。
+        cached_tokens = 0
         if raw_usage:
             prompt_tokens = int(raw_usage.get("prompt_tokens", 0))
             completion_tokens = int(raw_usage.get("completion_tokens", 0))
@@ -539,6 +629,15 @@ class GrokStreamingProvider:
             else:
                 inferred = total_tokens - prompt_tokens - completion_tokens
                 reasoning_tokens = inferred if inferred > 0 else 0
+
+            # 上游自动前缀缓存的命中量（OpenAI 兼容端点标准字段）。
+            # 不解析它，缓存节省的成本在计量表里完全不可见。
+            prompt_details = raw_usage.get("prompt_tokens_details")
+            cached_tokens = (
+                int(prompt_details.get("cached_tokens", 0) or 0)
+                if isinstance(prompt_details, Mapping)
+                else 0
+            )
 
             billed_floor = prompt_tokens + completion_tokens + reasoning_tokens
             if total_tokens < billed_floor:
@@ -564,6 +663,7 @@ class GrokStreamingProvider:
             input_tokens=prompt_tokens,
             output_tokens=completion_tokens,
             reasoning_tokens=reasoning_tokens,
+            cached_input_tokens=cached_tokens if cached_tokens > 0 else None,
             provider="grok",
             model=chosen_model,
             request_id=request_id,
@@ -609,18 +709,13 @@ class GrokStreamingProvider:
                     "topic, session, model or context length):\n" + standing
                 )
 
-            # The continuity anchor is what makes a resumed conversation feel like
-            # the same assistant rather than a fresh instance.
-            anchor = _render_identity(identity)
-            if anchor:
-                system_sections.append(
-                    "CONTINUITY ANCHOR (durable world-store evidence about this "
-                    "user and this relationship — evidence, not a script; you still "
-                    "decide what it means):\n" + anchor
-                )
-
             system_sections.extend(
                 [
+                    "RESPONSE LANGUAGE:",
+                    "- Reply in the language the user writes in. When the user writes "
+                    "Simplified Chinese, reply in Simplified Chinese (简体中文), "
+                    "including summaries, operation experiences and claims you persist. "
+                    "Keep identifiers, capability names and JSON keys in English.",
                     "DURABLE MEMORY DISCIPLINE:",
                     "- Anything that stays true beyond this conversation — who the user "
                     "is, their long-running work, standing preferences, agreed ways of "
@@ -628,11 +723,64 @@ class GrokStreamingProvider:
                     'commit_ai_world_claim (domain user_understanding / relationship / '
                     'self, tags ["core_context"]). Claims without that tag will not '
                     "appear in your continuity anchor on a later turn.",
+                    "- When the user states a durable fact about themselves (their name, "
+                    "job, location, or any standing fact) or explicitly asks you to "
+                    "remember something, you MUST first call commit_ai_world_claim, then "
+                    "reply. Do not just say you will remember — actually call the tool.",
+                    "- Example call (copy the exact argument names):",
+                    "```json",
+                    '{"call": "commit_ai_world_claim", "arguments": {',
+                    '  "domain": "user_understanding",',
+                    '  "statement": "The user is named 老王 and works on flexible-screen wristbands in Dongguan.",',
+                    '  "evidence_refs": [{"object_id": "<the user observation id>", "revision": 1}],',
+                    '  "confidence": 0.95,',
+                    '  "tags": ["core_context"]',
+                    '}}',
+                    "```",
                     "- Persist once, when it is first stated or first changed. Do not "
                     "re-persist what the anchor already says, and do not promote passing "
                     "remarks into durable facts.",
+                    "- When a durable fact CHANGES (the user corrects it, or new "
+                    "evidence contradicts it), do a FORWARD revision: first call "
+                    "retract_claim on the old claim (reason = what changed and why the "
+                    "old fact is now stale), then call commit_ai_world_claim with the "
+                    "new fact. Never silently keep the stale claim, and never erase "
+                    "history — the old claim stays, the new one supersedes it.",
                     "- The claim is a pointer, not a replacement: drill_down_conversation "
                     "still holds the user's exact words.",
+                    "DIMENSION DISCOVERY DISCIPLINE:",
+                    "- The WORLD MAP below lists the dimensions that currently exist. "
+                    "They are filing axes, not a fixed ontology: when you keep "
+                    "encountering the SAME KIND of durable fact across separate "
+                    "occasions and no existing dimension fits it, you are allowed — "
+                    "and expected — to propose a new observation axis rather than "
+                    "shoehorning it into an existing dimension.",
+                    "- Call propose_dimension with evidence pinned to the observations "
+                    "that made you notice the pattern. You must state why the existing "
+                    "dimensions are insufficient; a dimension with no rationale is noise.",
+                    "- Do NOT propose a dimension for a single event, a passing remark, "
+                    "or something an existing dimension already covers. Wait for "
+                    "recurrence.",
+                    "- Example call (copy the exact argument names):",
+                    "```json",
+                    '{"call": "propose_dimension", "arguments": {',
+                    '  "dimension_key": "dim:physical_recovery",',
+                    '  "name": "Physical recovery",',
+                    '  "description": "Sleep duration, neck/cervical pain and exercise '
+                    'habit as one recurring axis of the user\'s life.",',
+                    '  "data_shape": "time series of {sleep_hours, pain_level, exercise}",',
+                    '  "evidence_refs": [{"object_id": "<observation id>", "revision": 1}],',
+                    '  "why_existing_dimensions_are_insufficient": "Sleep, pain and '
+                    'exercise show up across separate dimensions, so the recurring '
+                    'recovery pattern is never visible as one thing.",',
+                    '  "continuity_rationale": "Reported on at least four separate '
+                    'occasions over three weeks.",',
+                    '  "user_value_rationale": "Lets later turns reason about recovery '
+                    'trends instead of isolated complaints.",',
+                    '  "maintenance_cost_rationale": "One summary per week.",',
+                    '  "confidence": 0.7',
+                    '}}',
+                    "```",
                     "CONSTITUTIONAL RULES:",
                     "0. The RECENT CONVERSATION block below is the verbatim dialogue. "
                     "If the answer is already visible there, answer from it directly — "
@@ -646,6 +794,45 @@ class GrokStreamingProvider:
                     "3. Otherwise, provide a concise, high-value natural language response.",
                 ]
             )
+
+            # CACHE-FRIENDLY SECTION ORDER: everything above is byte-stable
+            # across calls (role, constraints, disciplines, rules), and the
+            # capability catalog below is stable for the process lifetime.
+            # Keeping the static prefix contiguous lets OpenAI-compatible
+            # endpoints hit their automatic prompt prefix cache; all dynamic
+            # world state must stay AFTER this point.
+            if snapshot.capability_catalog:
+                cat_desc: list[str] = []
+                for cap in snapshot.capability_catalog:
+                    name = cap.get("name", "")
+                    desc = cap.get("description", "")
+                    schema = cap.get("input_schema")
+                    line = f"- {name}: {desc}"
+                    if schema:
+                        # Render the accepted argument names + types so the model
+                        # does not invent its own parameter names (C15 issue #403).
+                        # Values are type hints from the registry, e.g.
+                        # "statement": "string" or "confidence": "number[0,1]".
+                        params = ", ".join(
+                            f"{k}={v}" for k, v in schema.items()
+                        )
+                        line += f"  [arguments: {params}]"
+                    cat_desc.append(line)
+                system_sections.append(
+                    "AVAILABLE CAPABILITIES (use the exact argument names listed; "
+                    "do not invent parameter names):\n" + "\n".join(cat_desc)
+                )
+
+            # The continuity anchor is what makes a resumed conversation feel like
+            # the same assistant rather than a fresh instance. It stays after the
+            # static prefix because it changes as claims are committed mid-turn.
+            anchor = _render_identity(identity)
+            if anchor:
+                system_sections.append(
+                    "CONTINUITY ANCHOR (durable world-store evidence about this "
+                    "user and this relationship — evidence, not a script; you still "
+                    "decide what it means):\n" + anchor
+                )
 
             grounding = _render_turn_grounding(snapshot.cockpit.get("task_context"))
             if grounding:
@@ -697,12 +884,19 @@ class GrokStreamingProvider:
             if cards:
                 system_sections.append("RELEVANT WORLD MEMORY:\n" + cards)
 
-            if snapshot.capability_catalog:
-                cat_desc = [
-                    f"- {cap.get('name')}: {cap.get('description', '')}"
-                    for cap in snapshot.capability_catalog[:10]
-                ]
-                system_sections.append("AVAILABLE CAPABILITIES:\n" + "\n".join(cat_desc))
+            # Dynamic: it depends on this turn's budget arithmetic, so it must stay
+            # out of the byte-stable cacheable prefix that ends with the capability
+            # catalogue.
+            dropped = _render_dropped_sections(
+                snapshot.cockpit.get("dropped_sections"),
+                available_capabilities={
+                    str(cap.get("name"))
+                    for cap in snapshot.capability_catalog
+                    if isinstance(cap, Mapping)
+                },
+            )
+            if dropped:
+                system_sections.append(dropped)
 
             if snapshot.remaining_tool_rounds == 0:
                 system_sections.append(
@@ -715,13 +909,25 @@ class GrokStreamingProvider:
 
             # Ingest previous capability results in current turn if any
             if snapshot.capability_history:
-                history_text = "\n".join(
-                    f"Result of {r.name}: ok={r.ok}, data={json.dumps(r.data, ensure_ascii=False, default=str)}"
-                    for r in snapshot.capability_history
-                )
+                history_lines: list[str] = []
+                for r in snapshot.capability_history:
+                    if r.ok:
+                        history_lines.append(
+                            f"Result of {r.name}: ok=True, data={json.dumps(r.data, ensure_ascii=False, default=str)}"
+                        )
+                    else:
+                        # Failures must tell the model *why*, so it can correct the
+                        # call instead of blindly retrying the same bad arguments
+                        # (C15 issue #403).
+                        err_code = getattr(r, "error_code", None) or "UNKNOWN_ERROR"
+                        err_msg = getattr(r, "error_message", None) or ""
+                        history_lines.append(
+                            f"Result of {r.name}: ok=False, error_code={err_code}, "
+                            f"error_message={err_msg}"
+                        )
                 messages.append({
                     "role": "assistant",
-                    "content": f"Capability execution feedback:\n{history_text}"
+                    "content": "Capability execution feedback:\n" + "\n".join(history_lines)
                 })
 
             user_content = snapshot.user_input
@@ -736,12 +942,14 @@ class GrokStreamingProvider:
             if SILENCE_TOKEN in full_text:
                 return ModelDirective(silence=True, usage=usage, provenance=provenance)
 
-            # Check for JSON capability call block only if tool rounds remain
+            # Check for JSON capability call blocks only if tool rounds remain
             if snapshot.remaining_tool_rounds > 0:
-                tool_call = self._extract_capability_call(full_text, snapshot.capability_catalog)
-                if tool_call is not None:
+                tool_calls = self._extract_capability_calls(
+                    full_text, snapshot.capability_catalog
+                )
+                if tool_calls:
                     return ModelDirective(
-                        capability_calls=(tool_call,),
+                        capability_calls=tool_calls,
                         usage=usage,
                         provenance=provenance,
                     )
@@ -760,33 +968,41 @@ class GrokStreamingProvider:
         return _handler
 
     @staticmethod
-    def _extract_capability_call(
+    def _extract_capability_calls(
         text: str,
         catalog: Sequence[Mapping[str, Any]],
-    ) -> CapabilityCall | None:
-        """Parse text for capability invocation blocks matching registered capabilities."""
+    ) -> tuple[CapabilityCall, ...]:
+        """Parse one or more capability invocation blocks from model output.
+
+        Strong models may emit several tool calls in a single turn (e.g. commit +
+        retract, or commit + search + list_dimensions). The previous single-JSON
+        extraction used ``find("{")`` + ``rfind("}")``, which collapsed multiple
+        blocks into one invalid JSON string and silently dropped every call. We now
+        scan for balanced JSON objects and keep every block whose ``call`` names a
+        registered capability.
+        """
         available_names = {c.get("name") for c in catalog if isinstance(c, Mapping)}
         if not available_names:
-            return None
+            return ()
 
-        # Look for ```json { ... } ``` or raw {"call": ...}
-        match = re.search(r"\{[\s\S]*\"call\"\s*:\s*\"([^\"]+)\"[\s\S]*\}", text)
-        if not match:
-            return None
-
-        try:
-            start_idx = text.find("{")
-            end_idx = text.rfind("}")
-            if start_idx == -1 or end_idx == -1 or end_idx <= start_idx:
-                return None
-            candidate_json = text[start_idx : end_idx + 1]
-            data = json.loads(candidate_json)
-            call_name = data.get("call")
-            if call_name in available_names:
-                args = data.get("arguments", {})
-                if isinstance(args, dict):
-                    return CapabilityCall(name=call_name, arguments=args)
-        except Exception:
-            return None
-
-        return None
+        calls: list[CapabilityCall] = []
+        decoder = json.JSONDecoder()
+        idx = 0
+        n = len(text)
+        while idx < n:
+            brace = text.find("{", idx)
+            if brace == -1:
+                break
+            try:
+                obj, end = decoder.raw_decode(text, brace)
+            except json.JSONDecodeError:
+                idx = brace + 1
+                continue
+            if isinstance(obj, dict):
+                call_name = obj.get("call")
+                if call_name in available_names:
+                    args = obj.get("arguments", {})
+                    if isinstance(args, dict):
+                        calls.append(CapabilityCall(name=call_name, arguments=args))
+            idx = end
+        return tuple(calls)

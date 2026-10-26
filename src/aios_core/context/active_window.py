@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 import json
 from typing import TYPE_CHECKING, Any, Sequence
 
+from aios_core.context.budget_policy import resolve_context_budget_policy
 from aios_core.contracts.models import ObjectRef
 from aios_core.contracts.time import as_utc
 
@@ -64,11 +65,20 @@ class ActiveRollingWindow:
     def __init__(
         self,
         *,
-        max_active_turns: int = 6,
-        max_token_budget: int = 1500,
+        max_active_turns: int | None = None,
+        max_token_budget: int | None = None,
         session_id: str = "default_session",
         store: SQLiteWorldStore | None = None,
     ) -> None:
+        # Omitted -> policy (which also honours AIOS_BUDGET_* overrides); an
+        # explicit argument still wins.
+        policy = resolve_context_budget_policy(
+            active_window_max_turns=max_active_turns,
+            active_window_token_budget=max_token_budget,
+        )
+        max_active_turns = policy.active_window_max_turns
+        max_token_budget = policy.active_window_token_budget
+
         if max_active_turns < 1:
             raise ValueError("max_active_turns must be at least 1")
         if max_token_budget < 256:

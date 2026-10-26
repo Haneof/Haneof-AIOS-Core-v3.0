@@ -1,0 +1,28 @@
+{"event_id":"d0302-chat","occurred_at":"2026-03-02T08:40:00+08:00","channel":"conversation","payload":"柔性屏手环第二批试产的良率只有62%，主要失效是弯折区的微裂纹。客户下下周要来审厂，这条线我得盯死。","metadata":{"source":"chat","session":"week-1"}}
+{"event_id":"d0303-note","occurred_at":"2026-03-03T22:30:00+08:00","channel":"note","payload":"又加班到十一点。怀疑裂纹跟贴合张力有关，现在的参数是我拍脑袋定的，没有数据支撑。","metadata":{"source":"notes","session":"week-1"}}
+{"event_id":"d0304-chat","occurred_at":"2026-03-04T07:20:00+08:00","channel":"conversation","payload":"昨晚只睡了五个小时，今天头一直昏沉沉的，开早会的时候反应慢半拍。","metadata":{"source":"chat","session":"week-1"}}
+{"event_id":"d0305-calendar","occurred_at":"2026-03-05T20:10:00+08:00","channel":"calendar","payload":{"title":"客户审厂预备会","start":"2026-03-06T14:00:00+08:00","duration_minutes":180},"metadata":{"source":"calendar","session":"week-1"}}
+{"event_id":"d0306-chat","occurred_at":"2026-03-06T21:40:00+08:00","channel":"conversation","payload":"今天跟客户开了三个小时会，回来还要改报告。压力太大了，胸口有点发闷，晚上估计又睡不好。","metadata":{"source":"chat","session":"week-1"}}
+{"event_id":"d0307-chat","occurred_at":"2026-03-07T20:00:00+08:00","channel":"conversation","payload":"楼下新开的那家兰州拉面真不错，汤头比原来那家好，下次还去。","metadata":{"source":"chat","session":"week-1"}}
+{"event_id":"d0308-chat","occurred_at":"2026-03-08T22:00:00+08:00","channel":"conversation","payload":"这周一天没休，天天睡不够，整个人很烦躁，跟谁说话都没耐心。","metadata":{"source":"chat","session":"week-1"}}
+{"event_id":"d0309-chat","occurred_at":"2026-03-09T08:30:00+08:00","channel":"conversation","payload":"早上起来脖子僵得转不过去，颈椎的老毛病又犯了，估计是这段时间一直低头调设备。","metadata":{"source":"chat","session":"week-2"}}
+{"event_id":"d0310-note","occurred_at":"2026-03-10T21:30:00+08:00","channel":"note","payload":"白天脖子疼得没法集中，一个简单的参数校验 bug 我查了两个小时才找到，效率明显掉下来了。","metadata":{"source":"notes","session":"week-2"}}
+{"event_id":"d0311-calendar","occurred_at":"2026-03-11T07:50:00+08:00","channel":"calendar","payload":{"title":"年度体检","start":"2026-03-11T08:30:00+08:00","location":"市中心医院"},"metadata":{"source":"calendar","session":"week-2"}}
+{"event_id":"d0311-chat","occurred_at":"2026-03-11T19:20:00+08:00","channel":"conversation","payload":"体检结果出来一部分：血压138/88，血脂偏高，颈椎生理曲度变直。医生说少低头、多运动，再这样下去要出大问题。","metadata":{"source":"chat","session":"week-2"}}
+{"event_id":"d0312-chat","occurred_at":"2026-03-12T22:15:00+08:00","channel":"conversation","payload":"今天开始跑步了，绕小区慢跑2公里，跑完出了一身汗，脖子反倒松了一些，晚上睡得也比前两天沉。","metadata":{"source":"chat","session":"week-2"}}
+{"event_id":"d0313-note","occurred_at":"2026-03-13T20:30:00+08:00","channel":"note","payload":"良率还卡在65%。今天把贴合张力从12N降到8N，小批量试了20片，裂纹少了一半，但样本太少不敢下结论。","metadata":{"source":"notes","session":"week-2"}}
+{"event_id":"d0314-chat","occurred_at":"2026-03-14T15:30:00+08:00","channel":"conversation","payload":"下午陪女儿去科技馆，她非要我讲清楚柔性屏为什么能弯折。给她讲的过程中，我反倒把弯折应力集中这件事想明白了。","metadata":{"source":"chat","session":"week-2"}}
+{"event_id":"d0314-note","occurred_at":"2026-03-14T21:40:00+08:00","channel":"note","payload":"小区门口那只流浪猫今天又来蹭饭，给它起了个名字叫「良率」，希望它别像产线一样掉链子。","metadata":{"source":"notes","session":"week-2"}}
+{"event_id":"d0315-chat","occurred_at":"2026-03-15T21:00:00+08:00","channel":"conversation","payload":"这周跑了三次步，睡眠差不多有六个小时了，比上周强一点，不过颈椎还是酸。","metadata":{"source":"chat","session":"week-2"}}
+{"event_id":"d0316-note","occurred_at":"2026-03-16T22:00:00+08:00","channel":"note","payload":"今天十点半就收工了，先跑3公里再回来洗漱，十一点半上床。工作是做不完的，先把人保住。","metadata":{"source":"notes","session":"week-3"}}
+{"event_id":"d0317-chat","occurred_at":"2026-03-17T07:10:00+08:00","channel":"conversation","payload":"早上七点自然醒，睡了七个多小时，好久没这么清醒了，上午看图纸一遍就记住了。","metadata":{"source":"chat","session":"week-3"}}
+{"event_id":"d0317-note","occurred_at":"2026-03-17T20:30:00+08:00","channel":"note","payload":"报了个 SPC 统计过程控制的线上课，还看了 DOE 实验设计那几章。良率这事不能再拍脑袋调参数了，得用数据说话。","metadata":{"source":"notes","session":"week-3"}}
+{"event_id":"d0318-chat","occurred_at":"2026-03-18T21:00:00+08:00","channel":"conversation","payload":"今天用课上学的 DOE 复跑了三轮小批量实验，把弯折区缓冲层厚度一起纳入因子，良率从65%拉到82%！","metadata":{"source":"chat","session":"week-3"}}
+{"event_id":"d0319-chat","occurred_at":"2026-03-19T21:00:00+08:00","channel":"conversation","payload":"刷到一个用咖啡渣除味的视频，试了下确实有用，冰箱里那股味没了。","metadata":{"source":"chat","session":"week-3"}}
+{"event_id":"d0319-note","occurred_at":"2026-03-19T22:30:00+08:00","channel":"note","payload":"客户审厂提前到下周一。换作上周我会慌，这次心里有底，数据都摆在那了。","metadata":{"source":"notes","session":"week-3"}}
+{"event_id":"d0320-note","occurred_at":"2026-03-20T08:20:00+08:00","channel":"note","payload":"地铁上把《掌控习惯》看完了，「习惯叠加」那招我用上了：跑完步立刻做五分钟颈椎拉伸，不用靠意志力提醒自己。","metadata":{"source":"notes","session":"week-3"}}
+{"event_id":"d0320-chat","occurred_at":"2026-03-20T19:30:00+08:00","channel":"conversation","payload":"老婆说我这一个月像换了个人，不再天天黑着脸回家，周末也愿意陪她们出门了。","metadata":{"source":"chat","session":"week-3"}}
+{"event_id":"d0321-calendar","occurred_at":"2026-03-21T09:00:00+08:00","channel":"calendar","payload":{"title":"全家爬山·香山","start":"2026-03-21T10:00:00+08:00","attendees":["妻子","女儿"]},"metadata":{"source":"calendar","session":"week-3"}}
+{"event_id":"d0321-chat","occurred_at":"2026-03-21T20:00:00+08:00","channel":"conversation","payload":"今天爬了四个小时山，脖子居然一点没疼，爬到山顶也不怎么喘。这半个月跑步真没白跑。","metadata":{"source":"chat","session":"week-3"}}
+{"event_id":"d0322-chat","occurred_at":"2026-03-22T20:30:00+08:00","channel":"conversation","payload":"这周只加了一天班，压力小多了，睡眠稳定在七个半小时，颈椎也没再犯。","metadata":{"source":"chat","session":"week-3"}}
+{"event_id":"d0322-chat-final","occurred_at":"2026-03-22T21:00:00+08:00","channel":"conversation","payload":"这一个月下来，你觉得我身体和工作状态有什么变化？","metadata":{"source":"chat","session":"week-3"}}

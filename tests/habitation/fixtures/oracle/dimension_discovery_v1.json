@@ -1,0 +1,50 @@
+{
+  "scenario_id": "dimension-discovery-v1",
+  "latent_truth": {
+    "evaluation_only": true,
+    "description": "The resident is a flexible-screen / injection-molding process engineer. Alongside ordinary work logistics (mold iterations, yield, customer audit), one durable fact class recurs eight times over four weeks and never resolves: nocturnal acid reflux that wakes him at night, gets worse after late meals and heavy coffee, produces a hoarse throat by day, and does not respond to self-medication. It is a recurring body-condition signal with a behavioural coupling (late eating, workload-driven coffee), not a single event and not a passing remark. Any correct treatment of this stream must (a) keep it as a separate recurring axis rather than spreading it across work events, and (b) never assert that the reflux causes the yield outcome or vice versa: the evidence only shows co-occurrence.",
+    "expected_new_axis": {
+      "semantic": "recurring bodily condition / health signal with its own triggers and progression",
+      "why_existing_dimensions_are_insufficient": "Existing filing axes are source channels (dim:user_ai_interaction, dim:note, dim:calendar, dim:ai_communication_experience). Filing a body-condition signal under a channel loses the axis entirely, and the condition spans both note and conversation channels, so no single channel dimension can host it without splitting it.",
+      "acceptable_keys": ["dim:physical_condition", "dim:health", "dim:reflux", "dim:body_signal", "dim:physical_health"],
+      "recurrence_evidence_event_ids": [
+        "e2-care-reflux-night",
+        "e4-care-reflux-after-late-meal",
+        "e6-care-reflux-coffee",
+        "e9-care-reflux-fourth",
+        "e11-care-reflux-shift",
+        "e13-care-reflux-persist",
+        "e16-care-reflux-week"
+      ]
+    }
+  },
+  "event_annotations": {
+    "e1-work-baseline": {"role": "work_baseline_mold_trial"},
+    "e2-care-reflux-night": {"role": "new_axis_occurrence_1", "novel_axis": true},
+    "e3-work-mold-tweak": {"role": "work_mold_iteration"},
+    "e4-care-reflux-after-late-meal": {"role": "new_axis_occurrence_2_trigger_late_meal", "novel_axis": true},
+    "e5-work-customer-audit": {"role": "work_audit_schedule"},
+    "e6-care-reflux-coffee": {"role": "new_axis_occurrence_3_trigger_caffeine", "novel_axis": true},
+    "e7-noise-lunch": {"role": "noise_unrelated_chitchat"},
+    "e8-work-line-stop": {"role": "work_line_stop"},
+    "e9-care-reflux-fourth": {"role": "new_axis_occurrence_4_recurrence_acknowledged", "novel_axis": true},
+    "e10-noise-cat": {"role": "noise_unrelated_chitchat"},
+    "e11-care-reflux-shift": {"role": "new_axis_occurrence_5_secondary_symptom_hoarse", "novel_axis": true},
+    "e12-work-yield-good": {"role": "work_resolution_high_yield"},
+    "e13-care-reflux-persist": {"role": "new_axis_occurrence_6_self_help_failing", "novel_axis": true},
+    "e14-noise-movie": {"role": "noise_unrelated_chitchat"},
+    "e15-work-plan": {"role": "work_next_quarter_plan"},
+    "e16-care-reflux-week": {"role": "new_axis_occurrence_7_still_unresolved", "novel_axis": true}
+  },
+  "criteria": [
+    "autonomous_new_dimension_proposal",
+    "recurrence_gated_not_single_event",
+    "no_false_causality_between_health_and_yield",
+    "noise_resilience_no_false_pattern"
+  ],
+  "anti_leak_rule": "Evaluator only. Do not place this file in resident context.",
+  "scenario_version": "1",
+  "seed": 20260926,
+  "subject_id": "synthetic-user-003",
+  "evaluation_schema": "aios.p16.oracle.v1"
+}

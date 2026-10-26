@@ -19,7 +19,7 @@ from aios_core.contracts.models import (
 )
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.time import TemporalExtent
-from aios_core.query.topic_associator import DynamicTopicAssociator
+from aios_core.query.topic_associator import DynamicTopicAssociator, _estimate_tokens
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 NOW = datetime(2026, 10, 19, 10, 0, tzinfo=timezone.utc)
@@ -151,3 +151,27 @@ def test_token_budget_bound(tmp_path):
     )
     assert card.estimated_tokens <= 25
     assert "... (已依据Token预算上限紧凑裁剪)" in card.context_text
+
+
+def test_token_budget_is_a_hard_bound(tmp_path):
+    """The budget must hold even when the header line alone exceeds it.
+
+    The header is always emitted, so a naive line-by-line cut gives up and returns
+    over-budget text. Underestimating token estimators used to hide this entirely for
+    Chinese input (see fixes note: /4 undercounts Chinese by ~2.5x).
+    """
+    store = SQLiteWorldStore(tmp_path / "world.db")
+    _seed_fixtures(store)
+
+    associator = DynamicTopicAssociator(store=store)
+    query = "当年在杭州聊的创业项目，还有我的极简主义生活哲学"
+
+    for budget in (1, 5, 12, 20, 60):
+        card = associator.associate_topic(query, max_tokens=budget)
+        # Must report honestly, never claim fewer tokens than the text it returns.
+        assert card.estimated_tokens == _estimate_tokens(card.context_text)
+        # Allow only the irreducible trim marker to overflow a degenerate budget.
+        assert card.estimated_tokens <= max(
+            budget, _estimate_tokens("... (已依据Token预算上限紧凑裁剪)")
+        )
+        assert "... (已依据Token预算上限紧凑裁剪)" in card.context_text

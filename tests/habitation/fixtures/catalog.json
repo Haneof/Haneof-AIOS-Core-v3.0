@@ -4,22 +4,56 @@
     {
       "scenario_id": "learning-independence-v1",
       "manifest": "learning_independence_v1.manifest.json",
-      "focus": ["longitudinal_pattern", "dynamic_dimension_candidate", "noise_resilience"]
+      "focus": [
+        "longitudinal_pattern",
+        "dynamic_dimension_candidate",
+        "noise_resilience"
+      ]
     },
     {
       "scenario_id": "cross-session-continuity-v1",
       "manifest": "cross_session_continuity_v1.manifest.json",
-      "focus": ["cross_session_continuity", "relevant_recall", "context_restraint"]
+      "focus": [
+        "cross_session_continuity",
+        "relevant_recall",
+        "context_restraint"
+      ]
     },
     {
       "scenario_id": "cognition-revision-v1",
       "manifest": "cognition_revision_v1.manifest.json",
-      "focus": ["cognition_revision", "historical_preservation", "stale_suppression"]
+      "focus": [
+        "cognition_revision",
+        "historical_preservation",
+        "stale_suppression"
+      ]
     },
     {
       "scenario_id": "uncertainty-restraint-v1",
       "manifest": "uncertainty_restraint_v1.manifest.json",
-      "focus": ["epistemic_restraint", "ambiguity", "no_overgeneralization"]
+      "focus": [
+        "epistemic_restraint",
+        "ambiguity",
+        "no_overgeneralization"
+      ]
+    },
+    {
+      "scenario_id": "longitudinal-multiscale-v1",
+      "manifest": "longitudinal_multiscale_v1.manifest.json",
+      "focus": [
+        "periodic_summary",
+        "cross_dimension",
+        "dynamic_dimension_candidate"
+      ]
+    },
+    {
+      "scenario_id": "dimension-discovery-v1",
+      "manifest": "dimension_discovery_v1.manifest.json",
+      "focus": [
+        "autonomous_new_dimension_proposal",
+        "recurrence_gated_not_single_event",
+        "no_false_causality"
+      ]
     }
   ]
 }

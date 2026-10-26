@@ -116,3 +116,54 @@ def test_rapport_and_posture_evaluation(tmp_path):
     assert summary["rapport_score"] >= 0.75
     assert len(summary["ethical_invariants"]) == 4
     assert "铁律二" in summary["ethical_invariants"][1]
+
+
+def test_seed_dimensions_carry_dimension_key_and_repair_existing_worlds(tmp_path):
+    """FIX-DIMENSION-SEED-NOT-VISIBLE.
+
+    `_world_map_context` indexes DIMENSION_DEFINITION objects by
+    `metadata["dimension_key"]` and drops any definition without one, so a seed
+    dimension stored with empty metadata is invisible to the resident model: the
+    WORLD MAP shows only observation-derived channel dimensions. Fresh worlds must
+    carry the key at creation, and worlds bootstrapped before the fix must be
+    repaired in place instead of staying broken forever.
+    """
+    from aios_core.contracts.operations import OperationRequest
+    from aios_core.contracts.enums import SourceClass, MaintenanceClass
+
+    store = SQLiteWorldStore(tmp_path / "world.db")
+    tracker = AISelfMindTracker(store=store)
+    tracker._ensure_ai_dimensions()
+
+    for key in ("dim:ai_promises_ledger", "dim:ai_rapport_depth"):
+        payload = store.get_payload(key)
+        assert payload["metadata"]["dimension_key"] == key
+
+    # Simulate a world bootstrapped by the old code: strip the key back out.
+    legacy = {
+        key: store.get_payload(key) for key in ("dim:ai_promises_ledger", "dim:ai_rapport_depth")
+    }
+    from aios_core.contracts.models import DimensionDefinition
+
+    for key, payload in legacy.items():
+        store.commit(
+            [
+                DimensionDefinition.model_validate(
+                    {**payload, "metadata": {}, "revision": int(payload["revision"]) + 1}
+                )
+            ],
+            OperationRequest(
+                operation_name="test.strip_dimension_key",
+                arguments={"dimension_key": key},
+                expected_world_revision=store.current_world_revision(),
+                reason="regression: simulate legacy empty metadata",
+                idempotency_key=f"strip:{key}",
+                source_class=SourceClass.MAINTENANCE,
+                maintenance_class=MaintenanceClass.INDEX_META,
+            ),
+        )
+        assert not store.get_payload(key)["metadata"].get("dimension_key")
+
+    tracker._ensure_ai_dimensions()
+    for key in legacy:
+        assert store.get_payload(key)["metadata"]["dimension_key"] == key
