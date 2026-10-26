@@ -1,9 +1,22 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-10-19 PM 独立证据与 Core 影响复核
+## 当前控制入口 — 2026-10-27 S1 原生 tools 协议闭环 / S2 独立复核待指派
 
+- **工程基线**：`41f12c7`（main）。S1 换协议（T05 → T06 → T07 → T08 → 接线）已完成，T10 真实端点取证三条硬指标（M1 写入率 / M2 关逐字仍答对 / M3 连问两遍不增）**全部 PASS**。
+- **核心能力现状**：记忆闭环**已真实可用**。原生 tools 为**主路径**；T2' 抽取轮**降级为兜底**（模型漏写时才触发）。验证模型：`minimaxai/minimax-m3.1-flash`（NVIDIA NIM）。证据见 `reviews/AIOS_T10_NATIVE_TOOLS_VERIFICATION_2026-10-27.md`。
+- **唯一当前任务**：`PM-AUDIT-C15-EVIDENCE-RECONCILIATION-001` —— 状态 `REVIEWER_UNASSIGNED`。R1–R9 **必须由独立 Reviewer 完成**；实现方已产出可供消费的证据包，但不得自行签署复核结论（不冒充独立 Reviewer）。
+  - 证据包入口：`reviews/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001/implementation_evidence_2026-10-27/README.md`（含逐项证据、复现手册、缺口清单）。Reviewer 可直接消费。
+- **近期已完成（不再派工，勿重复实现）**：T05 JSON Schema 转换、T06 原生 tools 流、T07 指令不变量放宽、T08 写入去重、T10 取证、T0' 安全门修复、T1 治理对账。
+- **遗留（不挡主线，需 owner 决策）**：① PR 清算 —— 见 `governance/AIOS_PR_LIQUIDATION_SURVEY_2026-10-27.md`：**PR #403 实为 `MERGED`（此前"仍 OPEN、建议关闭"系转述错误，已撤销）**；开放 PR 候选 **85** 个（按 `refs/pull/*/merge` 计数，四点交叉验证），关闭需 owner 授权；② T04 并发 attach 定性（报 Windows 3/3 失败，Linux 5/5 绿，未定性）；③ CODE HEALTH 统一检查入口（实测 48 个 workflow、42 个跑 pytest、仅 3 个跑全量，导致「CI 绿而全量跑不起来」）；④ 是否打 tag `v3.0.0-rc1`。
+- **发布口径**：`RELEASE_CANDIDATE`（技术就绪，非 FINAL_RELEASE）。升级为 FINAL_RELEASE 需独立 R1–R9 复核通过 + owner 授权。
+
+---
+
+## 历史控制入口（已替代，非派工入口）— 2026-10-19 PM 独立证据与 Core 影响复核
+
+- 本段已被上方 2026-10-27 控制入口替代，仅作追溯，不再授权施工。
 - 唯一派工来源：`governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md` 最新 CURRENT PM CONTROL 段；本地图不是第二张 READY 队列。普通治理合入 main 后本控制段生效。
-- 当前任务：`PM-AUDIT-C15-EVIDENCE-RECONCILIATION-001`，`READY_FOR_ASSIGNMENT / NOT_STARTED / REVIEWER_UNASSIGNED`，尚未启动独立 Reviewer。
+- 当时任务：`PM-AUDIT-C15-EVIDENCE-RECONCILIATION-001`，`READY_FOR_ASSIGNMENT / NOT_STARTED / REVIEWER_UNASSIGNED`，尚未启动独立 Reviewer。
 - 发布记录：`governance/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001_RELEASE_2026-10-19.md`；执行提示词：`governance/prompts/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001_2026-10-19.md`。
 - 工程基线 `259d035386ea203981c6247eeb4433dbfd8eed3f` 已含 Window80 四个新模块；旧 RC/Resident 证据不可自动证明新 Core。精确对象、合同与漂移策略见 `reviews/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001/BASELINE.json`。
 - C15 原关闭记录保留为 `RECORDED_CLOSED / EVIDENCE_REVIEW_OPEN`；新的生产/跨模型通过签署及 Window81 Resident/端侧/硬件放行暂 HOLD。未宣布旧实验整体无效，未回滚工程。

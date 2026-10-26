@@ -1,3 +1,27 @@
+## 2026-10-27 — S1 NATIVE-TOOLS PROTOCOL CLOSED / T10 LIVE-ENDPOINT EVIDENCE PASS
+
+- **根因修正（重要）**：durable claim=0 的真正根因不是「模型不想写」，而是 **provider 没给模型它被训练过的 `tools` 接口**。PR #403 的单变量对照证明：同一份 5272 字符提示词，只把「散文里手写 JSON 块」换成原生 `tools` 数组，模型第 1 轮就调用 `commit_ai_world_claim`；文本协议三轮调用数恒为 0。上一轮 T2' 把根因归为「依赖主模型顺便写」并做了抽取轮，**归因下早了**——抽取轮能用（已验证 claim>0），但它是绕路。
+- **T05**：`input_schema` 迷你语言 → JSON Schema 转换器（`capabilities.json_schema_for_arguments`），与 `required_arguments` 同侧以防两份目录漂移（该漂移已在真实端点上造成过一次「模型发明 `claim`/`evidence` 参数名」）。53 个能力全量验证、不抽样，零降级。
+- **T06**：新增 `stream_chat_with_tools`（纯新增，旧 `stream_chat` 一字未动，回滚只需不调它）。SSE 分片按 index 拼接（不能覆盖，否则只剩最后一段）；arguments 非法 JSON 时携带原文与错误返回，绝不丢弃。
+- **T07**：放宽 `ModelDirective` —— 允许「回复 + 工具调用」共存。该不变量（`cannot request capabilities and terminate simultaneously`）此前**零测试覆盖**，是当初随手加的门，也是原生 tools 落地的直接阻塞点。同时修掉 `run_turn` 里 `if directive.response: return` 跳过工具执行的坑。规则：全写 → 执行后终止；含读 → 回灌再叫一轮；末轮裸调用仍 fail-closed。
+- **T08**：`_commit_ai_world_claim` 内容级去重（大小写/空格/标点折叠），与 T06/T07 同批上线——协议修好后模型会重复写，不上去重世界会被重复 claim 填满。
+- **接线**：`as_model_handler` 用 T05 转换器从 catalog 建原生 `tools` 数组，走 `stream_chat_with_tools`，tool_calls 转 capability calls；文本协议解析降级为兜底（endpoint 忽略 tools 数组时仍能用）。
+- **T10 真实端点取证**（NVIDIA `minimaxai/minimax-m3.1-flash`，**不注入抽取轮兜底**）：
+  - **M1 写入率 PASS**：第 1 轮主动调 `commit_ai_world_claim`×2（另加 `record_ai_promise`、`propose_entity`×2），落地 durable claim「用户叫老王，在东莞做23cm柔性屏智能手环」。
+  - **M2 关逐字仍答对 PASS**：`recent_turn_limit=0` 下问「我叫什么」，答「你叫老王，在东莞，做 23cm 柔性屏智能手环」——从 continuity anchor 读到，非偷看逐字对话。这是唯一不可伪造的判据。
+  - **M3 连问两遍 claim 不增 PASS**：第 3 轮重复自我介绍，工具调用为空，claim 数保持 1。
+  - 详见 `reviews/AIOS_T10_NATIVE_TOOLS_VERIFICATION_2026-10-27.md`。
+- **主次关系**：原生 tools = **主路径**；T2' 抽取轮**降级为兜底**（模型某轮漏写时才触发），不再承担主路径职责。
+- **回归**：`tests/runtime/` **410 passed / 3 skipped**（新增 T07 契约测试 8 项、T08 去重测试 5 项）。安全门 `check_baseline.py` PASS。
+- **PR #403 —— 本 session 更正**：页面核实 `"state":"MERGED"`，**不是 OPEN**。此前「PR 仍 OPEN、建议关闭」系第三方审查转述，已撤销（见 `governance/AIOS_PR_LIQUIDATION_SURVEY_2026-10-27.md`）。其 head `3484a9cf` 确为 HEAD 祖先。
+- **PR 清算盘点**：开放 PR 候选 **85** 个（`refs/pull/*/merge` 计数，GitHub 只为 open PR 维护 merge ref；交叉验证 #101 有 / #326 无 / #394 有且页面 OPEN / #403 无且页面 MERGED，四点一致）。`refs/pull/*/head` 共 383 个（编号 1–403）。`gh` 未登录且 API 限流，权威 open 数未取得；85 为下界。**未关闭任何 PR**（owner 决策）。
+- **当前状态**：S1 换协议完成并验证。R1–R9 独立复核**仍缺独立 Reviewer** —— `reviews/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001/` 下仅 `BASELINE.json`，无 reviewer 交付目录。实现方不得冒充独立 Reviewer。
+- **已交付的证据包（供 Reviewer 消费，不等于复核结论）**：`reviews/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001/implementation_evidence_2026-10-27/` —— README（边界声明）、S1_NATIVE_TOOLS_EVIDENCE（逐项证据含 commit/行号/命令）、REPRODUCE（一键复现 + 失败判读）、verify_native_tools_live.py（取证脚本入库）、OPEN_GAPS（9 项未核实/未完成，含自查披露：5 个既有测试文件被补 stub 适配过）。
+- **已知遗留（不挡主线）**：T04 并发 attach（审查报 Windows 3/3 失败，Linux 5/5 绿，未定性，降级为独立调查）；CODE HEALTH（统一检查入口缺失；实测 48 个 workflow、42 个跑 pytest、仅 3 个跑全量，导致「CI 绿而全量跑不起来」）。
+- 基线：`41f12c7`（已推送 main）。
+
+---
+
 ## 2026-10-26 — T2' DURABLE MEMORY EXTRACTION PASS & RELEASE VERDICT
 
 - **T2' 记忆抽取轮已完成**：根因 = durable claim=0 是「依赖主模型顺便调用 commit_ai_world_claim」，真实端点常直接回复而跳过。方案 = 主对话轮后增加独立低温度抽取 pass，确定性落地 durable facts（`grok_provider.extract_durable_facts` + `turn_runtime.durable_fact_extractor` + `headless` 自动装配）。
