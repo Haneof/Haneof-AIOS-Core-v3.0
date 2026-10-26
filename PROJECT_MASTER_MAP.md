@@ -2,7 +2,7 @@
 
 ## 当前控制入口 — 2026-10-27 S1 原生 tools 协议闭环 / S2 独立复核待指派
 
-- **工程基线**：`016afce`（main HEAD，即本段所在提交；`pinned_sha` = `1cad586` 为最后一个含代码的提交）。S1 换协议（T05 → T06 → T07 → T08 → 接线）已完成，T10 真实端点取证三条硬指标（M1 写入率 / M2 关逐字仍答对 / M3 连问两遍不增）**全部 PASS**。
+- **工程基线**：本段所在提交 —— **不在此追 SHA**，后续治理/文档提交不移动基线。权威钉住值为 `governance/baseline.json` 的 `pinned_sha` = `1cad586`（最后一个含代码的提交）。S1 换协议（T05 → T06 → T07 → T08 → 接线）已完成，T10 真实端点取证三条硬指标（M1 写入率 / M2 关逐字仍答对 / M3 连问两遍不增）**全部 PASS**。
 - **核心能力现状**：记忆闭环**已真实可用**。原生 tools 为**主路径**；T2' 抽取轮**降级为兜底**（模型漏写时才触发）。验证模型：`minimaxai/minimax-m3.1-flash`（NVIDIA NIM）。证据见 `reviews/AIOS_T10_NATIVE_TOOLS_VERIFICATION_2026-10-27.md`。
 - **唯一当前任务**：`PM-AUDIT-C15-EVIDENCE-RECONCILIATION-001` —— 状态 `REVIEWER_UNASSIGNED`。R1–R9 **必须由独立 Reviewer 完成**；实现方已产出可供消费的证据包，但不得自行签署复核结论（不冒充独立 Reviewer）。
   - 证据包入口：`reviews/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001/implementation_evidence_2026-10-27/README.md`（含逐项证据、复现手册、缺口清单）。Reviewer 可直接消费。

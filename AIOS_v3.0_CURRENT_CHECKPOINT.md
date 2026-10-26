@@ -18,7 +18,7 @@
 - **当前状态**：S1 换协议完成并验证。R1–R9 独立复核**仍缺独立 Reviewer** —— `reviews/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001/` 下仅 `BASELINE.json`，无 reviewer 交付目录。实现方不得冒充独立 Reviewer。
 - **已交付的证据包（供 Reviewer 消费，不等于复核结论）**：`reviews/PM_AUDIT_C15_EVIDENCE_RECONCILIATION_001/implementation_evidence_2026-10-27/` —— README（边界声明）、S1_NATIVE_TOOLS_EVIDENCE（逐项证据含 commit/行号/命令）、REPRODUCE（一键复现 + 失败判读）、verify_native_tools_live.py（取证脚本入库）、OPEN_GAPS（9 项未核实/未完成，含自查披露：5 个既有测试文件被补 stub 适配过）。
 - **已知遗留（不挡主线）**：T04 并发 attach（审查报 Windows 3/3 失败，Linux 5/5 绿，未定性，降级为独立调查）；CODE HEALTH（统一检查入口缺失；实测 48 个 workflow、42 个跑 pytest、仅 3 个跑全量，导致「CI 绿而全量跑不起来」）。
-- 基线：`016afce`（已推送 main，即本段所在提交；`pinned_sha` = `1cad586` 为最后一个含代码的提交，`41f12c7` 起均为治理/文档）。
+- 基线：本段所在提交（已推送 main）——**不在此追 SHA**，后续治理/文档提交不移动基线。权威钉住值 `pinned_sha` = `1cad586`（最后一个含代码的提交）。
 
 ---
 
