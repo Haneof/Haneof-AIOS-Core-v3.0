@@ -597,6 +597,34 @@ class GrokProviderConfig:
     )
 
 
+@dataclass(frozen=True)
+class NativeToolCall:
+    """One tool call a model emitted through the ``tools`` protocol.
+
+    ``arguments`` is what decoded successfully. A call whose argument string does
+    not parse is still carried, with ``arguments_parse_error`` set and the original
+    text in ``arguments_raw`` — dropping it would lose the write silently, which is
+    the failure we are removing, not reproducing.
+    """
+
+    name: str
+    arguments: Mapping[str, Any] = field(default_factory=dict)
+    call_id: str = ""
+    arguments_raw: str = ""
+    arguments_parse_error: str | None = None
+
+
+@dataclass(frozen=True)
+class TurnCompletion:
+    """A streaming result that may carry both a reply and tool calls."""
+
+    text: str
+    usage: ModelUsage
+    provenance: ModelCallProvenance
+    tool_calls: tuple[NativeToolCall, ...] = ()
+    finish_reason: str | None = None
+
+
 class GrokStreamingProvider:
     """OpenAI-compatible SSE streaming client for Grok-4.7 and Grok-4.5."""
 
@@ -783,6 +811,245 @@ class GrokStreamingProvider:
         )
 
         return full_text, usage, provenance
+
+    def stream_chat_with_tools(
+        self,
+        messages: Sequence[Mapping[str, str]],
+        *,
+        model: str | None = None,
+        temperature: float | None = None,
+        tools: Sequence[Mapping[str, Any]] | None = None,
+    ) -> TurnCompletion:
+        """Execute a streaming completion that may answer with native tool calls.
+
+        ``stream_chat`` is deliberately left untouched. Every existing caller and
+        every scripted test drives it, and changing it would drag T07's contract
+        question into T06. This method is purely additive: turning the native
+        protocol off again is a matter of not calling it.
+
+        The reply and the tool calls both come back. That is the point — models are
+        trained to persist something and answer in one response, and splitting them
+        into separate rounds is what the text protocol forced them to do. Asking for
+        the write inside the prose was asking for an interface they were never
+        trained on; this asks for the one they were.
+        """
+        if not self.config.api_key:
+            raise RuntimeError(
+                "AIOS_GROK_API_KEY is not configured; refusing to send an "
+                "unauthenticated request to the provider endpoint"
+            )
+
+        chosen_model = model or self.config.default_model
+        temp = temperature if temperature is not None else self.config.temperature
+
+        headers = {
+            "Authorization": f"Bearer {self.config.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        payload: dict[str, Any] = {
+            "model": chosen_model,
+            "messages": list(messages),
+            "stream": True,
+            "stream_options": {"include_usage": True},
+            "temperature": temp,
+            "max_tokens": self.config.max_output_tokens,
+        }
+        if tools:
+            payload["tools"] = [dict(tool) for tool in tools]
+
+        req_bytes = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        req = urllib.request.Request(self._endpoint, data=req_bytes, headers=headers)
+
+        accumulated_chunks: list[str] = []
+        # A tool's name arrives on its first fragment; its arguments then dribble in
+        # across later ones. Keyed by ``index`` so two calls interleaved in one
+        # stream cannot collapse into each other.
+        partial_calls: dict[int, dict[str, str]] = {}
+        captured_id: str | None = None
+        raw_usage: dict[str, Any] | None = None
+        finish_reason: str | None = None
+
+        for attempt in range(3):
+            accumulated_chunks = []
+            partial_calls = {}
+            captured_id = None
+            raw_usage = None
+            finish_reason = None
+            attempt_start = time.perf_counter()
+            # Socket timeout guards a stalled read; this deadline additionally guards
+            # a slow-but-alive stream from holding a turn forever.
+            overall_deadline = self.config.timeout_seconds * 3.0
+            try:
+                with urllib.request.urlopen(req, timeout=self.config.timeout_seconds) as resp:
+                    if resp.status != 200:
+                        raise RuntimeError(f"Grok provider returned HTTP status {resp.status}")
+
+                    for raw_line in resp:
+                        if time.perf_counter() - attempt_start > overall_deadline:
+                            raise TimeoutError(
+                                f"Grok stream exceeded overall deadline {overall_deadline:.0f}s"
+                            )
+                        line = raw_line.decode("utf-8", errors="replace").strip()
+                        if not line or not line.startswith("data: "):
+                            continue
+                        data_str = line[6:].strip()
+                        if data_str == "[DONE]":
+                            break
+
+                        try:
+                            chunk = json.loads(data_str)
+                        except json.JSONDecodeError:
+                            continue
+
+                        if captured_id is None and chunk.get("id"):
+                            captured_id = str(chunk["id"])
+
+                        if chunk.get("usage"):
+                            raw_usage = chunk["usage"]
+
+                        choices = chunk.get("choices", [])
+                        if not choices:
+                            continue
+                        choice = choices[0]
+                        if choice.get("finish_reason"):
+                            finish_reason = str(choice["finish_reason"])
+
+                        delta = choice.get("delta", {})
+                        content = delta.get("content")
+                        if content:
+                            accumulated_chunks.append(content)
+
+                        for fragment in delta.get("tool_calls") or ():
+                            index = int(fragment.get("index", 0) or 0)
+                            entry = partial_calls.setdefault(
+                                index, {"id": "", "name": "", "arguments": ""}
+                            )
+                            if fragment.get("id"):
+                                entry["id"] = str(fragment["id"])
+                            function = fragment.get("function") or {}
+                            if function.get("name"):
+                                entry["name"] = str(function["name"])
+                            arguments = function.get("arguments")
+                            if arguments is not None:
+                                # Concatenate, never assign. One argument object is
+                                # spread across many deltas, and assigning here would
+                                # keep only the final fragment.
+                                entry["arguments"] += str(arguments)
+                break
+            except urllib.error.HTTPError as http_err:
+                body = ""
+                try:
+                    body = http_err.read().decode("utf-8", errors="ignore")[:500]
+                except Exception:
+                    pass
+                if http_err.code in (503, 429) and attempt < 2:
+                    time.sleep(2.0 * (attempt + 1))
+                    continue
+                raise RuntimeError(
+                    f"Grok HTTP {http_err.code} error: {http_err.reason}. Body: {body}"
+                ) from http_err
+            except (urllib.error.URLError, TimeoutError) as net_err:
+                if attempt < 2:
+                    time.sleep(1.5 * (attempt + 1))
+                    continue
+                if isinstance(net_err, TimeoutError):
+                    raise TimeoutError(
+                        f"Grok stream timed out after {self.config.timeout_seconds}s"
+                    ) from net_err
+                raise ConnectionError(f"Grok connection failure: {net_err}") from net_err
+
+        full_text = "".join(accumulated_chunks).strip()
+        request_id = captured_id or f"grok-{int(time.time() * 1000)}"
+
+        tool_calls: list[NativeToolCall] = []
+        for index in sorted(partial_calls):
+            entry = partial_calls[index]
+            if not entry["name"]:
+                continue
+            raw_arguments = entry["arguments"]
+            parsed: Mapping[str, Any] = {}
+            parse_error: str | None = None
+            if raw_arguments.strip():
+                try:
+                    decoded = json.loads(raw_arguments)
+                except json.JSONDecodeError as exc:
+                    parse_error = f"arguments are not valid JSON: {exc.msg} at position {exc.pos}"
+                else:
+                    if isinstance(decoded, dict):
+                        parsed = decoded
+                    else:
+                        parse_error = "arguments must decode to a JSON object"
+            tool_calls.append(
+                NativeToolCall(
+                    name=entry["name"],
+                    arguments=parsed,
+                    call_id=entry["id"],
+                    arguments_raw=raw_arguments,
+                    arguments_parse_error=parse_error,
+                )
+            )
+
+        provenance = ModelCallProvenance(
+            provider="grok",
+            model=chosen_model,
+            request_id=request_id,
+        )
+        if raw_usage:
+            prompt_tokens = int(raw_usage.get("prompt_tokens", 0))
+            completion_tokens = int(raw_usage.get("completion_tokens", 0))
+            total_tokens = int(raw_usage.get("total_tokens", prompt_tokens + completion_tokens))
+            details = (
+                raw_usage.get("completion_tokens_details")
+                or raw_usage.get("output_tokens_details")
+                or {}
+            )
+            reported_reasoning = (
+                details.get("reasoning_tokens") if isinstance(details, Mapping) else None
+            )
+            if reported_reasoning is not None:
+                reasoning_tokens: int | None = int(reported_reasoning)
+            else:
+                inferred = total_tokens - prompt_tokens - completion_tokens
+                reasoning_tokens = inferred if inferred > 0 else 0
+            prompt_details = raw_usage.get("prompt_tokens_details")
+            cached_tokens = (
+                int(prompt_details.get("cached_tokens", 0) or 0)
+                if isinstance(prompt_details, Mapping)
+                else 0
+            )
+            billed_floor = prompt_tokens + completion_tokens + (reasoning_tokens or 0)
+            if total_tokens < billed_floor:
+                total_tokens = billed_floor
+        else:
+            est_input = max(1, sum(len(m.get("content", "")) for m in messages) // 4)
+            est_output = max(1, len(full_text) // 4)
+            prompt_tokens = est_input
+            completion_tokens = est_output
+            total_tokens = est_input + est_output
+            # The estimation branch cannot know reasoning cost; leave it empty
+            # rather than inventing a number.
+            reasoning_tokens = None
+            cached_tokens = 0
+
+        usage = ModelUsage(
+            total_tokens=total_tokens,
+            input_tokens=prompt_tokens,
+            output_tokens=completion_tokens,
+            reasoning_tokens=reasoning_tokens,
+            cached_input_tokens=cached_tokens if cached_tokens > 0 else None,
+            provider="grok",
+            model=chosen_model,
+            request_id=request_id,
+        )
+
+        return TurnCompletion(
+            text=full_text,
+            usage=usage,
+            provenance=provenance,
+            tool_calls=tuple(tool_calls),
+            finish_reason=finish_reason,
+        )
 
     def extract_durable_facts(
         self,
