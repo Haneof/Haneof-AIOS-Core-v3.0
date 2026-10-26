@@ -12,7 +12,11 @@ from __future__ import annotations
 from aios_core.context.controller import ContextController
 from aios_core.recommendation.proactive import MemoryCard, RecommendationBundle
 from aios_core.runtime.cognitive_runtime import RuntimeSnapshot
-from aios_core.runtime.grok_provider import GrokProviderConfig, GrokStreamingProvider
+from aios_core.runtime.grok_provider import (
+    GrokProviderConfig,
+    GrokStreamingProvider,
+    TurnCompletion,
+)
 
 CATALOG = (
     {"name": "drill_down_conversation", "description": "read exact raw dialogue"},
@@ -28,10 +32,15 @@ def _prompt(cockpit: dict, catalog: tuple = CATALOG) -> str:
         captured.append(messages[0]["content"])
         return "ok", [], None
 
+    def fake_stream_chat_with_tools(messages, *, model=None, tools=None, **kwargs):
+        captured.append(messages[0]["content"])
+        return TurnCompletion(text="ok", usage=None, provenance=None, tool_calls=())  # type: ignore[arg-type]
+
     provider = GrokStreamingProvider(
         GrokProviderConfig(api_key="test-key", base_url="http://127.0.0.1:1/v1")
     )
     provider.stream_chat = fake_stream_chat  # type: ignore[method-assign]
+    provider.stream_chat_with_tools = fake_stream_chat_with_tools  # type: ignore[method-assign]
 
     snapshot = RuntimeSnapshot(
         user_input="我们上次说到哪了？",

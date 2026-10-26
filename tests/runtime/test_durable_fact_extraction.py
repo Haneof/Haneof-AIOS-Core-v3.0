@@ -21,7 +21,11 @@ import pytest
 
 from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime.cognitive_runtime import ModelDirective, RuntimeSnapshot
-from aios_core.runtime.grok_provider import GrokProviderConfig, GrokStreamingProvider
+from aios_core.runtime.grok_provider import (
+    GrokProviderConfig,
+    GrokStreamingProvider,
+    TurnCompletion,
+)
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
@@ -33,10 +37,17 @@ class _PromptCapture:
             GrokProviderConfig(api_key="test-key", base_url="http://127.0.0.1:1/v1")
         )
         self.provider.stream_chat = self._stream_chat  # type: ignore[method-assign]
+        self.provider.stream_chat_with_tools = self._stream_chat_with_tools  # type: ignore[method-assign]
 
     def _stream_chat(self, messages, *, model=None, **kwargs):
         self.prompts.append(messages[0]["content"])
         return "ok", None, None
+
+    def _stream_chat_with_tools(self, messages, *, model=None, tools=None, **kwargs):
+        # Same stub as _stream_chat: capture the prompt, carry no usage/provenance
+        # so the turn's metering replay is not exercised by this prompt test.
+        self.prompts.append(messages[0]["content"])
+        return TurnCompletion(text="ok", usage=None, provenance=None, tool_calls=())  # type: ignore[arg-type]
 
     @property
     def last(self) -> str:

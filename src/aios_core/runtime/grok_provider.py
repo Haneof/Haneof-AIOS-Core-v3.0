@@ -27,7 +27,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Collection, Mapping, Sequence
 
 from aios_core.context.budget_policy import resolve_context_budget_policy
-from aios_core.runtime.capabilities import CapabilityCall
+from aios_core.runtime.capabilities import CapabilityCall, json_schema_for_arguments
 from aios_core.runtime.cognitive_runtime import (
     ModelCallProvenance,
     ModelDirective,
@@ -37,6 +37,40 @@ from aios_core.runtime.cognitive_runtime import (
 )
 
 SILENCE_TOKEN = "<AIOS_SILENCE>"
+
+
+def _build_native_tools(
+    catalog: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Translate the capability catalogue into an OpenAI ``tools`` array.
+
+    The catalogue's ``input_schema`` is the kernel's argument mini-language; the
+    tools protocol needs real JSON Schema. One converter, sitting next to
+    ``required_arguments``, renders both the prompt shorthand and this array so the
+    two cannot drift — that drift already cost a live run, where a model invented
+    ``claim``/``evidence`` instead of ``statement``/``evidence_refs``.
+    """
+    tools: list[dict[str, Any]] = []
+    for cap in catalog:
+        if not isinstance(cap, Mapping):
+            continue
+        name = str(cap.get("name") or "")
+        if not name:
+            continue
+        description = str(cap.get("description") or "")
+        parameters = json_schema_for_arguments(cap.get("input_schema") or {})
+        tools.append(
+            {
+                "type": "function",
+                "function": {
+                    "name": name,
+                    "description": description,
+                    "parameters": parameters,
+                },
+            }
+        )
+    return tools
+
 
 DEFAULT_BASE_URL = os.environ.get("AIOS_GROK_BASE_URL", "http://127.0.0.1:8080/v1")
 # Credentials MUST come from the environment. A literal default here would be
@@ -1392,30 +1426,62 @@ class GrokStreamingProvider:
                 user_content = f"[{snapshot.wake_reason}] {user_content}"
             messages.append({"role": "user", "content": user_content})
 
-            # Execute streaming call
-            full_text, usage, provenance = self.stream_chat(messages, model=chosen_model)
+            # Build the native tools array from the capability catalogue, then ask
+            # the model through the interface it was trained on (T06/T07): a reply
+            # and tool calls may arrive in the same response.
+            native_tools = _build_native_tools(snapshot.capability_catalog)
 
-            # Check for silence token
-            if SILENCE_TOKEN in full_text:
+            if native_tools:
+                completion = self.stream_chat_with_tools(
+                    messages, model=chosen_model, tools=native_tools
+                )
+                full_text = completion.text
+                usage = completion.usage
+                provenance = completion.provenance
+                tool_calls = tuple(
+                    CapabilityCall(
+                        name=nc.name,
+                        arguments=dict(nc.arguments),
+                        call_id=nc.call_id or None,
+                    )
+                    for nc in completion.tool_calls
+                )
+            else:
+                full_text, usage, provenance = self.stream_chat(
+                    messages, model=chosen_model
+                )
+                tool_calls = ()
+
+            # Check for silence token only when no tool call was requested.
+            if SILENCE_TOKEN in full_text and not tool_calls:
                 return ModelDirective(silence=True, usage=usage, provenance=provenance)
 
-            # Check for JSON capability call blocks only if tool rounds remain
-            if snapshot.remaining_tool_rounds > 0:
+            # Fallback: some endpoints ignore the tools array and answer in prose.
+            # Keep the text-protocol parser so a JSON block in the reply is not lost.
+            if not tool_calls and snapshot.remaining_tool_rounds > 0:
                 tool_calls = self._extract_capability_calls(
                     full_text, snapshot.capability_catalog
                 )
-                if tool_calls:
-                    return ModelDirective(
-                        capability_calls=tool_calls,
-                        usage=usage,
-                        provenance=provenance,
-                    )
 
-            # Clean response text
             cleaned_response = full_text.strip()
+
+            if tool_calls and cleaned_response:
+                # Reply + writes/reads together (the native-tools shape). The runtime
+                # executes the calls and, when they are all writes, returns this reply.
+                return ModelDirective(
+                    response=cleaned_response,
+                    capability_calls=tool_calls,
+                    usage=usage,
+                    provenance=provenance,
+                )
+            if tool_calls:
+                return ModelDirective(
+                    capability_calls=tool_calls,
+                    usage=usage,
+                    provenance=provenance,
+                )
             if not cleaned_response:
                 return ModelDirective(silence=True, usage=usage, provenance=provenance)
-
             return ModelDirective(
                 response=cleaned_response,
                 usage=usage,

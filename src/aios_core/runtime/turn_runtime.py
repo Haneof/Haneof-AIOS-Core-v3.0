@@ -203,6 +203,18 @@ _ARGUMENT_TYPE_SHORTHANDS = {
 _required_arguments = required_arguments
 
 
+def _normalize_statement(text: str) -> str:
+    """Canonical form for comparing durable claims (T08 content-level dedup).
+
+    Folds case, whitespace and punctuation so that byte-identical — or trivially
+    re-punctuated — re-writes of the same fact compare equal. This is intentionally
+    NOT semantic equality: it only stops a native-tools model from filling the world
+    with duplicate copies of a fact it already persisted. CJK and alphanumeric runs
+    survive; everything else is dropped.
+    """
+    return "".join(ch for ch in str(text).lower() if ch.isalnum())
+
+
 @dataclass(frozen=True, slots=True)
 class FusedTurnResult:
     runtime: RuntimeTurnResult
@@ -3409,6 +3421,26 @@ class FusedTurnRuntime:
             if valid_time is None
             else TemporalExtent.model_validate(valid_time)
         )
+
+        # T08: content-level dedup. A native-tools model may re-write the same
+        # durable fact on a later turn; persisting it again fills the world with
+        # duplicate claims. Compare the normalized statement against the domain's
+        # existing active claims and skip the write when it already exists.
+        normalized_statement = _normalize_statement(statement)
+        if normalized_statement:
+            for existing in self.ai_world.current(
+                domains=(AIWorldDomain(domain),), limit=1000
+            ):
+                if _normalize_statement(existing.statement) == normalized_statement:
+                    return {
+                        "domain": existing.domain.value,
+                        "dimension": existing.dimension,
+                        "subject_id": existing.subject_id,
+                        "claim": None,
+                        "duplicate": True,
+                        "matched_object_id": existing.object_id,
+                    }
+
         receipt = self.ai_world.commit(
             AIWorldClaimRequest(
                 domain=AIWorldDomain(domain),
@@ -3430,6 +3462,7 @@ class FusedTurnRuntime:
             "dimension": receipt.dimension,
             "subject_id": receipt.subject_id,
             "claim": asdict(receipt.claim),
+            "duplicate": False,
         }
 
     def _commit_claim(

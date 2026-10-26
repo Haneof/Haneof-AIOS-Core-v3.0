@@ -13,6 +13,7 @@ from typing import Any, Callable, Mapping, Sequence
 
 from .capabilities import (
     CapabilityCall,
+    CapabilityKind,
     CapabilityRegistry,
     CapabilityResult,
     CapabilitySpec,
@@ -86,11 +87,20 @@ class ModelDirective:
     provenance: ModelCallProvenance | None = None
 
     def __post_init__(self) -> None:
-        terminal_count = int(self.response is not None) + int(self.silence)
-        if self.capability_calls and terminal_count:
-            raise ValueError("directive cannot request capabilities and terminate simultaneously")
-        if not self.capability_calls and terminal_count != 1:
-            raise ValueError("directive must either request capabilities, respond, or stay silent")
+        # A directive may answer AND request capabilities in the same turn. This is
+        # the native-tools shape: a model that writes a durable fact and greets the
+        # user in one response. Silence stays exclusive — it means "no output, no
+        # action", so it cannot coexist with either a response or a tool request.
+        if self.silence and self.response is not None:
+            raise ValueError("directive cannot be silent and respond simultaneously")
+        if self.silence and self.capability_calls:
+            raise ValueError(
+                "directive cannot be silent and request capabilities simultaneously"
+            )
+        if not self.capability_calls and not self.silence and self.response is None:
+            raise ValueError(
+                "directive must request capabilities, respond, or stay silent"
+            )
         if self.response is not None and not self.response.strip():
             raise ValueError("response must be non-blank when provided")
         if self.usage is not None and not isinstance(self.usage, ModelUsage):
@@ -406,14 +416,6 @@ class CognitiveRuntime:
                 # cannot erase an already-consumed model call.
                 self.model_usage_recorder(snapshot, directive)
 
-            if directive.response is not None:
-                return _result(
-                    response=directive.response,
-                    silenced=False,
-                    capability_history=tuple(history),
-                    model_rounds=round_index + 1,
-                    termination_reason="responded",
-                )
             if directive.silence:
                 return _result(
                     response=None,
@@ -423,9 +425,33 @@ class CognitiveRuntime:
                     termination_reason="silence",
                 )
 
-            # At the final allowed model round, new tool requests are not executed.
-            # We fail closed rather than silently granting unbounded autonomous loops.
-            if round_index >= effective_model_rounds - 1:
+            calls = directive.capability_calls
+            has_response = directive.response is not None
+            last_round = round_index >= effective_model_rounds - 1
+
+            # Classify the requested calls before executing them. A response may
+            # accompany the calls (native-tools shape); whether we need another model
+            # round to digest read results decides whether this round terminates.
+            contains_read = False
+            for call in calls:
+                try:
+                    call_spec = self.registry.get_spec(call.name)
+                except KeyError:
+                    call_spec = None
+                if call_spec is not None and call_spec.kind == CapabilityKind.READ:
+                    contains_read = True
+
+            # Continue into another model round only when there is something to feed
+            # back: reads whose results the model must digest, or a bare tool request
+            # with no accompanying response. A response plus only writes terminates
+            # this round after the writes land.
+            needs_continuation = bool(calls) and (not has_response or contains_read)
+
+            # At the final allowed model round we never start another loop: new tool
+            # requests are not executed and we fail closed rather than granting
+            # unbounded autonomous loops. A response-plus-writes round is exempt —
+            # it terminates here, so it is not a loop.
+            if needs_continuation and last_round:
                 return _result(
                     response=None,
                     silenced=False,
@@ -438,7 +464,7 @@ class CognitiveRuntime:
                     ),
                 )
 
-            for call in directive.capability_calls:
+            for call in calls:
                 if total_calls >= self.max_total_capability_calls:
                     return _result(
                         response=None,
@@ -494,5 +520,17 @@ class CognitiveRuntime:
 
                 history.append(self.registry.invoke(call))
                 total_calls += 1
+
+            # The requested calls (if any) have landed and their results are in
+            # ``history``. A response that needed no further digestion terminates the
+            # turn here; otherwise the loop continues and feeds those results back.
+            if has_response and not needs_continuation:
+                return _result(
+                    response=directive.response,
+                    silenced=False,
+                    capability_history=tuple(history),
+                    model_rounds=round_index + 1,
+                    termination_reason="responded",
+                )
 
         raise AssertionError("unreachable runtime loop state")

@@ -26,6 +26,7 @@ from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.grok_provider import (
     GrokProviderConfig,
     GrokStreamingProvider,
+    TurnCompletion,
     _render_capabilities,
     _render_capability_result,
 )
@@ -224,7 +225,12 @@ def test_the_prompt_a_provider_sends_states_write_arguments(tmp_path: Path) -> N
         sent["messages"] = messages
         return "ok", None, None
 
+    def fake_stream_chat_with_tools(messages, model=None, tools=None, **kwargs):  # type: ignore[no-untyped-def]
+        sent["messages"] = messages
+        return TurnCompletion(text="ok", usage=None, provenance=None, tool_calls=())  # type: ignore[arg-type]
+
     provider.stream_chat = fake_stream_chat  # type: ignore[method-assign]
+    provider.stream_chat_with_tools = fake_stream_chat_with_tools  # type: ignore[method-assign]
     provider.as_model_handler(model="m")(snapshot)
 
     system = sent["messages"][0]["content"]

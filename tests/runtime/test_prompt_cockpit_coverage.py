@@ -25,7 +25,11 @@ import pytest
 
 from aios_core.context.controller import ModelContextBundle
 from aios_core.runtime.cognitive_runtime import ModelDirective, RuntimeSnapshot
-from aios_core.runtime.grok_provider import GrokProviderConfig, GrokStreamingProvider
+from aios_core.runtime.grok_provider import (
+    GrokProviderConfig,
+    GrokStreamingProvider,
+    TurnCompletion,
+)
 
 # Fields that carry no meaning for the model and must stay out of the prompt: they are
 # budget arithmetic for the controller, not context. Anything else in the cockpit is
@@ -133,10 +137,15 @@ def _outbound_text(cockpit: dict) -> str:
         captured.extend(message["content"] for message in messages)
         return "ok", [], None
 
+    def fake_stream_chat_with_tools(messages, *, model=None, tools=None, **kwargs):
+        captured.extend(message["content"] for message in messages)
+        return TurnCompletion(text="ok", usage=None, provenance=None, tool_calls=())  # type: ignore[arg-type]
+
     provider = GrokStreamingProvider(
         GrokProviderConfig(api_key="test-key", base_url="http://127.0.0.1:1/v1")
     )
     provider.stream_chat = fake_stream_chat  # type: ignore[method-assign]
+    provider.stream_chat_with_tools = fake_stream_chat_with_tools  # type: ignore[method-assign]
 
     snapshot = RuntimeSnapshot(
         user_input=cockpit["user_input"],
