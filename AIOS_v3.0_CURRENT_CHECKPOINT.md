@@ -1,3 +1,13 @@
+## 2026-10-26 — T2' DURABLE MEMORY EXTRACTION PASS & RELEASE VERDICT
+
+- **T2' 记忆抽取轮已完成**：根因 = durable claim=0 是「依赖主模型顺便调用 commit_ai_world_claim」，真实端点常直接回复而跳过。方案 = 主对话轮后增加独立低温度抽取 pass，确定性落地 durable facts（`grok_provider.extract_durable_facts` + `turn_runtime.durable_fact_extractor` + `headless` 自动装配）。
+- **真实端点验证（NVIDIA NIM `minimaxai/minimax-m3.1-flash`）**：端到端 `run_turn` 第 1 轮落地 3 条 fact（此前 grok-4.6 为 0），第 2 轮正确跨轮回忆；误报已消除（天气闲聊 0 条）。
+- **回归**：新增 `tests/runtime/test_durable_fact_extraction.py`（5 passed）；安全门 + identity 回归全绿。
+- **Release Verdict**：`RELEASE_CANDIDATE`（技术就绪，非 FINAL_RELEASE）。独立 R1–R9 复核、PR #403 处置、Issue #11 关闭、tag 打标为遗留项，需 owner 决策。
+- 详见 `reviews/AIOS_PM_STAGE_ADJUDICATION_2026-10-26.md`。
+
+---
+
 ## 2026-10-26 — OWNER GOVERNANCE RECONCILIATION / SECURITY GATE HARDENED
 
 - Owner 裁决（本次会话）：允许密钥提交仓库、就一个能用的模型测试、推进治理。
