@@ -7,6 +7,7 @@ returns structured evidence/errors. It does not decide which capability is relev
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any, Callable, Mapping
@@ -69,6 +70,160 @@ def required_arguments(input_schema: Any) -> dict[str, str]:
             short = text if len(text) <= 24 else text[:21] + "..."
         required[str(name)] = short
     return required
+
+
+_JSON_SCHEMA_SCALARS: dict[str, dict[str, Any]] = {
+    "string": {"type": "string"},
+    "integer": {"type": "integer"},
+    "number": {"type": "number"},
+    "boolean": {"type": "boolean"},
+    "object": {"type": "object"},
+    "array": {"type": "array"},
+}
+
+
+def _split_top_level(text: str) -> list[str]:
+    """Split on commas that sit outside any brace or bracket.
+
+    ``{object_id:string,path:array[string]?}`` uses a comma both to separate
+    members and inside a member's own type, so a plain split would cut a type in
+    half and invent a member named ``path:array[string``.
+    """
+
+    parts: list[str] = []
+    current: list[str] = []
+    depth = 0
+    for char in text:
+        if char in "{[":
+            depth += 1
+        elif char in "}]":
+            depth -= 1
+        if char == "," and depth == 0:
+            parts.append("".join(current))
+            current = []
+        else:
+            current.append(char)
+    tail = "".join(current)
+    if tail.strip():
+        parts.append(tail)
+    return [part.strip() for part in parts if part.strip()]
+
+
+def _strip_optional(text: str) -> tuple[str, bool]:
+    """Split a declared type from its trailing ``?`` marker."""
+
+    stripped = text.strip()
+    if stripped.endswith("?"):
+        return stripped[:-1].strip(), True
+    return stripped, False
+
+
+def _parse_object_members(members: str) -> dict[str, Any]:
+    properties: dict[str, Any] = {}
+    required: list[str] = []
+    for member in _split_top_level(members):
+        key, _, value = member.partition(":")
+        if not key.strip() or not value.strip():
+            continue
+        name = key.strip()
+        inner, optional = _strip_optional(value)
+        properties[name] = _parse_type_text(inner)
+        if not optional:
+            required.append(name)
+    schema: dict[str, Any] = {"type": "object", "properties": properties}
+    if required:
+        schema["required"] = required
+    return schema
+
+
+def _parse_type_text(text: str) -> dict[str, Any]:
+    """Translate one mini-language type string into a JSON Schema fragment.
+
+    The kernel declares argument types in a language meant for a human reading a
+    prompt — ``string``, ``integer?``, ``array[string]``, ``number[0,1]``,
+    ``a|b|c``, ``{object_id:string,revision:integer}``. A ``tools`` array needs
+    real JSON Schema instead, and every constraint has to survive that
+    translation: if the schema says ``number`` where the kernel meant ``number
+    between 0 and 1``, the model supplies something legal that the turn then
+    rejects.
+
+    Unknown spellings degrade to ``string`` rather than raising. A crash would be
+    loud and obvious; a quietly wrong parameter shape teaches the model the wrong
+    contract, which is the failure we are trying to end.
+    """
+
+    declared, _ = _strip_optional(text)
+    if not declared:
+        return {}
+    lowered = declared.lower()
+
+    if lowered.startswith("iso-8601"):
+        return {"type": "string", "format": "date-time", "description": declared}
+    if lowered.startswith("string starting "):
+        prefix = declared[len("string starting ") :].strip()
+        return {"type": "string", "pattern": f"^{re.escape(prefix)}", "description": declared}
+    if "json value" in lowered:
+        # Deliberately unconstrained: every JSON value is acceptable here.
+        return {"description": declared}
+    if "temporalextent" in lowered:
+        return {"type": "object", "description": declared}
+
+    bounded = re.fullmatch(r"number\s*\[\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*\]", declared)
+    if bounded:
+        return {
+            "type": "number",
+            "minimum": float(bounded.group(1)),
+            "maximum": float(bounded.group(2)),
+        }
+
+    map_of = re.fullmatch(r"object\s*\[\s*([A-Za-z]+)\s*\]", declared)
+    if map_of:
+        return {"type": "object", "additionalProperties": _parse_type_text(map_of.group(1))}
+
+    if declared.startswith("array[") and declared.endswith("]"):
+        return {"type": "array", "items": _parse_type_text(declared[6:-1])}
+
+    if declared.startswith("{") and declared.endswith("}"):
+        return _parse_object_members(declared[1:-1])
+
+    if "|" in declared:
+        return {
+            "type": "string",
+            "enum": [part.strip() for part in declared.split("|") if part.strip()],
+        }
+
+    scalar = _JSON_SCHEMA_SCALARS.get(lowered)
+    if scalar is not None:
+        return dict(scalar)
+
+    return {"type": "string", "description": f"declared as {declared}"}
+
+
+def json_schema_for_arguments(input_schema: Any) -> dict[str, Any]:
+    """Convert a kernel ``input_schema`` into the JSON Schema a tools array needs.
+
+    This sits next to ``required_arguments`` deliberately. Both answer "what must
+    the caller supply"; if they disagree, the prompt text and the tools array
+    advertise two different contracts for one call, which is exactly the class of
+    drift that already cost us once. ``required`` here matches
+    ``required_arguments`` by construction — same semicolon rule for appended
+    guidance, same trailing-``?`` rule for optionality.
+    """
+
+    if not isinstance(input_schema, Mapping):
+        return {"type": "object", "properties": {}, "required": []}
+    properties: dict[str, Any] = {}
+    required: list[str] = []
+    for name, type_text in input_schema.items():
+        declared = str(type_text).split(";")[0].strip()
+        inner, optional = _strip_optional(declared)
+        properties[str(name)] = _parse_type_text(inner)
+        if not optional:
+            required.append(str(name))
+    schema: dict[str, Any] = {"type": "object", "properties": properties}
+    if required:
+        schema["required"] = required
+    return schema
 
 
 @dataclass(frozen=True)

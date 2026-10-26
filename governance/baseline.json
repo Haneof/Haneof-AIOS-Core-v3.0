@@ -1,6 +1,6 @@
 {
   "_comment": "AIOS 基线钉住文件。受保护路径的任何变更，必须由对应 task 授权，且提交信息含 Authorized-Task trailer。由 PM 维护，实现方不得自行更新。",
-  "pinned_sha": "b81635c65a2b725c9fa6aa2221d8fa6040239bb2",
+  "pinned_sha": "22b4adbe5f1845f8b214699eaa70f4be7a272a26",
   "pinned_at": "2026-10-26T00:00:00Z",
   "pinned_by": "owner",
   "task_id": [
@@ -8,7 +8,8 @@
     "PM-DURABLE-MEMORY-EXTRACTION-001",
     "P16-MEMORY-DIRECTIVE-001",
     "P16-IDENTITY-CONTINUITY-001",
-    "P16-LIVE-MODEL-001"
+    "P16-LIVE-MODEL-001",
+    "PM-NATIVE-TOOLS-PROTOCOL-001"
   ],
   "allowed_paths": [
     "governance/",
