@@ -241,6 +241,7 @@ class HeadlessCore:
             store = SQLiteWorldStore(self.config.world_path)
             index = WorldSearchIndex(self.config.index_path, store=store)
             index.catch_up()
+            durable_extractor = getattr(self.model_handler, "extract_durable_facts", None)
             runtime = FusedTurnRuntime(
                 store=store,
                 index=index,
@@ -248,6 +249,9 @@ class HeadlessCore:
                 model_handler=self.model_handler,
                 round_summary_handler=self.round_summary_handler,
                 dimension_summary_handler=self.dimension_summary_handler,
+                durable_fact_extractor=(
+                    durable_extractor if callable(durable_extractor) else None
+                ),
             )
             self.store = store
             self.index = index

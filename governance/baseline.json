@@ -4,7 +4,8 @@
   "pinned_at": "2026-10-26T00:00:00Z",
   "pinned_by": "owner",
   "task_id": [
-    "PM-GOVERNANCE-SECURITY-GATE-001"
+    "PM-GOVERNANCE-SECURITY-GATE-001",
+    "PM-DURABLE-MEMORY-EXTRACTION-001"
   ],
   "allowed_paths": [
     "governance/",

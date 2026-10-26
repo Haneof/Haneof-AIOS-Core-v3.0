@@ -671,6 +671,84 @@ class GrokStreamingProvider:
 
         return full_text, usage, provenance
 
+    def extract_durable_facts(
+        self,
+        user_input: str,
+        assistant_text: str,
+        *,
+        model: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Deterministic memory-extraction pass (T2').
+
+        The main dialogue turn no longer depends on the model volunteering a
+        ``commit_ai_world_claim`` tool call mid-reply. Real endpoints routinely
+        answer the user directly and skip the tool call, which leaves the durable
+        claim count at zero no matter how hard the main prompt insists. This method
+        runs a separate low-temperature pass over the turn's (user message,
+        assistant reply) and returns only the durable-fact arguments the caller
+        should persist. ``evidence_refs`` are deliberately omitted here: the caller
+        binds them to the turn's real observation so the model cannot hallucinate
+        a reference.
+        """
+        system = (
+            "You are the memory-extraction pass of a personal AI. You receive one "
+            "conversation turn (a user message and the assistant reply). Extract "
+            "ONLY durable facts about the user or the relationship that stay true "
+            "beyond this conversation: the user's identity, long-running work, "
+            "standing preferences, agreed ways of working, or promises made. "
+            "Output one JSON object per durable fact using commit_ai_world_claim, "
+            "or output exactly <AIOS_SILENCE> when nothing durable is present.\n"
+            "Rules:\n"
+            "- domain is one of: user_understanding, relationship, self\n"
+            "- statement is a single self-contained factual sentence in the user's language\n"
+            "- confidence is a number from 0.0 to 1.0\n"
+            '- tags must be ["core_context"]\n'
+            "- Only extract durable facts the USER explicitly stated about themselves, "
+            "their work or their standing preferences. Do NOT infer user attributes "
+            "(location, identity) from the assistant reply or from an incidental "
+            "place/time mention.\n"
+            "- Transient content (weather, small talk, one-off questions) is NOT durable.\n"
+            "- Do NOT invent facts that were not stated. Do NOT add commentary. "
+            "Do NOT set evidence_refs.\n"
+            "Example output:\n"
+            '{"call": "commit_ai_world_claim", "arguments": {"domain": "user_understanding", "statement": "The user is named Lao Wang and works on flexible-screen wristbands.", "confidence": 0.95, "tags": ["core_context"]}}'
+        )
+        user_content = (
+            f"USER MESSAGE:\n{user_input}\n\nASSISTANT REPLY:\n{assistant_text}"
+        )
+        messages = [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user_content},
+        ]
+        text, _usage, _provenance = self.stream_chat(
+            messages, model=model, temperature=0.0
+        )
+        if SILENCE_TOKEN in text:
+            return []
+        # Only commit_ai_world_claim is allowed from the extraction pass. The
+        # forward-revision flow (retract + commit) is intentionally not solicited
+        # here: the caller reconciles duplicates against the existing anchor.
+        catalog = [{"name": "commit_ai_world_claim"}]
+        calls = self._extract_capability_calls(text, catalog)
+        facts: list[dict[str, Any]] = []
+        for call in calls:
+            args = call.arguments
+            if not isinstance(args, dict):
+                continue
+            domain = str(args.get("domain", "")).strip()
+            statement = str(args.get("statement", "")).strip()
+            if not domain or not statement:
+                continue
+            facts.append(
+                {
+                    "domain": domain,
+                    "statement": statement,
+                    "confidence": float(args.get("confidence", 0.9)),
+                    "tags": list(args.get("tags") or ["core_context"]),
+                }
+            )
+        return facts
+
     def as_executor(self, model: str | None = None) -> Callable[[str, dict[str, Any]], str]:
         """Returns a simple prompt executor callable compatible with MultiModelEdgeScheduler."""
         def _executor(prompt: str, context: dict[str, Any]) -> str:
@@ -964,6 +1042,10 @@ class GrokStreamingProvider:
                 usage=usage,
                 provenance=provenance,
             )
+
+        # Expose the deterministic extraction pass on the handler so a headless
+        # runtime can auto-wire it (T2') without a separate configuration knob.
+        _handler.extract_durable_facts = self.extract_durable_facts  # type: ignore[attr-defined]
 
         return _handler
 

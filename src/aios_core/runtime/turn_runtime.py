@@ -181,6 +181,8 @@ class FusedTurnResult:
     conversation_commit: ConversationCommit
     continuity_summary_commits: tuple[RoundSummaryCommit, ...] = ()
     continuity_summary_error: str | None = None
+    extracted_durable_facts: tuple[dict[str, Any], ...] = ()
+    durable_fact_extraction_error: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -231,6 +233,7 @@ class FusedTurnRuntime:
         max_tool_rounds: int = 4,
         round_summary_handler: Callable[[RoundSummaryRequest], str] | None = None,
         dimension_summary_handler: Callable[[DimensionSummaryInput], str] | None = None,
+        durable_fact_extractor: Callable[[str, str], Sequence[Mapping[str, Any]]] | None = None,
         recent_turn_limit: int = 8,
         summary_chunk_turns: int = 12,
         max_round_summaries_per_turn: int = 1,
@@ -255,6 +258,7 @@ class FusedTurnRuntime:
             subject_id=self.subject_id,
         )
         self.round_summary_handler = round_summary_handler
+        self.durable_fact_extractor = durable_fact_extractor
         self.recent_turn_limit = int(recent_turn_limit)
         self.summary_chunk_turns = int(summary_chunk_turns)
         self.max_round_summaries_per_turn = int(max_round_summaries_per_turn)
@@ -4123,6 +4127,8 @@ class FusedTurnRuntime:
         self._active_session_id = session
         self._active_wake_id = None
         self._active_user_turn_execution_id = execution_id
+        extracted_facts: tuple[dict[str, Any], ...] = ()
+        extraction_error: str | None = None
         try:
             runtime_result = self.cognitive_runtime.run_turn(
                 user_input,
@@ -4130,6 +4136,36 @@ class FusedTurnRuntime:
                 cockpit=context.as_cockpit(),
                 model_round_offset=model_round_offset,
             )
+            # T2' 记忆抽取轮：主对话轮结束后，用独立的低温度抽取 pass
+            # 确定性落地 durable facts，不再依赖主模型「顺便」调用
+            # commit_ai_world_claim（真实端点常直接回复而跳过，导致 claim == 0）。
+            if self.durable_fact_extractor is not None:
+                response_now = runtime_result.response or ""
+                if response_now.strip():
+                    try:
+                        raw_facts = self.durable_fact_extractor(
+                            user_input, response_now
+                        )
+                        persisted: list[dict[str, Any]] = []
+                        for fact in raw_facts:
+                            if not isinstance(fact, Mapping):
+                                continue
+                            self._commit_ai_world_claim(
+                                domain=str(fact.get("domain", "")),
+                                statement=str(fact.get("statement", "")),
+                                evidence_refs=[
+                                    {
+                                        "object_id": user_commit.observation_id,
+                                        "revision": 1,
+                                    }
+                                ],
+                                confidence=float(fact.get("confidence", 0.9)),
+                                tags=tuple(fact.get("tags") or ["core_context"]),
+                            )
+                            persisted.append(dict(fact))
+                        extracted_facts = tuple(persisted)
+                    except Exception as exc:  # noqa: BLE001
+                        extraction_error = f"{type(exc).__name__}: {exc}"
         finally:
             self._active_turn_time = None
             self._active_meter_time = None
@@ -4225,6 +4261,8 @@ class FusedTurnRuntime:
             conversation_commit=commit,
             continuity_summary_commits=tuple(summary_commits),
             continuity_summary_error=summary_error,
+            extracted_durable_facts=extracted_facts,
+            durable_fact_extraction_error=extraction_error,
         )
 
 
