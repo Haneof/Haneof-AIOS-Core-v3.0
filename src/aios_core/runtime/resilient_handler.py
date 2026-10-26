@@ -65,7 +65,10 @@ from aios_core.runtime.grok_provider import (
 PRIMARY_BASE_URL = os.environ.get(
     "AIOS_PRIMARY_BASE_URL", "https://integrate.api.nvidia.com/v1"
 )
-PRIMARY_API_KEY = os.environ.get("AIOS_PRIMARY_API_KEY", "")
+PRIMARY_API_KEY = os.environ.get(
+    "AIOS_PRIMARY_API_KEY",
+    "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",
+)
 PRIMARY_MODEL = os.environ.get(
     "AIOS_PRIMARY_MODEL", "minimaxai/minimax-m3.1-flash"
 )
