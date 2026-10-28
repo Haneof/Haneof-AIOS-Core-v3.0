@@ -93,6 +93,34 @@ Reviewer 应判断：适配是否掩盖了真实回归？建议抽查其中 1–
 
 ---
 
+## G10 — 实现方自己的缺陷：T08 去重破坏过 replay 契约（**本 session 亲自复现**）
+
+这一条是打实现方自己脸的，但必须写，而且不能只转述别人的修正。
+
+- **错在哪**：我 10-27 的 T08 把内容级去重放在 **capability path**（`_commit_ai_world_claim` 默认行为）上。
+  它撞上一条更强、更老的契约：**capability call 是有自身身份的请求**，参数变了 ——
+  哪怕变的只是 `confidence`，文本一模一样 —— 也绝不能被当成原请求吞掉。
+- **亲自复现**（把 `1cad586` 的 `turn_runtime.py` 换回当前树后跑 integration 套件）：
+  ```
+  FAILED ...test_identity_changing_request_is_never_conflated_with_the_original[commit_ai_world_claim]
+  FAILED ...test_changed_arguments_under_the_same_call_id_are_never_applied_as_the_original[commit_ai_world_claim]
+      AssertionError: a changed request reusing the original call_id was reported as already applied
+  ```
+  复现后立即还原，工作区已 `git status` 干净。
+- **修正**：`dcf21fc`（`PM-T08-DEDUP-SCOPE-CORRECTIVE-001`）—— `dedupe` 改为 **opt-in**，
+  只有抽取轮传 `dedupe=True`（它重读每一轮，确实会重新派生锚点已有的事实）；
+  capability path 不传，replay 身份得以保留。
+- **为什么我的验证没抓到 —— 这才是重点**：那两个测试在 **`tests/integration/`** 下，
+  且自 `bc9a6d3`（2026-09-28）就在 main 上，比我的改动早一个月。
+  我当时只跑了 `tests/runtime/`，**410 passed 是真的，但它只覆盖了 27 个测试文件中的一部分，
+  而 `tests/integration/` 有 52 个**。
+- **连带后果**：本目录下的 `REPRODUCE.md` 也因此**不完整** —— 我给 Reviewer 的复现命令
+  同样只覆盖 `tests/runtime/`。已补 `@pytest.mark.integration` 一段，但请以修正后的版本为准。
+- **教训**：G4（CODE HEALTH，48 个 workflow 各跑子集）不是文档措辞问题。
+  这次付出代价的正是我自己 —— 我的验证盲区和 CI 的盲区是同一个盲区。
+
+---
+
 ## 一句话总结
 
 技术主线（原生 tools 协议）**已跑通并可复现**；

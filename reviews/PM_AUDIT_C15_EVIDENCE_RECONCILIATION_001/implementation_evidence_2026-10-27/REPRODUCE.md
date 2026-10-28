@@ -41,6 +41,34 @@ grep -c "registry.register(" src/aios_core/runtime/turn_runtime.py
 # 预期：53
 ```
 
+### ⚠️ A 节是不够的 —— 实现方初版漏了集成套件
+
+初版的复现手册只让你跑 `tests/runtime/`，**这是盲区，而且付出了代价**：
+`tests/integration/` 下 52 个测试文件从未被本包的复现步骤覆盖，
+而其中两个测试自 2026-09-28 起就守着 capability replay 契约 —— T08 去重恰好破坏了它们。
+详见 `OPEN_GAPS.md` G10（含亲自复现的输出）。
+
+复核时请把下面这步纳入：
+
+```bash
+# A5 — capability replay 契约（必跑）
+python3.11 -m pytest \
+  tests/integration/test_core_background_trusted_return_corrective_001_capability_replay.py -q
+# 预期：全通过
+# 若出现 "reported as already applied" 之类的失败，说明去重又回到了 capability path
+# —— 那是契约被破坏，不是测试写错了
+```
+
+```bash
+# A6 — 全量健康的唯一入口（耗时见下）
+python3.11 tools/check.py --quick    # 快子集，约 2 分钟
+python3.11 tools/check.py            # 全量，请在 CI 或发版前跑
+```
+
+> **关于全量耗时**：实测 `pytest tests` 跑到 25 分钟只完成约 50%，被强杀。
+> plan 里"全量约 17 分钟"的基线已不成立。所以 `--quick` 不是偷懒，是目前现实的日常入口。
+> 这正是 G4（CODE HEALTH）要解决的那件事本身。
+
 ### 失败判读
 
 | 现象 | 含义 |
