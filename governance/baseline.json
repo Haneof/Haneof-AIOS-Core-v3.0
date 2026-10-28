@@ -1,7 +1,7 @@
 {
   "_comment": "AIOS 基线钉住文件。受保护路径的任何变更，必须由对应 task 授权，且提交信息含 Authorized-Task trailer。由 PM 维护，实现方不得自行更新。",
-  "pinned_sha": "dcf21fc0639a3ae6fe10946a60d521b2b64afb24",
-  "pinned_at": "2026-10-28T09:00:26Z",
+  "pinned_sha": "f600a4ddb57d0ffb1df1748621abef64292217c3",
+  "pinned_at": "2026-10-28T09:30:13Z",
   "pinned_by": "PM",
   "task_id": [
     "PM-GOVERNANCE-SECURITY-GATE-001",
