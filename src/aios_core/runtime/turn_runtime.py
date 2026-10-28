@@ -3400,6 +3400,7 @@ class FusedTurnRuntime:
         valid_time: Mapping[str, Any] | None = None,
         unknown_items: Sequence[str] = (),
         counter_evidence_refs: Sequence[Mapping[str, Any]] = (),
+        dedupe: bool = False,
     ) -> dict[str, Any]:
         if self._active_turn_time is None:
             raise RuntimeError(
@@ -3422,12 +3423,20 @@ class FusedTurnRuntime:
             else TemporalExtent.model_validate(valid_time)
         )
 
-        # T08: content-level dedup. A native-tools model may re-write the same
-        # durable fact on a later turn; persisting it again fills the world with
-        # duplicate claims. Compare the normalized statement against the domain's
-        # existing active claims and skip the write when it already exists.
+        # Content-level dedup, opted into by the extraction pass only.
+        #
+        # It cannot live on the capability path: a capability call is a request
+        # with its own identity, and the replay contract says a request whose
+        # arguments changed must never be conflated with the original — even when
+        # the statement text is the same (e.g. only `confidence` moved). Swallowing
+        # that as "duplicate" broke
+        # test_changed_arguments_under_the_same_call_id_are_never_applied_as_the_original.
+        #
+        # The extraction pass is different: it re-reads the same turn and can
+        # legitimately re-derive a fact already in the anchor, so it asks for the
+        # comparison explicitly.
         normalized_statement = _normalize_statement(statement)
-        if normalized_statement:
+        if dedupe and normalized_statement:
             for existing in self.ai_world.current(
                 domains=(AIWorldDomain(domain),), limit=1000
             ):
@@ -4236,6 +4245,10 @@ class FusedTurnRuntime:
                                 ],
                                 confidence=float(fact.get("confidence", 0.9)),
                                 tags=tuple(fact.get("tags") or ["core_context"]),
+                                # The pass re-reads every turn, so it can re-derive
+                                # a fact the anchor already holds. Dedup belongs
+                                # here, not on the capability path.
+                                dedupe=True,
                             )
                             persisted.append(dict(fact))
                         extracted_facts = tuple(persisted)
