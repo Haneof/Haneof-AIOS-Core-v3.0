@@ -72,6 +72,62 @@ def _build_native_tools(
     return tools
 
 
+# The capabilities a conversational turn on a wearable actually needs.
+#
+# Advertising all 53 costs 34,736 characters (~11.5k tokens) on *every* dialogue
+# call, and the measured effect on the endpoint we have was zero tool calls in
+# six turns — so the bulk of that payload buys nothing while it slows every turn.
+#
+# Everything not listed here stays reachable: the capability names are still
+# rendered in the prompt, and the text-protocol parser still accepts a
+# ``{"call": ...}`` block for any registered name. What the cold set loses is the
+# JSON Schema advertisement, not the ability to act.
+#
+# Keep this list justified by what the standing instructions actually ask for:
+# persist a durable fact, correct one, promise something, set a goal, open a task,
+# and read back the four places the prompt points at when context is missing.
+_HOT_TOOL_NAMES = frozenset(
+    {
+        "commit_ai_world_claim",
+        "revise_claim",
+        "retract_claim",
+        "record_ai_promise",
+        "propose_goal",
+        "create_task",
+        "drill_down_conversation",
+        "list_conversation_summaries",
+        "search_conversation_summaries",
+        "search_world",
+        "expand_recall",
+        "list_dimensions",
+    }
+)
+
+_NATIVE_TOOLS_ENV = "AIOS_NATIVE_TOOLS"
+_FALSEY = frozenset({"off", "0", "false", "no", "disabled"})
+
+
+def native_tools_enabled() -> bool:
+    """Whether to advertise tools at all.
+
+    ``off`` falls back to the text protocol for the whole turn. That matters for
+    endpoints whose model ignores the tools array: the payload is pure cost there.
+    """
+
+    return os.environ.get(_NATIVE_TOOLS_ENV, "on").strip().lower() not in _FALSEY
+
+
+def select_native_tools(catalog: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Build the tools array from the hot set only. See ``_HOT_TOOL_NAMES``."""
+
+    hot = [
+        cap
+        for cap in catalog
+        if isinstance(cap, Mapping) and str(cap.get("name") or "") in _HOT_TOOL_NAMES
+    ]
+    return _build_native_tools(hot)
+
+
 DEFAULT_BASE_URL = os.environ.get("AIOS_GROK_BASE_URL", "http://127.0.0.1:8080/v1")
 # Credentials MUST come from the environment. A literal default here would be
 # committed to the repository and leak on every clone; fail closed instead.
@@ -1426,10 +1482,15 @@ class GrokStreamingProvider:
                 user_content = f"[{snapshot.wake_reason}] {user_content}"
             messages.append({"role": "user", "content": user_content})
 
-            # Build the native tools array from the capability catalogue, then ask
-            # the model through the interface it was trained on (T06/T07): a reply
-            # and tool calls may arrive in the same response.
-            native_tools = _build_native_tools(snapshot.capability_catalog)
+            # Build the native tools array from the hot set, then ask the model
+            # through the interface it was trained on (T06/T07): a reply and tool
+            # calls may arrive in the same response. Cold capabilities stay
+            # reachable through the text-protocol fallback below.
+            native_tools = (
+                select_native_tools(snapshot.capability_catalog)
+                if native_tools_enabled()
+                else []
+            )
 
             if native_tools:
                 completion = self.stream_chat_with_tools(
