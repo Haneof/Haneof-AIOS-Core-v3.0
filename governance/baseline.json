@@ -9,7 +9,8 @@
     "P16-MEMORY-DIRECTIVE-001",
     "P16-IDENTITY-CONTINUITY-001",
     "P16-LIVE-MODEL-001",
-    "PM-NATIVE-TOOLS-PROTOCOL-001"
+    "PM-NATIVE-TOOLS-PROTOCOL-001",
+    "PM-WINDOWS-PARITY-001"
   ],
   "allowed_paths": [
     "governance/",
