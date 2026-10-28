@@ -1,3 +1,40 @@
+## 2026-10-28 — SYNC AUDIT / T03 UNIFIED HEALTH CHECK / T08 DEFECT REPRODUCED
+
+- **同步审查（会话开头必做，这次发现了东西）**：本地 `feat/native-tools-protocol` 停在 `7f68691`，
+  而远端 main 已是 `8d2f7b2` —— **落后 13 个提交**。已 fast-forward，工作区干净、无 stash。
+  落下的三类工作均已是 main 的一部分：`PM-WINDOWS-PARITY-001`（`_filelock.py`，Windows 上
+  `import fcntl` 会让整个模块挂掉）、`PM-SUITE-RUNNABILITY-001`（`pyproject.toml` 补声明
+  `jsonschema` —— 干净环境连套件都收集不了，**这是我 T05 引入的**）、`PM-T08-DEDUP-SCOPE-CORRECTIVE-001`。
+- **T08 缺陷，亲自复现（不转述别人的修正）**：把 `1cad586` 的 `turn_runtime.py` 换回当前树后，
+  两个集成测试立刻红 —— `test_identity_changing_request_is_never_conflated_with_the_original`、
+  `test_changed_arguments_under_the_same_call_id_are_never_applied_as_the_original`，
+  均报 "a changed request reusing the original call_id was reported as already applied"。
+  它们自 `bc9a6d3`（2026-09-28）就在 main 上。**漏掉的原因是职位描述性的**：当时只跑
+  `tests/runtime/`（27 个文件），而这两个在 `tests/integration/`（52 个文件）。
+  修正方案 `dedupe` 改为 opt-in，只有抽取轮传 `True`；capability path 保住 replay 身份。
+  已写入 `OPEN_GAPS.md` G10，`REPRODUCE.md` 也补全了集成套件 —— 我给 Reviewer 的复现手册
+  当初有同样的盲区。
+- **T03 统一检查入口 `tools/check.py`（plan 既定任务，已完成）**：三步 —— pytest → 治理基线校验 →
+  跳过原因分布；一条命令出 PASS/FAIL 与耗时，不引新依赖。
+  - 实测 `--quick`（runtime+unit+audit）：**473 passed, 3 skipped，129s**；跳过的三个是
+    live provider 测试（需 `AIOS_LIVE_PROVIDER=1` + 可达端点）。
+  - 一个真 bug 已修：**pytest 在非 tty 下不打印摘要行**，初版靠解析摘要，结果把"473 passed"
+    报成 "skipped"。改用 `--junitxml` 取精确计数。跑出来的，不是读出来的。
+  - **全量耗时**：`pytest tests` 跑到 **25 分钟只完成约 50%**，被强杀。
+    plan 里"全量约 17 分钟"的基线**已不成立**，`--quick` 是目前现实的日常入口。
+- **T04 并发 attach：定性仍差 Windows**（诚实边界）：目标测试
+  `test_ca2_015_concurrent_attach_yields_one_canonical_winner` 在本 Linux 沙箱**单独跑通过**，
+  与 plan 记载的"Linux 5/5 绿"一致。所以本机**无法复现** Windows 上的
+  `sqlite3.OperationalError: attempt to write a readonly database`。
+  filelock 修复解决的是 `import fcntl`（Windows 导入就崩），与 attach 的只读错误**不是同一回事**，
+  **不声称 T04 已解决**。要定性必须在 Windows 上跑。
+- **本轮提交**：`23ef996`（治理：承认缺陷 + 授权新任务）、`4677043`（`tools/check.py`）、
+  `7fb4050`（pin）。基线 `pinned_sha` = `4677043`。
+- **仍然未完成**：独立 Reviewer 仍未指派（**唯一发布阻塞项**）；T04 缺 Windows 复现；
+  85 个开放 PR 未清算；T10 仍只验过 1 个模型 1 个端点。
+
+---
+
 ## 2026-10-27 — S1 NATIVE-TOOLS PROTOCOL CLOSED / T10 LIVE-ENDPOINT EVIDENCE PASS
 
 - **根因修正（重要）**：durable claim=0 的真正根因不是「模型不想写」，而是 **provider 没给模型它被训练过的 `tools` 接口**。PR #403 的单变量对照证明：同一份 5272 字符提示词，只把「散文里手写 JSON 块」换成原生 `tools` 数组，模型第 1 轮就调用 `commit_ai_world_claim`；文本协议三轮调用数恒为 0。上一轮 T2' 把根因归为「依赖主模型顺便写」并做了抽取轮，**归因下早了**——抽取轮能用（已验证 claim>0），但它是绕路。
