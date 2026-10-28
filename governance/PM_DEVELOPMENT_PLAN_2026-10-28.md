@@ -101,16 +101,12 @@ S3 治理（0.5 天）         85 个开放 PR、checkpoint
 
 ## 4. S2 — 凭证与证据
 
-### T6 轮换硬编码的 NVIDIA key（**owner 决策**）
+### T6 ~~轮换硬编码的 NVIDIA key~~ —— **owner 已决：不轮换**
 
-- **现状**：`src/aios_core/runtime/resilient_handler.py:70` 有真实 key，仓库 public，已在 git 历史里；治理用 `secret_allowlist` 显式放行。
-- **改法**：
-  1. 轮换 key（在 NVIDIA 控制台作废旧 key）；
-  2. 代码只读 env，无默认值；缺 key 时 fail-closed（现在是"静默用默认值"）；
-  3. 删掉 `secret_allowlist` 那条；
-  4. CI 用 repository secret 注入。
-- **验收**：`grep -rn "nvapi-" src/` 无输出；无 key 时抛明确错误而不是发请求；CI 绿。
-- **代价**：旧 key 已公开，**轮换前它一直可用**。这不是"清理代码"，是止损。
+- **决定**（2026-10-28，owner）：这把 key 是给测试和开发用的，能用就行，不用管。
+- **记录**：`resilient_handler.py:70` 的默认值保留；`governance/baseline.json` 的 `secret_allowlist` 例外保留；**不再作为待决事项反复提出**。
+- **已知后果**（留档，不再讨论）：仓库 public，key 在 git 历史里；失效方式是偶发 429，看起来像端点不稳而不是被盗。
+- **不做**：轮换、改 env-only、删 allowlist 条目、CI secret 注入。
 
 ### T7 证据状态修正
 
@@ -130,31 +126,34 @@ S3 治理（0.5 天）         85 个开放 PR、checkpoint
 
 ---
 
-## 6. 需要 owner 拍的四件事
+## 6. 需要 owner 拍的三件事
 
-1. **T6 轮换 key** —— 公开仓库里的活凭证。我建议立刻轮换；不轮换的话，任何人 clone 都能花你的额度。
-2. **T4 接受"回复先返回、记忆稍后落库"** —— 语义让步：同一会话内紧接着问"你记得吗"，可能读不到刚说的事（跨会话一定读得到）。这是拿一致性换延迟。
-3. **T3 热集砍到 12–15 个能力** —— 决定模型能直接看到哪些能力。建议：7 个连续性写 + `list_dimensions` / `get_world_map` / `recall` 这类读，其余走 `describe_capability`。
-4. **T4b 是否接受启发式漏判** —— 漏判 = 该记的没记。我设的容忍线是 10%。
+1. **T4 接受"回复先返回、记忆稍后落库"** —— 语义让步：同一会话内紧接着问"你记得吗"，可能读不到刚说的事（跨会话一定读得到）。这是拿一致性换延迟。
+2. **T3 热集砍到 12–15 个能力** —— 决定模型能直接看到哪些能力。建议：7 个连续性写 + `list_dimensions` / `get_world_map` / `recall` 这类读，其余走 `describe_capability`。
+3. **T4b 是否接受启发式漏判** —— 漏判 = 该记的没记。我设的容忍线是 10%。
+
+> T6（轮换 key）已由 owner 于 2026-10-28 决定：**不轮换**。不再列为待决。
 
 ---
 
 ## 7. 任务表
 
-| ID | 任务 | 依赖 | 改动面 | 需 owner 拍 |
-|---|---|---|---|---|
-| T1 | 跨平台文件锁 | — | 新 `_filelock.py` + `resilient_handler` | 否 |
-| T2 | 统一检查入口 | T1 | `tools/check.py` | 否 |
-| T3 | 热集 12–15 | — | `_build_native_tools` + 提示词 | **是**（能力面） |
-| T4 | 抽取延后 | — | `turn_runtime` 回合生命周期 | **是**（语义） |
-| T4b | 抽取条件触发 | T4 | 启发式 + 统计 | **是**（漏判容忍） |
-| T5 | 模型能力探测 | — | `tools/model_probe.py` | 否 |
-| T6 | 轮换 key | — | `resilient_handler` + CI secret | **是** |
-| T7 | 证据状态修正 | 本复审核 | `reviews/` | 否 |
-| T8 | PR 清算 | — | GitHub | **是**（关闭 PR） |
-| T9 | checkpoint | T4 | checkpoint | 否 |
+| ID | 任务 | 依赖 | 改动面 | 需 owner 拍 | 状态 |
+|---|---|---|---|---|---|
+| T1 | 跨平台文件锁 | — | 新 `_filelock.py` + `resilient_handler` | 否 | **已提交，PR #405** |
+| T2 | 统一检查入口 | T1 | `tools/check.py` | 否 | 待做 |
+| T3 | 热集 12–15 | — | `_build_native_tools` + 提示词 | **是**（能力面） | 待拍 |
+| T4 | 抽取延后 | — | `turn_runtime` 回合生命周期 | **是**（语义） | 待拍 |
+| T4b | 抽取条件触发 | T4 | 启发式 + 统计 | **是**（漏判容忍） | 待拍 |
+| T5 | 模型能力探测 | — | `tools/model_probe.py` | 否 | 待做 |
+| T6 | ~~轮换 key~~ | — | — | 已决 | **不做**（owner 2026-10-28） |
+| T7 | 证据状态修正 | 本复审核 | `reviews/` | 否 | 待做 |
+| T8 | PR 清算 | — | GitHub | **是**（关闭 PR） | 待拍 |
+| T9 | checkpoint | T4 | checkpoint | 否 | 待做 |
 
-关键路径：**T1 → T3 → T4 → 复测 M4**。T5/T6/T7 可并行。
+关键路径：**T1 → T3 → T4 → 复测 M4**。T1 已完成；T5/T7 可并行。
+
+T1 落地后的实测：Windows 上 `pytest tests --collect-only` 从"收集即失败"变成 **1666 项收集成功**，`tests/runtime` **414 通过 / 3 跳过**。
 
 ---
 
