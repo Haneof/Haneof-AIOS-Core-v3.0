@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12.14"
-      - run: python -m pip install -e . pydantic==2.13.5 pytest==8.4.2
+      - run: python -m pip install -e . pydantic==2.13.5 pytest==8.4.2 "jsonschema>=4,<5"
       - name: Record exact formal environment and enumeration
         run: |
           python - <<'PY'
