@@ -22,6 +22,10 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=8,<9",
+  # test_json_schema_conversion.py validates the generated schemas with a real
+  # Draft 2020-12 validator. Without this declared, a clean install cannot even
+  # collect the suite, which is how the full-suite CI jobs went red.
+  "jsonschema>=4,<5",
 ]
 
 [project.scripts]

@@ -1,10 +1,16 @@
 """T08: content-level dedup of durable AI-world claims.
 
-A native-tools model may re-write the same durable fact on a later turn (it now has
-a real ``commit_ai_world_claim`` tool and will use it). Persisting the fact again
-would fill the world with duplicate claims. ``_commit_ai_world_claim`` therefore
-compares a normalized form of the statement against the domain's existing active
-claims and skips the write when it already exists.
+The extraction pass re-reads every turn, so it can re-derive a fact the anchor
+already holds. Persisting it again would fill the world with duplicate claims, so
+the pass asks for the comparison explicitly (``dedupe=True``) and
+``_commit_ai_world_claim`` skips the write when a normalized-equal statement is
+already active in that domain.
+
+Dedup is deliberately *not* on the capability path: a capability call carries its
+own identity, and a request whose arguments changed must never be conflated with
+the original even when the statement text matches — that is the replay contract
+covered by
+``tests/integration/test_core_background_trusted_return_corrective_001_capability_replay.py``.
 """
 
 from __future__ import annotations

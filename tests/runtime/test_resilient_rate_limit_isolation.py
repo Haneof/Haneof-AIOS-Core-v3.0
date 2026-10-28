@@ -116,10 +116,12 @@ def test_unwritable_state_dir_degrades_without_crashing(tmp_path):
 def test_flock_failure_degrades_without_crashing(tmp_path, monkeypatch):
     limiter = _limiter(tmp_path, URL_A, KEY_A, "model-a")
 
-    def _boom(fd: int, op: int) -> None:
+    def _boom(fd: int, *, timeout: float = 0.0) -> None:
         raise OSError("ENOLCK: advisory locking unavailable")
 
-    monkeypatch.setattr(rh.fcntl, "flock", _boom)
+    # The platform lock now lives behind _filelock, which is what the handler
+    # calls; patching fcntl directly would only prove that fcntl is gone.
+    monkeypatch.setattr(rh, "_lock_file", _boom)
 
     assert limiter.acquire() < TICK * 0.2  # must not raise
     assert limiter.acquire() >= TICK * 0.5  # pacing survives, no cross-process lock
