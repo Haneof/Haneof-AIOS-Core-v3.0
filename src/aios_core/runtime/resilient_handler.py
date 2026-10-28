@@ -41,13 +41,15 @@ Environment
 
 from __future__ import annotations
 
-import fcntl
 import hashlib
 import json
 import logging
 import os
 import threading
 import time
+
+from aios_core.runtime._filelock import lock as _lock_file
+from aios_core.runtime._filelock import unlock as _unlock_file
 import urllib.error
 from pathlib import Path
 from typing import Any, Callable
@@ -154,11 +156,12 @@ class _SharedRateLimiter:
 
     State file: ``{"stamps": [...], "last": ts, "penalty": seconds}``
 
-    Concurrency: an in-process ``RLock`` serialises threads; ``fcntl.flock``
-    serialises processes. Either layer failing is survivable — the limiter marks
-    itself degraded (see :attr:`degraded` / :meth:`snapshot`) and keeps pacing
-    in process memory instead of raising, so a read-only or lock-less filesystem
-    can never stop AIOS from starting.
+    Concurrency: an in-process ``RLock`` serialises threads; an OS advisory
+    file lock (``_filelock``: ``fcntl.flock`` on POSIX, ``msvcrt.locking`` on
+    Windows) serialises processes. Either layer failing is survivable — the
+    limiter marks itself degraded (see :attr:`degraded` / :meth:`snapshot`) and
+    keeps pacing in process memory instead of raising, so a read-only or
+    lock-less filesystem can never stop AIOS from starting.
     """
 
     def __init__(
@@ -236,7 +239,7 @@ class _SharedRateLimiter:
             lock_held = False
             try:
                 try:
-                    fcntl.flock(fd, fcntl.LOCK_EX)
+                    _lock_file(fd)
                     lock_held = True
                 except OSError as exc:
                     # No advisory locking (some network/odd filesystems). Pace
@@ -252,7 +255,7 @@ class _SharedRateLimiter:
             finally:
                 if lock_held:
                     try:
-                        fcntl.flock(fd, fcntl.LOCK_UN)
+                        _unlock_file(fd)
                     except OSError:
                         pass
                 try:
