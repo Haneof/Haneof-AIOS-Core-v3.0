@@ -1,0 +1,35 @@
+[
+  {
+    "tag": "机制清洗后",
+    "input_count": 39,
+    "input_chars": 1642,
+    "elapsed": 234.6,
+    "summary": "母亲昨晚住院，在二院心内科\n下午赶到二院陪母亲\n医生安排造影，明早出结果\n缴纳住院预缴金12000元\n与小李因项目分工吵架\n合同初稿今天须交张总\n合同交付30天，违约金5%\n目标一个月减重五斤\n下午头晕严重，站不稳\n心率一度升至128次/分\n护颈枕订单周四送达\n周四项目周会，周五公司体检\n系统卡顿，存储空间不足\n朋友阿强约周末钓鱼",
+    "hits": {
+      "母亲住院（市二院心内科）": true,
+      "承诺周三前给张总合同": true,
+      "头晕加重（两次递进）": true,
+      "与小李的工作冲突": true,
+      "减重五斤目标": true,
+      "周五体检 / 周四周会": true,
+      "需带医保卡身份证": false
+    },
+    "hit_count": 6,
+    "finish_reason": "stop",
+    "usage": {
+      "prompt_tokens": 1103,
+      "completion_tokens": 1564,
+      "total_tokens": 2667,
+      "prompt_tokens_details": {
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 1453
+      }
+    }
+  },
+  {
+    "tag": "AI清洗后",
+    "error": "HTTP Error 504: Gateway Timeout"
+  }
+]

@@ -1,0 +1,5 @@
+AI 臂保留 17 条，开始回声（最多 4 次重试）
+第 1 次失败：HTTPError HTTP Error 504: Gateway Timeout
+第 2 次失败：HTTPError HTTP Error 504: Gateway Timeout
+第 3 次失败：HTTPError HTTP Error 504: Gateway Timeout
+第 4 次失败：HTTPError HTTP Error 504: Gateway Timeout
