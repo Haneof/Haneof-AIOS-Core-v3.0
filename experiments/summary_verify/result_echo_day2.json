@@ -1,0 +1,194 @@
+{
+  "day": "DAY2_2026-10-29",
+  "n_dimension_summaries": 9,
+  "dimensions_summarized": [
+    "dim:app_usage",
+    "dim:calendar",
+    "dim:camera_visual",
+    "dim:external_chat",
+    "dim:heart_rate",
+    "dim:mic_audio",
+    "dim:note",
+    "dim:order",
+    "dim:payment"
+  ],
+  "summaries": {
+    "dim:app_usage": {
+      "content": "09:50，XX商城出现“限时秒杀3折，点领券”提示；13:40，使用阅读App 32分钟；17:00，系统提示存储不足并建议清理；19:20，银行通知尾号1234支行有一笔860元支出。",
+      "source_count": 4
+    },
+    "dim:calendar": {
+      "content": "当天日程要点：10月31日个税汇算清缴截止；明晚（10月30日）有家庭聚餐。",
+      "source_count": 2
+    },
+    "dim:camera_visual": {
+      "content": "当天画面记录了三件事：07:25，床头柜上有手机和眼镜；11:35，手臂可见一片红色皮疹；12:15，餐桌旁有两人、三道菜。",
+      "source_count": 3
+    },
+    "dim:external_chat": {
+      "content": "10:05，同事老赵转达：领导要求“税的事”周五前必须交。15:30，收到【10086】短信，称话费礼包待领取，附 t.cn/xxx。18:00，朋友小美邀约周末喝咖啡。20:50，收到【安全中心】短信，称“您的账户已被锁定”，要求立即验证，附 t.cn/lock。",
+      "source_count": 6
+    },
+    "dim:heart_rate": {
+      "content": "全天心率基本在两组读数间交替：均值66.8（64.4–69.2）与71.0（70.4–71.6），从00:00延续至23:51。08:00突变：69.2骤升至154.0（+84.8），08:02–08:16持续146–154高位；08:21从150.0回落至70.4（−79.6），恢复基线。10:00短暂升至75–76。11:25再上行至93.0（+21.4），11:29–11:45在91–99波动，11:47回落至65.6（−25.4）。其余平稳。",
+      "source_count": 296
+    },
+    "dim:mic_audio": {
+      "content": "早晨跑步心率飙到150，虽累但练完很爽；上午称后天要缴个税汇算清缴，否则有滞纳金，并笑说明天就辞职不干。午间胳膊起了一片疹子、痒得不行，怀疑与上午吃的海鲜有关，11:32服了氯雷他定；13:10疹子好转，已不怎么痒。14:00因老婆指责不陪孩子发生争吵。16:40订好明天带娃去动物园的票。20:10为过敏急诊挂号并刷卡，八百多；21:50抱怨输入法又卡。",
+      "source_count": 18
+    },
+    "dim:note": {
+      "content": "11:35，便签记录氯雷他定用法：1片/日，连续吃3天。12:50，便签写下“qwertyuiop”，未注明用途。20:30，提醒明天记得带娃的水杯和帽子。",
+      "source_count": 3
+    },
+    "dim:order": {
+      "content": "14:30：动物园门票订单共2张，预计于10月30日使用。",
+      "source_count": 1
+    },
+    "dim:payment": {
+      "content": "当天共记录3笔支出：08:05早餐咖啡18元；16:45过敏急诊挂号860元，为当天最大一笔支出；21:00视频会员续费25元。三笔合计903元。",
+      "source_count": 3
+    }
+  },
+  "per_dimension_echo": {
+    "dim:app_usage": {
+      "responsible": [
+        "过敏急诊花费860"
+      ],
+      "hit": [
+        "过敏急诊花费860"
+      ],
+      "rate": "1/1"
+    },
+    "dim:calendar": {
+      "responsible": [
+        "个税汇算清缴截止10-31",
+        "明晚家庭聚餐"
+      ],
+      "hit": [
+        "个税汇算清缴截止10-31",
+        "明晚家庭聚餐"
+      ],
+      "rate": "2/2"
+    },
+    "dim:camera_visual": {
+      "responsible": [
+        "海鲜过敏起疹+服药"
+      ],
+      "hit": [
+        "海鲜过敏起疹+服药"
+      ],
+      "rate": "1/1"
+    },
+    "dim:external_chat": {
+      "responsible": [
+        "个税汇算清缴截止10-31"
+      ],
+      "hit": [
+        "个税汇算清缴截止10-31"
+      ],
+      "rate": "1/1"
+    },
+    "dim:heart_rate": {
+      "responsible": [],
+      "hit": [],
+      "rate": "n/a"
+    },
+    "dim:mic_audio": {
+      "responsible": [
+        "海鲜过敏起疹+服药",
+        "个税汇算清缴截止10-31",
+        "与妻子因陪孩子吵架",
+        "明带娃去动物园"
+      ],
+      "hit": [
+        "海鲜过敏起疹+服药",
+        "个税汇算清缴截止10-31",
+        "与妻子因陪孩子吵架",
+        "明带娃去动物园"
+      ],
+      "rate": "4/4"
+    },
+    "dim:note": {
+      "responsible": [
+        "海鲜过敏起疹+服药",
+        "记得带娃水杯帽子"
+      ],
+      "hit": [
+        "海鲜过敏起疹+服药",
+        "记得带娃水杯帽子"
+      ],
+      "rate": "2/2"
+    },
+    "dim:order": {
+      "responsible": [
+        "明带娃去动物园"
+      ],
+      "hit": [
+        "明带娃去动物园"
+      ],
+      "rate": "1/1"
+    },
+    "dim:payment": {
+      "responsible": [
+        "过敏急诊花费860"
+      ],
+      "hit": [
+        "过敏急诊花费860"
+      ],
+      "rate": "1/1"
+    }
+  },
+  "cross_dimension_covered": "7/7",
+  "cross_dimension_detail": {
+    "海鲜过敏起疹+服药": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:camera_visual",
+        "dim:mic_audio",
+        "dim:note"
+      ]
+    },
+    "个税汇算清缴截止10-31": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:calendar",
+        "dim:external_chat",
+        "dim:mic_audio"
+      ]
+    },
+    "与妻子因陪孩子吵架": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:mic_audio"
+      ]
+    },
+    "明带娃去动物园": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:mic_audio",
+        "dim:order"
+      ]
+    },
+    "过敏急诊花费860": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:app_usage",
+        "dim:payment"
+      ]
+    },
+    "明晚家庭聚餐": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:calendar"
+      ]
+    },
+    "记得带娃水杯帽子": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:note"
+      ]
+    }
+  },
+  "noise_pollution_by_dimension": {}
+}

@@ -1,0 +1,197 @@
+{
+  "day": "DAY3_2026-10-30",
+  "n_dimension_summaries": 9,
+  "dimensions_summarized": [
+    "dim:app_usage",
+    "dim:calendar",
+    "dim:camera_visual",
+    "dim:external_chat",
+    "dim:heart_rate",
+    "dim:mic_audio",
+    "dim:note",
+    "dim:order",
+    "dim:payment"
+  ],
+  "summaries": {
+    "dim:app_usage": {
+      "content": "09:40，XX新闻推送您关注球队获胜的消息；13:50，使用邮件 App 40 分钟；17:00，系统提示电量低；20:30，安全提示账户异常已被锁定，需点击 t.cn/xx 进行验证。",
+      "source_count": 4
+    },
+    "dim:calendar": {
+      "content": "当天记录了两项日程：09:00 提到下周三有“孩子学校话剧”；10:30 提到周一安排“与老板一对一面谈”。",
+      "source_count": 2
+    },
+    "dim:camera_visual": {
+      "content": "07:15，玄关地上有行李箱和鞋。08:35，床边放着血氧仪，屏幕显示91%。12:20，餐桌上一人一菜。",
+      "source_count": 3
+    },
+    "dim:external_chat": {
+      "content": "09:10、09:11，同事大刘两次发来“在吗”，未见回复。10:20，老板说“周一详谈，别紧张”，未提具体事项。15:40，收到【10086】“话费礼包待领”及链接 t.cn/yy。18:30，朋友阿强问周末钓鱼去不去，未记录是否成行。",
+      "source_count": 5
+    },
+    "dim:heart_rate": {
+      "content": "全天心率总体平稳：多数时段在62.4–69.6之间交替（均值64.8与69.0）。07:33仍为62.4，07:35骤升至108（delta +45.6），07:39、07:45、07:52多次触及114，07:40–07:55维持在106–114；07:56回落至64.8（delta -41.2），08:03后恢复基线。14:26均值63.6，14:31小幅升至74（均值73），14:34即回落。23:58单次读数68.4。",
+      "source_count": 292
+    },
+    "dim:mic_audio": {
+      "content": "清晨没赶上7:20的火车，7:45改签9点，多花80元。昨夜没睡好，血氧仪显示夜间最低91%；16:30白天血氧正常97%。10:15老板发微信说周一找我谈谈；11:00孩子学校下周三有话剧表演，得去。14:20答应周爸周五前发项目月报，19:40确认模板在电脑D盘。18:00晚餐想吃清淡些；21:10睡了，因为明天还得早起。",
+      "source_count": 17
+    },
+    "dim:note": {
+      "content": "当天便签记录：11:05，项目月报模板在D盘，含Q3数据；13:20，内容为“zxcvbnm”，未注明具体含义；19:30，提到给孩子带话剧演出的衣服。",
+      "source_count": 3
+    },
+    "dim:order": {
+      "content": "08:00：记录了一笔血氧仪耗材订单，数量为 1 件，预计周三到货。",
+      "source_count": 1
+    },
+    "dim:payment": {
+      "content": "当天共记录3笔支出：07:50火车改签补差80元；12:00午餐35元；20:00会员续费30元，合计145元，分别涉及交通改签、餐食和会员续费。",
+      "source_count": 3
+    }
+  },
+  "per_dimension_echo": {
+    "dim:app_usage": {
+      "responsible": [],
+      "hit": [],
+      "rate": "n/a"
+    },
+    "dim:calendar": {
+      "responsible": [
+        "老板周一面谈",
+        "孩子下周三话剧"
+      ],
+      "hit": [
+        "老板周一面谈",
+        "孩子下周三话剧"
+      ],
+      "rate": "2/2"
+    },
+    "dim:camera_visual": {
+      "responsible": [
+        "夜间低血氧91%"
+      ],
+      "hit": [
+        "夜间低血氧91%"
+      ],
+      "rate": "1/1"
+    },
+    "dim:external_chat": {
+      "responsible": [
+        "老板周一面谈"
+      ],
+      "hit": [
+        "老板周一面谈"
+      ],
+      "rate": "1/1"
+    },
+    "dim:heart_rate": {
+      "responsible": [],
+      "hit": [],
+      "rate": "n/a"
+    },
+    "dim:mic_audio": {
+      "responsible": [
+        "错过7:20火车并改签",
+        "夜间低血氧91%",
+        "老板周一面谈",
+        "孩子下周三话剧",
+        "周五前交项目月报给周爸",
+        "白天血氧正常97%"
+      ],
+      "hit": [
+        "错过7:20火车并改签",
+        "夜间低血氧91%",
+        "老板周一面谈",
+        "孩子下周三话剧",
+        "周五前交项目月报给周爸",
+        "白天血氧正常97%"
+      ],
+      "rate": "6/6"
+    },
+    "dim:note": {
+      "responsible": [
+        "周五前交项目月报给周爸",
+        "给孩子带话剧衣服"
+      ],
+      "hit": [
+        "周五前交项目月报给周爸",
+        "给孩子带话剧衣服"
+      ],
+      "rate": "2/2"
+    },
+    "dim:order": {
+      "responsible": [],
+      "hit": [],
+      "rate": "n/a"
+    },
+    "dim:payment": {
+      "responsible": [
+        "错过7:20火车并改签"
+      ],
+      "hit": [
+        "错过7:20火车并改签"
+      ],
+      "rate": "1/1"
+    }
+  },
+  "cross_dimension_covered": "7/7",
+  "cross_dimension_detail": {
+    "错过7:20火车并改签": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:mic_audio",
+        "dim:payment"
+      ]
+    },
+    "夜间低血氧91%": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:camera_visual",
+        "dim:mic_audio"
+      ]
+    },
+    "老板周一面谈": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:calendar",
+        "dim:external_chat",
+        "dim:mic_audio"
+      ]
+    },
+    "孩子下周三话剧": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:calendar",
+        "dim:mic_audio"
+      ]
+    },
+    "周五前交项目月报给周爸": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:mic_audio",
+        "dim:note"
+      ]
+    },
+    "白天血氧正常97%": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:mic_audio"
+      ]
+    },
+    "给孩子带话剧衣服": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:note"
+      ]
+    }
+  },
+  "noise_pollution_by_dimension": {
+    "dim:external_chat": [
+      "在吗"
+    ],
+    "dim:mic_audio": [
+      "睡了"
+    ]
+  }
+}

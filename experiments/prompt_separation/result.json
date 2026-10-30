@@ -1,0 +1,992 @@
+{
+  "annotate": {
+    "batches": [
+      {
+        "day": "DAY1_2026-10-28",
+        "batch": 1,
+        "n_records": 20,
+        "prompt_chars": 2915,
+        "dimensions_injected": [
+          "dim:mic_audio"
+        ],
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 2500,
+        "max_tokens_declared": 1200,
+        "rounds": 1,
+        "elapsed_s": 148.0,
+        "ok": true,
+        "json_parse_error": null,
+        "raw_output_chars": 1373,
+        "parsed": true,
+        "n_decisions": 20,
+        "raw_excerpt": "[{\"id\":\"m01\",\"decision\":\"drop\",\"relevance\":\"user\",\"reason\":\"无意义发声\"},{\"id\":\"m02\",\"decision\":\"drop\",\"relevance\":\"user\",\"reason\":\"自我纠正无实质信息\"},{\"id\":\"m03\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"快递放置请求\"},{\"id\":\"m04\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"母亲住院及行程\"},{\"id\":\"m05\",\"decision\":\"drop\",\"relevance\":\"user\",\"reason\":\"无意义应答\"},{\"id\":\"m06\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\""
+      },
+      {
+        "day": "DAY1_2026-10-28",
+        "batch": 2,
+        "n_records": 18,
+        "prompt_chars": 2971,
+        "dimensions_injected": [
+          "dim:app_usage",
+          "dim:calendar",
+          "dim:external_chat"
+        ],
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 2500,
+        "max_tokens_declared": 1200,
+        "rounds": 1,
+        "elapsed_s": 143.8,
+        "ok": true,
+        "json_parse_error": null,
+        "raw_output_chars": 1217,
+        "parsed": true,
+        "n_decisions": 18,
+        "raw_excerpt": "[{\"id\":\"p03\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"自动续费金额\"},{\"id\":\"o01\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"订单及预计送达\"},{\"id\":\"c01\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"体检日程\"},{\"id\":\"c02\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"项目周会日程\"},{\"id\":\"n01\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"合同关键条款\"},{\"id\":\"n02\",\"decision\":\"drop\",\"relevance\":\"user\",\"reason\":\"乱"
+      },
+      {
+        "day": "DAY2_2026-10-29",
+        "batch": 1,
+        "n_records": 20,
+        "prompt_chars": 2849,
+        "dimensions_injected": [
+          "dim:mic_audio"
+        ],
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 2500,
+        "max_tokens_declared": 1200,
+        "rounds": 1,
+        "elapsed_s": 334.5,
+        "ok": true,
+        "json_parse_error": null,
+        "raw_output_chars": 1362,
+        "parsed": true,
+        "n_decisions": 20,
+        "raw_excerpt": "[{\"id\":\"m01\",\"decision\":\"drop\",\"relevance\":\"user\",\"reason\":\"无意义发声\"},{\"id\":\"m02\",\"decision\":\"drop\",\"relevance\":\"user\",\"reason\":\"自我纠正无信息\"},{\"id\":\"m03\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"快递沟通请求\"},{\"id\":\"m04\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"运动心率健康信号\"},{\"id\":\"m05\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"个税截止期待办\"},{\"id\":\"m06\",\"decision\":\"drop\",\"relevance\":\"user\",\"reason"
+      },
+      {
+        "day": "DAY2_2026-10-29",
+        "batch": 2,
+        "n_records": 20,
+        "prompt_chars": 3071,
+        "dimensions_injected": [
+          "dim:app_usage",
+          "dim:calendar",
+          "dim:external_chat"
+        ],
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 2500,
+        "max_tokens_declared": 1200,
+        "rounds": 1,
+        "elapsed_s": 202.2,
+        "ok": true,
+        "json_parse_error": null,
+        "raw_output_chars": 1360,
+        "parsed": true,
+        "n_decisions": 20,
+        "raw_excerpt": "[{\"id\":\"p03\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"重要金额支出\"},{\"id\":\"o01\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"明日使用计划\"},{\"id\":\"c01\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"申报截止期\"},{\"id\":\"c02\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"未来家庭聚餐\"},{\"id\":\"n01\",\"decision\":\"keep\",\"relevance\":\"user\",\"reason\":\"用药健康信号\"},{\"id\":\"n02\",\"decision\":\"drop\",\"relevance\":\"user\",\"reason\":\"乱"
+      }
+    ],
+    "days": {
+      "DAY1_2026-10-28": {
+        "n_scope": 38,
+        "metrics": {
+          "drop_purity": 1.0,
+          "false_drop_count": 0,
+          "drop_recall": 0.762,
+          "n_true_noise": 21,
+          "n_ai_drop": 16,
+          "n_correct_drop": 16
+        },
+        "false_dropped_ids": [],
+        "missed_noise_ids": [
+          "a04",
+          "m03",
+          "p01",
+          "p03",
+          "x01"
+        ],
+        "unlabeled_ids": [],
+        "planned_drops": [
+          {
+            "id": "a01",
+            "dim": "dim:app_usage",
+            "text": "【XX商城】限时秒杀！全场3折起，点开领券>>",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "广告推送"
+          },
+          {
+            "id": "a02",
+            "dim": "dim:app_usage",
+            "text": "【XX新闻】您关注的球队今日获胜",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "无关新闻推送"
+          },
+          {
+            "id": "m01",
+            "dim": "dim:mic_audio",
+            "text": "嗯……啊……那个……",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "无意义发声"
+          },
+          {
+            "id": "m02",
+            "dim": "dim:mic_audio",
+            "text": "今天周二了吧？哦不对，周三。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "自我纠正无实质信息"
+          },
+          {
+            "id": "m05",
+            "dim": "dim:mic_audio",
+            "text": "啊？哦。行。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "无意义应答"
+          },
+          {
+            "id": "m07",
+            "dim": "dim:mic_audio",
+            "text": "好的收到，谢谢，嗯嗯。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "无意义应答"
+          },
+          {
+            "id": "m09",
+            "dim": "dim:mic_audio",
+            "text": "哈哈哈笑死我了。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "无意义笑声"
+          },
+          {
+            "id": "m10",
+            "dim": "dim:mic_audio",
+            "text": "哈哈哈笑死我了。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "纯重复无新信息"
+          },
+          {
+            "id": "m12",
+            "dim": "dim:mic_audio",
+            "text": "午饭吃什么呢……随便吧。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "自言自语无事实"
+          },
+          {
+            "id": "m15",
+            "dim": "dim:mic_audio",
+            "text": "明天是世界末日哈哈哈，开玩笑的。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "玩笑夸张"
+          },
+          {
+            "id": "m17",
+            "dim": "dim:mic_audio",
+            "text": "烦死了，这破系统又卡了。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "情绪化抱怨无事实"
+          },
+          {
+            "id": "m18",
+            "dim": "dim:mic_audio",
+            "text": "算了不弄了，明天再说吧。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "含糊推迟无具体事项"
+          },
+          {
+            "id": "n02",
+            "dim": "dim:note",
+            "text": "便签：asdfghjkl",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "乱码输入"
+          },
+          {
+            "id": "v01",
+            "dim": "dim:camera_visual",
+            "text": "画面：桌面有一台笔记本电脑和一杯水。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "桌面环境画面"
+          },
+          {
+            "id": "v02",
+            "dim": "dim:camera_visual",
+            "text": "画面：餐桌上有两个人和三道菜。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "日常环境画面"
+          },
+          {
+            "id": "x02",
+            "dim": "dim:external_chat",
+            "text": "同事小王：在吗？",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "重复消息"
+          }
+        ],
+        "hard_cases": [
+          {
+            "id": "x04",
+            "class": "社交邀约",
+            "dim": "dim:external_chat",
+            "text": "朋友阿强：周末钓鱼去不去？",
+            "gt": "KEEP",
+            "model_decision": "keep",
+            "expected": "keep",
+            "verdict": "PASS",
+            "reason": "真实社交邀约"
+          },
+          {
+            "id": "m15",
+            "class": "玩笑夸张",
+            "dim": "dim:mic_audio",
+            "text": "明天是世界末日哈哈哈，开玩笑的。",
+            "gt": "DROP",
+            "model_decision": "drop",
+            "expected": "drop",
+            "verdict": "PASS",
+            "reason": "玩笑夸张"
+          }
+        ],
+        "unlabeled_policy": "未标注的按 keep 处理（保守方向），不影响纯度/误删统计"
+      },
+      "DAY2_2026-10-29": {
+        "n_scope": 40,
+        "metrics": {
+          "drop_purity": 1.0,
+          "false_drop_count": 0,
+          "drop_recall": 0.619,
+          "n_true_noise": 21,
+          "n_ai_drop": 13,
+          "n_correct_drop": 13
+        },
+        "false_dropped_ids": [],
+        "missed_noise_ids": [
+          "a03",
+          "m03",
+          "m17",
+          "m18",
+          "p01",
+          "p03",
+          "v02",
+          "x01"
+        ],
+        "unlabeled_ids": [],
+        "planned_drops": [
+          {
+            "id": "a01",
+            "dim": "dim:app_usage",
+            "text": "【XX商城】限时秒杀3折，点领券>>",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "商城广告推送"
+          },
+          {
+            "id": "m01",
+            "dim": "dim:mic_audio",
+            "text": "额……那个……那个……",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "无意义发声"
+          },
+          {
+            "id": "m02",
+            "dim": "dim:mic_audio",
+            "text": "今天周六对吧……不对周日。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "自我纠正无信息"
+          },
+          {
+            "id": "m06",
+            "dim": "dim:mic_audio",
+            "text": "哈哈哈我明天就辞职不干了哈哈。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "玩笑夸张非承诺"
+          },
+          {
+            "id": "m07",
+            "dim": "dim:mic_audio",
+            "text": "啊行嗯好的。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "无意义应答"
+          },
+          {
+            "id": "m10",
+            "dim": "dim:mic_audio",
+            "text": "午饭随便吃点吧。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "无信息闲聊"
+          },
+          {
+            "id": "m13",
+            "dim": "dim:mic_audio",
+            "text": "算了不说了。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "无意义发声"
+          },
+          {
+            "id": "m15",
+            "dim": "dim:mic_audio",
+            "text": "晚上吃啥呢随便。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "无信息闲聊"
+          },
+          {
+            "id": "n02",
+            "dim": "dim:note",
+            "text": "便签：qwertyuiop",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "乱码误触"
+          },
+          {
+            "id": "v01",
+            "dim": "dim:camera_visual",
+            "text": "画面：床头柜上有手机和眼镜。",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "无重要信息琐事"
+          },
+          {
+            "id": "x02",
+            "dim": "dim:external_chat",
+            "text": "同事老赵：在吗",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "纯重复无新信息"
+          },
+          {
+            "id": "x05",
+            "dim": "dim:external_chat",
+            "text": "【10086】尊敬的客户，您的话费礼包待领取，点击 t.cn/xxx",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "广告推送"
+          },
+          {
+            "id": "x06",
+            "dim": "dim:external_chat",
+            "text": "【安全中心】您的账户已被锁定，立即验证 t.cn/lock",
+            "gt": "DROP",
+            "verdict": "删得对",
+            "reason": "疑似钓鱼短信"
+          }
+        ],
+        "hard_cases": [
+          {
+            "id": "m06",
+            "class": "玩笑夸张",
+            "dim": "dim:mic_audio",
+            "text": "哈哈哈我明天就辞职不干了哈哈。",
+            "gt": "DROP",
+            "model_decision": "drop",
+            "expected": "drop",
+            "verdict": "PASS",
+            "reason": "玩笑夸张非承诺"
+          },
+          {
+            "id": "x04",
+            "class": "社交邀约",
+            "dim": "dim:external_chat",
+            "text": "朋友小美：周末喝咖啡去不去",
+            "gt": "KEEP",
+            "model_decision": "keep",
+            "expected": "keep",
+            "verdict": "PASS",
+            "reason": "真实社交邀约"
+          }
+        ],
+        "unlabeled_policy": "未标注的按 keep 处理（保守方向），不影响纯度/误删统计"
+      }
+    },
+    "elapsed_s": 828.6
+  },
+  "_meta": {
+    "script": "experiments/prompt_separation/verify_task_prompts.py",
+    "updated_at": "2026-10-31 03:08:43",
+    "endpoint": "https://integrate.api.nvidia.com/v1",
+    "primary_model": "minimaxai/minimax-m3.1-flash",
+    "backup_model": "z-ai/glm-5.3-flash",
+    "call_wrapper": "experiments/cleaning_ab/harness.py::_call_model（内部 504/空正文退避重试）",
+    "usage_note": "harness._call_model 只返回正文，不返回 usage；token 用字符数估算（中文约 1.6 字符/token）",
+    "cumulative_stats": {
+      "calls": 6,
+      "ok": 6,
+      "failed": 0,
+      "gateway_504": 0,
+      "rate_429": 0,
+      "empty_body": 1,
+      "truncated": 0,
+      "internal_retry_attempts": 1,
+      "model_fallback_used": 0,
+      "token_escalation_used": 0
+    },
+    "runs": [
+      {
+        "run_key": "2026-10-31 02:51:57",
+        "task": "all",
+        "stats": {
+          "calls": 6,
+          "ok": 6,
+          "failed": 0,
+          "gateway_504": 0,
+          "rate_429": 0,
+          "empty_body": 1,
+          "truncated": 0,
+          "internal_retry_attempts": 1,
+          "model_fallback_used": 0,
+          "token_escalation_used": 0
+        },
+        "calls": [
+          {
+            "tag": "annotate-DAY1_2026-10-28-b1",
+            "task": "annotate",
+            "ok": true,
+            "max_tokens_declared": 1200,
+            "max_tokens_effective": 2500,
+            "prompt_chars": 2939,
+            "model": "minimaxai/minimax-m3.1-flash",
+            "max_tokens": 2500,
+            "rounds": 1,
+            "elapsed_s": 148.0,
+            "output_chars": 1373,
+            "est_output_tokens": 858,
+            "est_prompt_tokens": 1837
+          },
+          {
+            "tag": "annotate-DAY1_2026-10-28-b2",
+            "task": "annotate",
+            "ok": true,
+            "max_tokens_declared": 1200,
+            "max_tokens_effective": 2500,
+            "prompt_chars": 2995,
+            "model": "minimaxai/minimax-m3.1-flash",
+            "max_tokens": 2500,
+            "rounds": 1,
+            "elapsed_s": 143.8,
+            "output_chars": 1217,
+            "est_output_tokens": 761,
+            "est_prompt_tokens": 1872
+          },
+          {
+            "tag": "annotate-DAY2_2026-10-29-b1",
+            "task": "annotate",
+            "ok": true,
+            "max_tokens_declared": 1200,
+            "max_tokens_effective": 2500,
+            "prompt_chars": 2873,
+            "model": "minimaxai/minimax-m3.1-flash",
+            "max_tokens": 2500,
+            "rounds": 1,
+            "elapsed_s": 334.5,
+            "output_chars": 1362,
+            "est_output_tokens": 851,
+            "est_prompt_tokens": 1796
+          },
+          {
+            "tag": "annotate-DAY2_2026-10-29-b2",
+            "task": "annotate",
+            "ok": true,
+            "max_tokens_declared": 1200,
+            "max_tokens_effective": 2500,
+            "prompt_chars": 3095,
+            "model": "minimaxai/minimax-m3.1-flash",
+            "max_tokens": 2500,
+            "rounds": 1,
+            "elapsed_s": 202.2,
+            "output_chars": 1360,
+            "est_output_tokens": 850,
+            "est_prompt_tokens": 1934
+          },
+          {
+            "tag": "summarize-dim:mic_audio",
+            "task": "summarize",
+            "ok": true,
+            "max_tokens_declared": 4000,
+            "max_tokens_effective": 4000,
+            "prompt_chars": 2031,
+            "model": "minimaxai/minimax-m3.1-flash",
+            "max_tokens": 4000,
+            "rounds": 1,
+            "elapsed_s": 66.7,
+            "output_chars": 159,
+            "est_output_tokens": 99,
+            "est_prompt_tokens": 1269
+          },
+          {
+            "tag": "summarize-dim:calendar",
+            "task": "summarize",
+            "ok": true,
+            "max_tokens_declared": 4000,
+            "max_tokens_effective": 4000,
+            "prompt_chars": 1063,
+            "model": "minimaxai/minimax-m3.1-flash",
+            "max_tokens": 4000,
+            "rounds": 1,
+            "elapsed_s": 110.0,
+            "output_chars": 62,
+            "est_output_tokens": 39,
+            "est_prompt_tokens": 664
+          }
+        ]
+      }
+    ],
+    "calls": [
+      {
+        "tag": "annotate-DAY1_2026-10-28-b1",
+        "task": "annotate",
+        "ok": true,
+        "max_tokens_declared": 1200,
+        "max_tokens_effective": 2500,
+        "prompt_chars": 2939,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 2500,
+        "rounds": 1,
+        "elapsed_s": 148.0,
+        "output_chars": 1373,
+        "est_output_tokens": 858,
+        "est_prompt_tokens": 1837
+      },
+      {
+        "tag": "annotate-DAY1_2026-10-28-b2",
+        "task": "annotate",
+        "ok": true,
+        "max_tokens_declared": 1200,
+        "max_tokens_effective": 2500,
+        "prompt_chars": 2995,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 2500,
+        "rounds": 1,
+        "elapsed_s": 143.8,
+        "output_chars": 1217,
+        "est_output_tokens": 761,
+        "est_prompt_tokens": 1872
+      },
+      {
+        "tag": "annotate-DAY2_2026-10-29-b1",
+        "task": "annotate",
+        "ok": true,
+        "max_tokens_declared": 1200,
+        "max_tokens_effective": 2500,
+        "prompt_chars": 2873,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 2500,
+        "rounds": 1,
+        "elapsed_s": 334.5,
+        "output_chars": 1362,
+        "est_output_tokens": 851,
+        "est_prompt_tokens": 1796
+      },
+      {
+        "tag": "annotate-DAY2_2026-10-29-b2",
+        "task": "annotate",
+        "ok": true,
+        "max_tokens_declared": 1200,
+        "max_tokens_effective": 2500,
+        "prompt_chars": 3095,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 2500,
+        "rounds": 1,
+        "elapsed_s": 202.2,
+        "output_chars": 1360,
+        "est_output_tokens": 850,
+        "est_prompt_tokens": 1934
+      },
+      {
+        "tag": "summarize-dim:mic_audio",
+        "task": "summarize",
+        "ok": true,
+        "max_tokens_declared": 4000,
+        "max_tokens_effective": 4000,
+        "prompt_chars": 2031,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 4000,
+        "rounds": 1,
+        "elapsed_s": 66.7,
+        "output_chars": 159,
+        "est_output_tokens": 99,
+        "est_prompt_tokens": 1269
+      },
+      {
+        "tag": "summarize-dim:calendar",
+        "task": "summarize",
+        "ok": true,
+        "max_tokens_declared": 4000,
+        "max_tokens_effective": 4000,
+        "prompt_chars": 1063,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 4000,
+        "rounds": 1,
+        "elapsed_s": 110.0,
+        "output_chars": 62,
+        "est_output_tokens": 39,
+        "est_prompt_tokens": 664
+      }
+    ],
+    "known_issue": "task_runtime(ANNOTATE).max_output_tokens=1200 在这个思考型模型上不够：20 条批次连续返回「空正文 finish_reason=length」（≥2 次），思考把 1200 全吃掉。故首个 attempt 抬到实测地板 2500，声明值与实测值都记在每批的 max_tokens_declared / max_tokens 里。"
+  },
+  "summarize": {
+    "day": "DAY1_2026-10-28",
+    "dimensions": {
+      "dim:mic_audio": {
+        "dim": "dim:mic_audio",
+        "n_sources": 18,
+        "prompt_chars": 2015,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 4000,
+        "rounds": 1,
+        "elapsed_s": 66.7,
+        "ok": true,
+        "summary": "上午交代快递放门口；妈妈昨晚住进市第二人民医院心内科，下午赶去。与小李因项目分工吵架，小李不愿接测试部分。答应张总周三前发合同初稿，需提醒。本月目标减重五斤，从今天起晚上不吃饭。下午两次提到头晕，15:41 已站不稳，先坐下缓一缓。傍晚到二院，医生说要做造影，明天上午出结果。夜里称系统又卡，最后决定先不弄，明天再说。",
+        "summary_chars": 159,
+        "est_output_tokens": 99,
+        "fact_hits": [
+          {
+            "dim": "dim:mic_audio",
+            "fact": "母亲住院（市二院心内科）",
+            "supporting_ids": [
+              "m04",
+              "m16",
+              "p02"
+            ],
+            "keywords": [
+              "妈",
+              "母亲",
+              "住院",
+              "二院",
+              "第二人民"
+            ],
+            "matched_keywords": [
+              "妈",
+              "二院",
+              "第二人民"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:mic_audio",
+            "fact": "承诺周三前给张总合同",
+            "supporting_ids": [
+              "m08",
+              "x03",
+              "n01"
+            ],
+            "keywords": [
+              "合同",
+              "张总",
+              "周三"
+            ],
+            "matched_keywords": [
+              "合同",
+              "张总",
+              "周三"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:mic_audio",
+            "fact": "头晕加重（两次递进）",
+            "supporting_ids": [
+              "m13",
+              "m14",
+              "v03"
+            ],
+            "keywords": [
+              "头晕",
+              "晕"
+            ],
+            "matched_keywords": [
+              "头晕",
+              "晕"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:mic_audio",
+            "fact": "与小李的工作冲突",
+            "supporting_ids": [
+              "m06"
+            ],
+            "keywords": [
+              "小李",
+              "吵",
+              "冲突"
+            ],
+            "matched_keywords": [
+              "小李",
+              "吵"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:mic_audio",
+            "fact": "减重五斤目标",
+            "supporting_ids": [
+              "m11"
+            ],
+            "keywords": [
+              "减",
+              "体重",
+              "斤"
+            ],
+            "matched_keywords": [
+              "减",
+              "斤"
+            ],
+            "hit": true
+          }
+        ],
+        "hit_count": 5,
+        "fact_count": 5
+      },
+      "dim:calendar": {
+        "dim": "dim:calendar",
+        "n_sources": 2,
+        "prompt_chars": 1047,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "max_tokens": 4000,
+        "rounds": 1,
+        "elapsed_s": 110.0,
+        "ok": true,
+        "summary": "日历记录包含两项约定：周四10:00项目周会[2]；周五15:00公司年度体检[1]。条目仅注明星期与时刻，未注明具体日期。",
+        "summary_chars": 62,
+        "est_output_tokens": 39,
+        "fact_hits": [
+          {
+            "dim": "dim:calendar",
+            "fact": "周五体检 / 周四周会",
+            "supporting_ids": [
+              "c01",
+              "c02"
+            ],
+            "keywords": [
+              "体检",
+              "周会",
+              "周五",
+              "周四"
+            ],
+            "matched_keywords": [
+              "体检",
+              "周会",
+              "周五",
+              "周四"
+            ],
+            "hit": true
+          }
+        ],
+        "hit_count": 1,
+        "fact_count": 1
+      }
+    },
+    "fact_hits": [
+      {
+        "dim": "dim:mic_audio",
+        "fact": "母亲住院（市二院心内科）",
+        "supporting_ids": [
+          "m04",
+          "m16",
+          "p02"
+        ],
+        "keywords": [
+          "妈",
+          "母亲",
+          "住院",
+          "二院",
+          "第二人民"
+        ],
+        "matched_keywords": [
+          "妈",
+          "二院",
+          "第二人民"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:mic_audio",
+        "fact": "承诺周三前给张总合同",
+        "supporting_ids": [
+          "m08",
+          "x03",
+          "n01"
+        ],
+        "keywords": [
+          "合同",
+          "张总",
+          "周三"
+        ],
+        "matched_keywords": [
+          "合同",
+          "张总",
+          "周三"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:mic_audio",
+        "fact": "头晕加重（两次递进）",
+        "supporting_ids": [
+          "m13",
+          "m14",
+          "v03"
+        ],
+        "keywords": [
+          "头晕",
+          "晕"
+        ],
+        "matched_keywords": [
+          "头晕",
+          "晕"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:mic_audio",
+        "fact": "与小李的工作冲突",
+        "supporting_ids": [
+          "m06"
+        ],
+        "keywords": [
+          "小李",
+          "吵",
+          "冲突"
+        ],
+        "matched_keywords": [
+          "小李",
+          "吵"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:mic_audio",
+        "fact": "减重五斤目标",
+        "supporting_ids": [
+          "m11"
+        ],
+        "keywords": [
+          "减",
+          "体重",
+          "斤"
+        ],
+        "matched_keywords": [
+          "减",
+          "斤"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:calendar",
+        "fact": "周五体检 / 周四周会",
+        "supporting_ids": [
+          "c01",
+          "c02"
+        ],
+        "keywords": [
+          "体检",
+          "周会",
+          "周五",
+          "周四"
+        ],
+        "matched_keywords": [
+          "体检",
+          "周会",
+          "周五",
+          "周四"
+        ],
+        "hit": true
+      }
+    ],
+    "hit_total": 6,
+    "fact_total": 6,
+    "elapsed_s": 176.8
+  },
+  "contract_cost": {
+    "per_task_prompt_chars": {
+      "annotate": {
+        "prompt_chars": 3026,
+        "est_tokens": 1891,
+        "max_output_tokens": 1200,
+        "model_tier": "cheap",
+        "temperature": 0.0,
+        "failure_policy": "skip_retry_next"
+      },
+      "gate": {
+        "prompt_chars": 1500,
+        "est_tokens": 938,
+        "max_output_tokens": 800,
+        "model_tier": "cheap",
+        "temperature": 0.0,
+        "failure_policy": "conservative_keep"
+      },
+      "extract": {
+        "prompt_chars": 1148,
+        "est_tokens": 718,
+        "max_output_tokens": 800,
+        "model_tier": "cheap",
+        "temperature": 0.0,
+        "failure_policy": "skip_retry_next"
+      },
+      "summarize": {
+        "prompt_chars": 1671,
+        "est_tokens": 1044,
+        "max_output_tokens": 4000,
+        "model_tier": "standard",
+        "temperature": 0.3,
+        "failure_policy": "fail_soft"
+      },
+      "digest": {
+        "prompt_chars": 1462,
+        "est_tokens": 914,
+        "max_output_tokens": 4000,
+        "model_tier": "standard",
+        "temperature": 0.3,
+        "failure_policy": "fail_soft"
+      },
+      "dialogue": {
+        "prompt_chars": 1185,
+        "est_tokens": 741,
+        "max_output_tokens": 4096,
+        "model_tier": "strong",
+        "temperature": 0.6,
+        "failure_policy": "degrade"
+      }
+    },
+    "comparison": {
+      "old_static_prompt_chars": 4753,
+      "old_static_prompt_lines": 91,
+      "old_capability_catalog": {
+        "capability_count": 53,
+        "catalog_chars": 1806,
+        "description_chars_total": 6634,
+        "note": "catalog 由 grok_provider._render_capabilities 用 53 个真实能力名实测渲染；能力描述（description）不进这个块，但老提示词的其他路径会带上它"
+      },
+      "old_total_chars_lower_bound": 6559,
+      "old_total_est_tokens": 4099,
+      "old_total_chars_with_descriptions": 13193,
+      "annotate_shrink_ratio_with_descriptions": 4.4,
+      "new_annotate_chars": 3026,
+      "new_summarize_chars": 1671,
+      "annotate_shrink_ratio": 2.2,
+      "annotate_smaller_by_chars": 3533,
+      "conclusion": "老对话提示词常驻 6559 字符（53 条能力 + 纪律 + 规则，还不含随会话增长的 cockpit/近期对话/记忆卡），约 4099 token；新的 ANNOTATE 提示词 3026 字符（约 1891 token），小到约 1/2.2；SUMMARIZE 1671 字符。且新提示词只带本任务契约，不带 53 条能力——模型没有多余的表面去自造字段名。",
+      "caveat": "老提示词的实际长度随会话增长（cockpit/对话/记忆卡为动态段），这里是常驻部分的下界。"
+    }
+  }
+}
