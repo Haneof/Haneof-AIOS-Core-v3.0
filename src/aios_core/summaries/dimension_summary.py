@@ -11,7 +11,7 @@ import hashlib
 import json
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Sequence
+from typing import Any, Callable, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -54,6 +54,10 @@ class DimensionSummaryInput(BaseModel):
     source_world_revision: int = Field(ge=0)
     sources: tuple[DimensionSummarySource, ...]
     truncated: bool = False
+    # The source cap and admission policy used at prepare time. commit()
+    # re-prepares with the same values, so both sides stay consistent.
+    max_source_objects: int = Field(default=500, ge=1)
+    admission_filtered: bool = False
 
     @model_validator(mode="after")
     def validate_window(self) -> "DimensionSummaryInput":
@@ -157,7 +161,14 @@ class DimensionSummaryService:
         subject_id: str = "user_1",
         max_source_objects: int = 500,
         source_subject_ids: Sequence[str] | None = None,
+        source_admission: Callable[[str, str, dict[str, Any]], bool] | None = None,
     ) -> None:
+        """``source_admission(object_id, object_type, payload) -> bool`` decides
+        whether a candidate source may feed a summary. It is injected at
+        construction time so prepare() and commit()'s internal re-check always
+        apply the identical policy (e.g. drop sources flagged as noise by the
+        cleaning pipeline). Admission must be deterministic.
+        """
         if max_source_objects < 1:
             raise ValueError("max_source_objects must be >= 1")
         self.store = store
@@ -165,6 +176,7 @@ class DimensionSummaryService:
         self.subject_id = subject_id
         self.source_subject_ids = tuple(dict.fromkeys((subject_id, *(source_subject_ids or ()))))
         self.max_source_objects = max_source_objects
+        self.source_admission = source_admission
 
     def _summary_id(self, dimension: str, granularity: str,
                     start: datetime, end: datetime) -> str:
@@ -222,6 +234,9 @@ class DimensionSummaryService:
                 raise ValueError("summary source is not current/admissible")
             if derive_dimension(raw, source.object_type) != prepared.dimension:
                 raise ValueError("summary source belongs to a different dimension")
+            if (self.source_admission is not None
+                    and not self.source_admission(source.object_id, source.object_type, raw)):
+                raise ValueError("summary source rejected by source admission policy")
             if source.object_type == "summary":
                 rank = _SUMMARY_SCALE_RANK.get(raw.get("granularity"))
                 if (not prepared.include_summary_sources or rank is None
@@ -243,6 +258,7 @@ class DimensionSummaryService:
             dimension=prepared.dimension, granularity=prepared.granularity,
             window_start=prepared.window_start, window_end=prepared.window_end,
             include_summary_sources=prepared.include_summary_sources,
+            max_source_objects=prepared.max_source_objects,
         )
         current_refs = {(item.object_id, item.revision) for item in current.sources}
         if current.truncated or current_refs != seen:
@@ -256,11 +272,15 @@ class DimensionSummaryService:
         window_start: datetime,
         window_end: datetime,
         include_summary_sources: bool = False,
+        max_source_objects: int | None = None,
     ) -> DimensionSummaryInput:
         start = as_utc(window_start, "window_start")
         end = as_utc(window_end, "window_end")
         if end < start:
             raise ValueError("window_end must not be before window_start")
+        effective_cap = self.max_source_objects if max_source_objects is None else max_source_objects
+        if effective_cap < 1:
+            raise ValueError("max_source_objects must be >= 1")
 
         self.index.catch_up()
         source_world_revision = int(self.store.current_world_revision())
@@ -276,8 +296,8 @@ class DimensionSummaryService:
         # intentionally excluded below. Computing truncation before this filter can
         # both publish self-dependencies and hide valid lower-level sources.
         scan_limit = max(
-            self.max_source_objects + 1,
-            min(10_000, self.max_source_objects * 8 + 64),
+            effective_cap + 1,
+            min(10_000, effective_cap * 8 + 64),
         )
         hits = []
         saturated = self.index.lag() > 0
@@ -290,6 +310,7 @@ class DimensionSummaryService:
             saturated |= len(page.hits) >= scan_limit
 
         eligible: list[tuple[Any, dict[str, Any]]] = []
+        admission_filtered = False
         for hit in hits:
             if hit.object_id == target_summary_id:
                 continue
@@ -307,12 +328,16 @@ class DimensionSummaryService:
                     or source_rank >= target_rank
                 ):
                     continue
+            if (self.source_admission is not None
+                    and not self.source_admission(hit.object_id, hit.object_type, payload)):
+                admission_filtered = True
+                continue
             eligible.append((hit, payload))
 
-        truncated = (saturated or len(eligible) > self.max_source_objects
+        truncated = (saturated or len(eligible) > effective_cap
                      or source_world_revision != self.store.current_world_revision())
         sources: list[DimensionSummarySource] = []
-        for hit, payload in eligible[: self.max_source_objects]:
+        for hit, payload in eligible[:effective_cap]:
             metadata = payload.get("metadata")
             sources.append(
                 DimensionSummarySource(
@@ -341,6 +366,8 @@ class DimensionSummaryService:
             source_world_revision=source_world_revision,
             sources=tuple(sources),
             truncated=truncated,
+            max_source_objects=effective_cap,
+            admission_filtered=admission_filtered,
         )
 
     def mark_stale_if_present(
@@ -531,6 +558,8 @@ class DimensionSummaryService:
                 "dimension": prepared.dimension,
                 "source_count": len(prepared.sources),
                 "truncated": prepared.truncated,
+                "max_source_objects": prepared.max_source_objects,
+                "admission_filtered": prepared.admission_filtered,
             },
             summary_status=SummaryStatus.CURRENT,
             metadata={

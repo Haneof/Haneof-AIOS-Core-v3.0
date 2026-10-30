@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import StrEnum
-from typing import Callable, Sequence
+from typing import Callable, Mapping, Sequence
 
 from aios_core.contracts.enums import ObjectType
 from aios_core.contracts.time import as_utc
@@ -19,6 +19,7 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.contracts.refs import ObjectRef
 
 from .cognitive_derivation import CognitiveDerivationReconcileResult, CognitiveDerivationScheduler
+from .daily_digest import DIGEST_DIMENSION, DailyDigestService
 from .dimension_summary import DimensionSummaryInput, DimensionSummaryService, SummaryCommit
 
 UTC = timezone.utc
@@ -129,18 +130,35 @@ class MultiScaleSummaryScheduler:
         max_source_objects: int = 500,
         source_subject_ids: Sequence[str] | None = None,
         cognitive_derivation_scheduler: CognitiveDerivationScheduler | None = None,
+        source_admission: Callable[[str, str, dict], bool] | None = None,
+        dimension_source_caps: Mapping[str, int] | None = None,
+        enable_daily_digest: bool = True,
     ) -> None:
+        """``source_admission`` is forwarded to the summary service (identical
+        policy in prepare and commit). ``dimension_source_caps`` overrides
+        ``max_source_objects`` per dimension, e.g. high-cardinality numeric
+        streams. When ``enable_daily_digest`` is set, every closed DAY window
+        that already carries single-dimension DAY summaries also gets a
+        cross-dimension ``dim:daily_digest`` summary."""
         self.store = store
         self.index = index
         self.summary_handler = summary_handler
         self.subject_id = subject_id
         self.source_subject_ids = tuple(dict.fromkeys((subject_id, *(source_subject_ids or ()))))
+        self.dimension_source_caps = dict(dimension_source_caps or {})
+        self.enable_daily_digest = enable_daily_digest
         self.service = DimensionSummaryService(
             store=store,
             index=index,
             subject_id=subject_id,
             max_source_objects=max_source_objects,
             source_subject_ids=self.source_subject_ids,
+            source_admission=source_admission,
+        )
+        self.digest_service = DailyDigestService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
         )
         self.cognitive_derivation_scheduler = (
             cognitive_derivation_scheduler
@@ -189,6 +207,7 @@ class MultiScaleSummaryScheduler:
             if (
                 dimension
                 and dimension != "dim_unclassified"
+                and dimension != DIGEST_DIMENSION  # digest is scheduled below, never re-discovered
                 and dimension not in terminal_keys
             ):
                 dimensions.add(dimension)
@@ -242,6 +261,34 @@ class MultiScaleSummaryScheduler:
     @staticmethod
     def _source_identity(prepared: DimensionSummaryInput) -> tuple[tuple[str, int], ...]:
         return tuple((item.object_id, item.revision) for item in prepared.sources)
+
+    def _digest_candidate_windows(self, *, now: datetime) -> tuple[tuple[datetime, datetime], ...]:
+        """Closed DAY windows that already hold at least one current
+        single-dimension DAY summary — the digest's own source material."""
+        current_start, _ = window_bounds(now, SummaryScale.DAY)
+        windows: set[tuple[datetime, datetime]] = set()
+        for payload in self._source_payloads():
+            if str(payload.get("object_type") or "") != ObjectType.SUMMARY.value:
+                continue
+            if str(payload.get("granularity") or "") != "day":
+                continue
+            metadata = payload.get("metadata")
+            if isinstance(metadata, dict) and metadata.get("dimension") == DIGEST_DIMENSION:
+                continue
+            extent = payload.get("summary_time")
+            if not isinstance(extent, dict) or not isinstance(extent.get("start"), str):
+                continue
+            try:
+                summary_start = as_utc(
+                    datetime.fromisoformat(extent["start"].replace("Z", "+00:00")),
+                    "summary_time.start",
+                )
+            except ValueError:
+                continue
+            start, end = window_bounds(summary_start, SummaryScale.DAY)
+            if end < current_start:
+                windows.add((start, end))
+        return tuple(sorted(windows, key=lambda item: item[0]))
 
     def _matching_current_summary(self, prepared: DimensionSummaryInput) -> dict | None:
         for payload in self.store.list_payloads(
@@ -337,6 +384,7 @@ class MultiScaleSummaryScheduler:
                         window_start=start,
                         window_end=end,
                         include_summary_sources=(scale is not SummaryScale.DAY),
+                        max_source_objects=self.dimension_source_caps.get(dimension),
                     )
                     job = ScheduledSummaryJob(
                         dimension=dimension,
@@ -386,6 +434,55 @@ class MultiScaleSummaryScheduler:
                         )
                     )
                     semantic_jobs += 1
+
+        # Cross-dimension daily digest: runs after every dimension's DAY
+        # summaries so the digest always sees the freshest closed window.
+        # It is a global artifact, so it is only scheduled on full sweeps —
+        # explicitly scoped runs (dimensions=...) never write a cross-dimension
+        # digest as a side effect.
+        if self.enable_daily_digest and dimensions is None:
+            for start, end in self._digest_candidate_windows(now=current):
+                prepared = self.digest_service.prepare(window_start=start, window_end=end)
+                job = ScheduledSummaryJob(
+                    dimension=DIGEST_DIMENSION,
+                    scale=SummaryScale.DAY,
+                    window_start=start,
+                    window_end=end,
+                    source_count=len(prepared.sources),
+                )
+                jobs.append(job)
+                if not prepared.sources:
+                    skipped_empty.append(job)
+                    continue
+                if self._unchanged(prepared):
+                    skipped_unchanged.append(job)
+                    continue
+                if semantic_jobs >= max_jobs:
+                    truncated = True
+                    continue
+                content = self.summary_handler(prepared)
+                if not isinstance(content, str) or not content.strip():
+                    raise ValueError("daily digest handler must return non-blank text")
+                committed = self.digest_service.commit(
+                    prepared,
+                    content=content,
+                    generated_at=current,
+                )
+                commits.append(
+                    SummaryCommit(
+                        object_id=committed.object_id,
+                        revision=committed.revision,
+                        world_revision=committed.world_revision,
+                        reused_existing=committed.reused_existing,
+                    )
+                )
+                self.cognitive_derivation_scheduler.ensure(
+                    ObjectRef(
+                        object_id=committed.object_id,
+                        revision=committed.revision,
+                    )
+                )
+                semantic_jobs += 1
 
         return SummaryScheduleResult(
             attempted_jobs=tuple(jobs),

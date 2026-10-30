@@ -7,11 +7,20 @@ from .dimension_summary import (
     SummaryCommit,
 )
 
+from .daily_digest import (
+    DIGEST_DIMENSION,
+    DailyDigestService,
+    DigestCommit,
+)
+
 __all__ = [
     "DimensionSummaryInput",
     "DimensionSummaryService",
     "DimensionSummarySource",
     "SummaryCommit",
+    "DIGEST_DIMENSION",
+    "DailyDigestService",
+    "DigestCommit",
 ]
 
 from .scheduler import (

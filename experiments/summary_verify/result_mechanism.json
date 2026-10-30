@@ -1,0 +1,83 @@
+{
+  "active_dimensions": [
+    "dim:app_usage",
+    "dim:calendar",
+    "dim:camera_visual",
+    "dim:external_chat",
+    "dim:heart_rate",
+    "dim:mic_audio",
+    "dim:note",
+    "dim:order",
+    "dim:payment"
+  ],
+  "n_dimensions": 9,
+  "day_commits_per_dimension": {
+    "dim:app_usage": 3,
+    "dim:calendar": 3,
+    "dim:camera_visual": 3,
+    "dim:external_chat": 3,
+    "dim:heart_rate": 3,
+    "dim:mic_audio": 3,
+    "dim:note": 3,
+    "dim:order": 3,
+    "dim:payment": 3
+  },
+  "n_day_commits": 27,
+  "n_day_skipped_empty": 0,
+  "daily_digest": {
+    "n_commits": 3,
+    "source_dimensions_of_first": [
+      "dim:app_usage",
+      "dim:calendar",
+      "dim:camera_visual",
+      "dim:external_chat",
+      "dim:heart_rate",
+      "dim:mic_audio",
+      "dim:note",
+      "dim:order",
+      "dim:payment"
+    ],
+    "source_count_of_first": 9
+  },
+  "rerun_commits": 0,
+  "rerun_skipped_unchanged": 30,
+  "week_n_commits": 9,
+  "week_commits_per_dimension": {
+    "dim:app_usage": 1,
+    "dim:calendar": 1,
+    "dim:camera_visual": 1,
+    "dim:external_chat": 1,
+    "dim:heart_rate": 1,
+    "dim:mic_audio": 1,
+    "dim:note": 1,
+    "dim:order": 1,
+    "dim:payment": 1
+  },
+  "week_windows": [
+    [
+      "2026-10-26T00:00:00+00:00",
+      "2026-11-01T23:59:59.999999+00:00"
+    ]
+  ],
+  "week_checked": 9,
+  "week_includes_day_summary_source": true,
+  "week_has_equal_or_higher_summary_source": false,
+  "week_has_raw_observation_source": true,
+  "mic_day1_source_count": 7,
+  "noise_ids_in_mic_summary": [],
+  "n_noise_in_mic_summary": 0,
+  "window_bounds_utc": {
+    "day": [
+      "2026-10-28T00:00:00+00:00",
+      "2026-10-28T23:59:59.999999+00:00"
+    ],
+    "week": [
+      "2026-10-26T00:00:00+00:00",
+      "2026-11-01T23:59:59.999999+00:00"
+    ],
+    "month": [
+      "2026-10-01T00:00:00+00:00",
+      "2026-10-31T23:59:59.999999+00:00"
+    ]
+  }
+}
