@@ -157,10 +157,10 @@ def summary_handler_real_model(prepared) -> str:
             f"直接输出正文不超过 300 字。\n\n" + "\n".join(dlines)
         )
         # digest 源是 9 个维度的整段总结，跨维整合的推理开销大：实测 2500/4500
-        # 会被思考耗尽（finish_reason=length 空正文），8000 会撞网关 504；
-        # 6000 是甜点（思考约 2900 tokens + 正文）。
+        # 会被思考耗尽（finish_reason=length 空正文），6000 会撞网关 504；
+        # 紧凑提示词下思考收敛在 ~3400 tokens，4000 是甜点（实测 274s 成功）。
         return harness._call_model(
-            [{"role": "user", "content": body}], 6000, "今日总览"
+            [{"role": "user", "content": body}], 4000, "今日总览"
         )
     else:
         body = (

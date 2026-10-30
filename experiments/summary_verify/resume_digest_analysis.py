@@ -78,7 +78,7 @@ def digest_with_patience(prepared, now) -> str:
     for model, rounds in ((harness.PRIMARY_MODEL, 2), (SECONDARY_MODEL, 2)):
         for r in range(rounds):
             try:
-                text = _call_raw(model, body, 6000)
+                text = _call_raw(model, body, 4000)
                 if model != harness.PRIMARY_MODEL:
                     print(f"[resume] digest 使用备用模型 {model} 完成", flush=True)
                 return text
@@ -97,8 +97,17 @@ def summary_handler_real_model(prepared):
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--day", type=int, default=0)
+    ap.add_argument(
+        "--digest-text-file",
+        help="已产出的今日总览正文（模型端点不稳定时，用同提示词同模型的独立"
+             "调用结果注入，仍走完整的 prepare/校验/commit 机制）",
+    )
     args = ap.parse_args()
     day_idx = args.day
+    injected = (
+        Path(args.digest_text_file).read_text(encoding="utf-8").strip()
+        if args.digest_text_file else None
+    )
 
     db = HERE / f"_tmp_echo_{day_idx}.db"
     store = SQLiteWorldStore(db)
@@ -118,7 +127,7 @@ def main() -> None:
         p = sched.digest_service.prepare(window_start=start, window_end=end)
         if not p.sources:
             continue
-        content = digest_with_patience(p, now)
+        content = injected if injected else digest_with_patience(p, now)
         c = sched.digest_service.commit(p, content=content, generated_at=now)
         digest_content = content
         print(f"[resume] digest 提交 {c.object_id} rev{c.revision} "

@@ -60,12 +60,21 @@ class ScheduledSummaryJob:
 
 
 @dataclass(frozen=True, slots=True)
+class FailedSummaryJob:
+    """A job whose model handler failed — recorded, never silently dropped."""
+
+    job: ScheduledSummaryJob
+    error: str
+
+
+@dataclass(frozen=True, slots=True)
 class SummaryScheduleResult:
     attempted_jobs: tuple[ScheduledSummaryJob, ...]
     commits: tuple[SummaryCommit, ...]
     skipped_unchanged: tuple[ScheduledSummaryJob, ...]
     skipped_empty: tuple[ScheduledSummaryJob, ...]
     truncated: bool
+    failed: tuple[FailedSummaryJob, ...] = ()
 
 
 def window_bounds(moment: datetime, scale: SummaryScale) -> tuple[datetime, datetime]:
@@ -364,6 +373,7 @@ class MultiScaleSummaryScheduler:
         commits: list[SummaryCommit] = []
         skipped_unchanged: list[ScheduledSummaryJob] = []
         skipped_empty: list[ScheduledSummaryJob] = []
+        failed: list[FailedSummaryJob] = []
         truncated = False
         semantic_jobs = 0
 
@@ -416,16 +426,30 @@ class MultiScaleSummaryScheduler:
                         truncated = True
                         continue
 
-                    content = self.summary_handler(prepared)
+                    # Fail-soft: a model outage (timeout/504) on one window must
+                    # not abort the whole sweep. Record it, leave the world
+                    # untouched for that window, and let the next tick retry.
+                    try:
+                        content = self.summary_handler(prepared)
+                    except Exception as exc:  # noqa: BLE001
+                        failed.append(FailedSummaryJob(job=job, error=f"{type(exc).__name__}: {exc}"))
+                        continue
                     if not isinstance(content, str) or not content.strip():
-                        raise ValueError(
-                            "dimension summary handler must return non-blank text"
+                        failed.append(
+                            FailedSummaryJob(job=job, error="handler returned blank text")
                         )
-                    committed = self.service.commit(
-                        prepared,
-                        content=content,
-                        generated_at=current,
-                    )
+                        continue
+                    try:
+                        committed = self.service.commit(
+                            prepared,
+                            content=content,
+                            generated_at=current,
+                        )
+                    except Exception as exc:  # noqa: BLE001
+                        # Source-window races / CAS failures are expected under
+                        # concurrency: retry next tick instead of crashing.
+                        failed.append(FailedSummaryJob(job=job, error=f"{type(exc).__name__}: {exc}"))
+                        continue
                     commits.append(committed)
                     self.cognitive_derivation_scheduler.ensure(
                         ObjectRef(
@@ -460,14 +484,25 @@ class MultiScaleSummaryScheduler:
                 if semantic_jobs >= max_jobs:
                     truncated = True
                     continue
-                content = self.summary_handler(prepared)
+                try:
+                    content = self.summary_handler(prepared)
+                except Exception as exc:  # noqa: BLE001
+                    failed.append(FailedSummaryJob(job=job, error=f"{type(exc).__name__}: {exc}"))
+                    continue
                 if not isinstance(content, str) or not content.strip():
-                    raise ValueError("daily digest handler must return non-blank text")
-                committed = self.digest_service.commit(
-                    prepared,
-                    content=content,
-                    generated_at=current,
-                )
+                    failed.append(
+                        FailedSummaryJob(job=job, error="handler returned blank text")
+                    )
+                    continue
+                try:
+                    committed = self.digest_service.commit(
+                        prepared,
+                        content=content,
+                        generated_at=current,
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    failed.append(FailedSummaryJob(job=job, error=f"{type(exc).__name__}: {exc}"))
+                    continue
                 commits.append(
                     SummaryCommit(
                         object_id=committed.object_id,
@@ -490,4 +525,5 @@ class MultiScaleSummaryScheduler:
             skipped_unchanged=tuple(skipped_unchanged),
             skipped_empty=tuple(skipped_empty),
             truncated=truncated,
+            failed=tuple(failed),
         )

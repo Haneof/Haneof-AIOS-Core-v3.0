@@ -184,6 +184,37 @@ def test_source_admission_drops_flagged_noise(tmp_path):
     assert payload["coverage"]["admission_filtered"] is True
 
 
+def test_handler_failure_is_fail_soft_and_retried_next_tick(tmp_path):
+    store, index, _ = _seed(tmp_path)
+    attempts = {"n": 0}
+
+    def flaky(prepared):
+        attempts["n"] += 1
+        if prepared.dimension == DIGEST_DIMENSION:
+            raise RuntimeError("gateway 504")  # model outage on the digest only
+        return _summarize(prepared)
+
+    scheduler = MultiScaleSummaryScheduler(
+        store=store, index=index, summary_handler=flaky,
+    )
+    result = scheduler.run_due(now=CLOSED, scales=(SummaryScale.DAY,), max_jobs=32)
+    # the 9 single-dimension style windows still commit; the digest is recorded
+    assert result.commits, "handler failure must not abort the whole sweep"
+    assert len(result.failed) == 1
+    assert result.failed[0].job.dimension == DIGEST_DIMENSION
+    assert "504" in result.failed[0].error
+
+    def ok(prepared):
+        return _summarize(prepared)
+
+    scheduler.summary_handler = ok
+    second = scheduler.run_due(
+        now=CLOSED + timedelta(minutes=1), scales=(SummaryScale.DAY,), max_jobs=32,
+    )
+    assert second.failed == ()
+    assert [c for c in second.commits if _is_digest(store, c.object_id)]
+
+
 def test_dimension_source_cap_override(tmp_path):
     store, index, _ = _seed(tmp_path, turns=tuple((i, 8 + i) for i in range(1, 8)))
     scheduler = MultiScaleSummaryScheduler(

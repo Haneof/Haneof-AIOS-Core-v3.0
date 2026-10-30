@@ -1,0 +1,209 @@
+{
+  "day": "DAY1_2026-10-28",
+  "n_dimension_summaries": 10,
+  "dimensions_summarized": [
+    "dim:app_usage",
+    "dim:calendar",
+    "dim:camera_visual",
+    "dim:daily_digest",
+    "dim:external_chat",
+    "dim:heart_rate",
+    "dim:mic_audio",
+    "dim:note",
+    "dim:order",
+    "dim:payment"
+  ],
+  "summaries": {
+    "dim:daily_digest": {
+      "content": "今天得知妈妈昨晚住进市第二人民医院心内科；与小李因项目分工吵架，小李不愿接测试。小王转述李总：合同周三须到，否则重谈；我答应张总周三前发初稿，交付周期30天、违约金5%。定下本月减重五斤、今晚起不吃饭；缴住院预缴金12000元。下午头晕，用文档App 47分钟；15:36心率骤升至124，15:40、15:47达131–132，站不稳、扶桌时面色苍白，15:51回落基线。提醒带医保卡和身份证；18:20到医院，医生告知妈妈需造影，明日上午出结果。周四10:00项目周会、周五15:00公司年度体检；订护颈枕×1，预计周四送达。阿强约周末钓鱼，未记录答复或成行。",
+      "source_count": 9
+    },
+    "dim:payment": {
+      "content": "13:05，记录医院住院预缴金 12000 元。",
+      "source_count": 1
+    },
+    "dim:order": {
+      "content": "20:10 记录了一笔订单：护颈枕 ×1，预计周四送达。",
+      "source_count": 1
+    },
+    "dim:note": {
+      "content": "11:00 记录合同要点：交付周期为 30 天，违约金为 5%，对方联系人是张总（138****2210）。17:55 提醒自己记得给妈妈带医保卡和身份证。",
+      "source_count": 2
+    },
+    "dim:mic_audio": {
+      "content": "08:02得知妈妈昨晚住院，在市第二人民医院心内科，计划下午前往。08:40与小李因项目分工吵架，小李不愿接测试。09:47答应张总周三前发合同初稿，需提醒。11:22设定本月减重五斤目标，从今天起晚上不吃饭。14:05头晕，可能是没睡好；15:41加重至站不稳，先坐下缓一缓。18:20到二院，医生告知妈妈要做造影，明日上午出结果。",
+      "source_count": 7
+    },
+    "dim:heart_rate": {
+      "content": "全天心率总体平稳：00:00–09:24及15:57–23:58多在66.4–73.6间交替（均值68.8/73.0）。09:30出现短暂升高，均值78.0、最高79.0。15:36心率由72.4骤升至124.0（delta +51.6），15:40与15:47两次升至131–132（最高132.0），15:50回落至124.0；15:51骤降至70.0（delta −54.0），随后恢复基线。23:58末次记录72.4。",
+      "source_count": 290
+    },
+    "dim:external_chat": {
+      "content": "09:25，同事小王转述李总：合同周三必须到，否则就重谈。21:30，朋友阿强询问周末是否一起去钓鱼，记录中未提及答复或是否成行。",
+      "source_count": 2
+    },
+    "dim:camera_visual": {
+      "content": "15:45，画面中一人扶着桌子站立不稳，面色苍白。",
+      "source_count": 1
+    },
+    "dim:calendar": {
+      "content": "当天记录了两项日程安排：周五15:00公司年度体检；周四10:00项目周会。",
+      "source_count": 2
+    },
+    "dim:app_usage": {
+      "content": "14:20，使用文档编辑 App，用时 47 分钟。",
+      "source_count": 1
+    }
+  },
+  "per_dimension_echo": {
+    "dim:payment": {
+      "responsible": [
+        "母亲住院（市二院心内科）"
+      ],
+      "hit": [
+        "母亲住院（市二院心内科）"
+      ],
+      "rate": "1/1"
+    },
+    "dim:order": {
+      "responsible": [],
+      "hit": [],
+      "rate": "n/a"
+    },
+    "dim:note": {
+      "responsible": [
+        "承诺周三前给张总合同",
+        "需带医保卡身份证"
+      ],
+      "hit": [
+        "承诺周三前给张总合同",
+        "需带医保卡身份证"
+      ],
+      "rate": "2/2"
+    },
+    "dim:mic_audio": {
+      "responsible": [
+        "母亲住院（市二院心内科）",
+        "承诺周三前给张总合同",
+        "头晕加重（两次递进）",
+        "与小李的工作冲突",
+        "减重五斤目标"
+      ],
+      "hit": [
+        "母亲住院（市二院心内科）",
+        "承诺周三前给张总合同",
+        "头晕加重（两次递进）",
+        "与小李的工作冲突",
+        "减重五斤目标"
+      ],
+      "rate": "5/5"
+    },
+    "dim:heart_rate": {
+      "responsible": [],
+      "hit": [],
+      "rate": "n/a"
+    },
+    "dim:external_chat": {
+      "responsible": [
+        "承诺周三前给张总合同"
+      ],
+      "hit": [
+        "承诺周三前给张总合同"
+      ],
+      "rate": "1/1"
+    },
+    "dim:camera_visual": {
+      "responsible": [
+        "头晕加重（两次递进）"
+      ],
+      "hit": [],
+      "rate": "0/1"
+    },
+    "dim:calendar": {
+      "responsible": [
+        "周五体检 / 周四周会"
+      ],
+      "hit": [
+        "周五体检 / 周四周会"
+      ],
+      "rate": "1/1"
+    },
+    "dim:app_usage": {
+      "responsible": [],
+      "hit": [],
+      "rate": "n/a"
+    }
+  },
+  "cross_dimension_covered": "7/7",
+  "cross_dimension_detail": {
+    "母亲住院（市二院心内科）": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:mic_audio",
+        "dim:payment"
+      ]
+    },
+    "承诺周三前给张总合同": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:external_chat",
+        "dim:mic_audio",
+        "dim:note"
+      ]
+    },
+    "头晕加重（两次递进）": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:mic_audio"
+      ]
+    },
+    "与小李的工作冲突": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:mic_audio"
+      ]
+    },
+    "减重五斤目标": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:mic_audio"
+      ]
+    },
+    "周五体检 / 周四周会": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:calendar"
+      ]
+    },
+    "需带医保卡身份证": {
+      "covered": true,
+      "hit_in_dims": [
+        "dim:note"
+      ]
+    }
+  },
+  "noise_pollution_by_dimension": {},
+  "daily_digest_present": true,
+  "daily_digest_content": "今天得知妈妈昨晚住进市第二人民医院心内科；与小李因项目分工吵架，小李不愿接测试。小王转述李总：合同周三须到，否则重谈；我答应张总周三前发初稿，交付周期30天、违约金5%。定下本月减重五斤、今晚起不吃饭；缴住院预缴金12000元。下午头晕，用文档App 47分钟；15:36心率骤升至124，15:40、15:47达131–132，站不稳、扶桌时面色苍白，15:51回落基线。提醒带医保卡和身份证；18:20到医院，医生告知妈妈需造影，明日上午出结果。周四10:00项目周会、周五15:00公司年度体检；订护颈枕×1，预计周四送达。阿强约周末钓鱼，未记录答复或成行。",
+  "digest_echo": {
+    "responsible": [
+      "母亲住院（市二院心内科）",
+      "承诺周三前给张总合同",
+      "头晕加重（两次递进）",
+      "与小李的工作冲突",
+      "减重五斤目标",
+      "周五体检 / 周四周会",
+      "需带医保卡身份证"
+    ],
+    "hit": [
+      "母亲住院（市二院心内科）",
+      "承诺周三前给张总合同",
+      "头晕加重（两次递进）",
+      "与小李的工作冲突",
+      "减重五斤目标",
+      "周五体检 / 周四周会",
+      "需带医保卡身份证"
+    ],
+    "rate": "7/7"
+  }
+}

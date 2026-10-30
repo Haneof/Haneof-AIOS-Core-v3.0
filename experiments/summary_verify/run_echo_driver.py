@@ -50,27 +50,30 @@ def main() -> None:
     )
     now = sim_realtime.DATES[day_idx] + timedelta(days=1)
 
-    # 1) 各维度 DAY 总结（限定模式：不触发 digest，digest 单独提交便于续跑/控预算）
-    res = sched.run_due(
-        now=now, scales=(SummaryScale.DAY,), max_jobs=200,
-        dimensions=sched.active_dimensions(),
-    )
+    # 1) 全量 sweep（scheduler 已 fail-soft：digest 撞网关失败不中断其他维度）
+    res = sched.run_due(now=now, scales=(SummaryScale.DAY,), max_jobs=200)
+    for f in res.failed:
+        print(f"[driver] job 失败（下轮重试）: {f.job.dimension} {f.error[:80]}", flush=True)
     dims_done = sorted({
         store.get_payload(c.object_id)["metadata"]["dimension"] for c in res.commits
     })
     print(f"[driver] 维度 DAY 完成: {len(res.commits)} {dims_done}", flush=True)
 
-    # 2) 今日总览（digest）：全量 sweep 等价路径，幂等由 commit 保证
-    wins = sched._digest_candidate_windows(now=now)
+    # 2) 今日总览（digest）：若 sweep 中因网关失败未提交，再补一次
     digest_content = None
+    wins = sched._digest_candidate_windows(now=now)
     for start, end in wins:
         p = sched.digest_service.prepare(window_start=start, window_end=end)
         if not p.sources:
             continue
-        content = summary_handler_real_model(p)
-        c = sched.digest_service.commit(p, content=content, generated_at=now)
-        digest_content = content
-        print(f"[driver] digest 提交 {c.object_id} rev{c.revision}", flush=True)
+        try:
+            content = summary_handler_real_model(p)
+            c = sched.digest_service.commit(p, content=content, generated_at=now)
+            digest_content = content
+            print(f"[driver] digest 提交 {c.object_id} rev{c.revision}", flush=True)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[driver] digest 仍失败，分析继续（无 digest）："
+                  f"{type(exc).__name__}: {str(exc)[:80]}", flush=True)
 
     # 3) 分析（与 verify_summary.run_echo 同口径）
     day = sim_realtime.DAYS[day_idx]
