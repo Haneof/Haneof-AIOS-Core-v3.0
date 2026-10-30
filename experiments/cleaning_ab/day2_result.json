@@ -1,0 +1,525 @@
+{
+  "day": "DAY2_2026-10-29",
+  "mechanical": {
+    "kept": [
+      "m01",
+      "m02",
+      "m03",
+      "m04",
+      "m05",
+      "m06",
+      "m07",
+      "m08",
+      "m09",
+      "m10",
+      "m11",
+      "m12",
+      "m13",
+      "m14",
+      "m15",
+      "m16",
+      "m17",
+      "m18",
+      "p01",
+      "p02",
+      "p03",
+      "o01",
+      "c01",
+      "c02",
+      "n01",
+      "n02",
+      "n03",
+      "v01",
+      "v02",
+      "v03",
+      "a01",
+      "a02",
+      "a03",
+      "a04",
+      "x01",
+      "x02",
+      "x03",
+      "x04",
+      "x05",
+      "x06",
+      "hr"
+    ],
+    "dropped": [],
+    "failures": [],
+    "numeric_note": "1000采样 → 292段 + 4变化事件"
+  },
+  "ai_runs": [
+    {
+      "run": 1,
+      "elapsed": 100.4,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "reason": "无意义语气词"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "reason": "日期口误无价值"
+        },
+        {
+          "id": "m03",
+          "decision": "drop",
+          "reason": "快递已投驿站琐事"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "reason": "运动心率健康信号"
+        },
+        {
+          "id": "m05",
+          "decision": "keep",
+          "reason": "个税清缴截止待办"
+        },
+        {
+          "id": "m06",
+          "decision": "drop",
+          "reason": "玩笑非真实辞职"
+        },
+        {
+          "id": "m07",
+          "decision": "drop",
+          "reason": "无信息应答"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "reason": "皮疹健康信号"
+        },
+        {
+          "id": "m09",
+          "decision": "keep",
+          "reason": "服药记录"
+        },
+        {
+          "id": "m10",
+          "decision": "drop",
+          "reason": "午餐随口"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "reason": "皮疹好转"
+        },
+        {
+          "id": "m12",
+          "decision": "keep",
+          "reason": "夫妻争吵关系冲突"
+        },
+        {
+          "id": "m13",
+          "decision": "drop",
+          "reason": "无信息"
+        },
+        {
+          "id": "m14",
+          "decision": "keep",
+          "reason": "明日亲子游计划"
+        },
+        {
+          "id": "m15",
+          "decision": "drop",
+          "reason": "晚餐随口"
+        },
+        {
+          "id": "m16",
+          "decision": "keep",
+          "reason": "急诊挂号重要金额"
+        },
+        {
+          "id": "m17",
+          "decision": "drop",
+          "reason": "输入法抱怨"
+        },
+        {
+          "id": "m18",
+          "decision": "drop",
+          "reason": "入睡闲聊"
+        },
+        {
+          "id": "p01",
+          "decision": "drop",
+          "reason": "小额日常消费"
+        },
+        {
+          "id": "p02",
+          "decision": "keep",
+          "reason": "急诊挂号重要金额"
+        },
+        {
+          "id": "p03",
+          "decision": "drop",
+          "reason": "小额会员续费"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "reason": "明日门票订单"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "reason": "个税清缴截止日"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "reason": "家庭聚餐日程"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "reason": "用药疗程记录"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "reason": "乱码误触"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "reason": "明日出行待办"
+        },
+        {
+          "id": "v01",
+          "decision": "drop",
+          "reason": "环境背景"
+        },
+        {
+          "id": "v02",
+          "decision": "drop",
+          "reason": "环境背景"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "reason": "皮疹视觉佐证"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "reason": "商城广告"
+        },
+        {
+          "id": "a02",
+          "decision": "drop",
+          "reason": "瞬时应用使用"
+        },
+        {
+          "id": "a03",
+          "decision": "drop",
+          "reason": "系统推送"
+        },
+        {
+          "id": "a04",
+          "decision": "keep",
+          "reason": "860元支出通知"
+        },
+        {
+          "id": "x01",
+          "decision": "drop",
+          "reason": "无意义招呼"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "reason": "重复无信息"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "reason": "税务截止要求"
+        },
+        {
+          "id": "x04",
+          "decision": "drop",
+          "reason": "未确认社交邀约"
+        },
+        {
+          "id": "x05",
+          "decision": "drop",
+          "reason": "运营商广告链接"
+        },
+        {
+          "id": "x06",
+          "decision": "drop",
+          "reason": "钓鱼验证链接"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "reason": "心率健康数据"
+        }
+      ],
+      "n": 41
+    },
+    {
+      "run": 2,
+      "elapsed": 119.7,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "reason": "无意义发声"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "reason": "日期口误无价值"
+        },
+        {
+          "id": "m03",
+          "decision": "drop",
+          "reason": "快递已投一次性琐事"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "reason": "跑步心率异常信号"
+        },
+        {
+          "id": "m05",
+          "decision": "keep",
+          "reason": "个税清缴截止待办"
+        },
+        {
+          "id": "m06",
+          "decision": "drop",
+          "reason": "玩笑非真实辞职"
+        },
+        {
+          "id": "m07",
+          "decision": "drop",
+          "reason": "无信息应答"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "reason": "皮疹健康信号"
+        },
+        {
+          "id": "m09",
+          "decision": "keep",
+          "reason": "服药记录"
+        },
+        {
+          "id": "m10",
+          "decision": "drop",
+          "reason": "午餐闲聊"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "reason": "皮疹好转更新"
+        },
+        {
+          "id": "m12",
+          "decision": "keep",
+          "reason": "家庭冲突关系变化"
+        },
+        {
+          "id": "m13",
+          "decision": "drop",
+          "reason": "无信息内容"
+        },
+        {
+          "id": "m14",
+          "decision": "keep",
+          "reason": "明日亲子出行计划"
+        },
+        {
+          "id": "m15",
+          "decision": "drop",
+          "reason": "晚餐闲聊"
+        },
+        {
+          "id": "m16",
+          "decision": "keep",
+          "reason": "急诊挂号重要金额"
+        },
+        {
+          "id": "m17",
+          "decision": "drop",
+          "reason": "输入法抱怨"
+        },
+        {
+          "id": "m18",
+          "decision": "drop",
+          "reason": "入睡闲聊"
+        },
+        {
+          "id": "p01",
+          "decision": "drop",
+          "reason": "小额日常消费"
+        },
+        {
+          "id": "p02",
+          "decision": "keep",
+          "reason": "急诊挂号重要金额"
+        },
+        {
+          "id": "p03",
+          "decision": "keep",
+          "reason": "会员续费持续支出"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "reason": "明日门票订单"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "reason": "个税清缴截止日"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "reason": "明晚家庭聚餐"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "reason": "用药疗程记录"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "reason": "乱码误触"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "reason": "明日出行待办"
+        },
+        {
+          "id": "v01",
+          "decision": "drop",
+          "reason": "环境背景画面"
+        },
+        {
+          "id": "v02",
+          "decision": "drop",
+          "reason": "环境背景画面"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "reason": "皮疹视觉佐证"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "reason": "广告推送"
+        },
+        {
+          "id": "a02",
+          "decision": "keep",
+          "reason": "阅读活动观察"
+        },
+        {
+          "id": "a03",
+          "decision": "drop",
+          "reason": "系统推送"
+        },
+        {
+          "id": "a04",
+          "decision": "keep",
+          "reason": "银行支出佐证"
+        },
+        {
+          "id": "x01",
+          "decision": "drop",
+          "reason": "无意义招呼"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "reason": "重复招呼"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "reason": "税务截止要求"
+        },
+        {
+          "id": "x04",
+          "decision": "drop",
+          "reason": "未确认社交邀约"
+        },
+        {
+          "id": "x05",
+          "decision": "drop",
+          "reason": "营销短信"
+        },
+        {
+          "id": "x06",
+          "decision": "drop",
+          "reason": "钓鱼链接"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "reason": "心率健康数据"
+        }
+      ],
+      "n": 41
+    }
+  ],
+  "score": {
+    "noise_removal": 1.0,
+    "n_drop": 21,
+    "correctly_dropped": 21,
+    "false_dropped": [
+      "a02",
+      "x04"
+    ],
+    "n_keep": 20,
+    "round_agreement_drift": [
+      "p03",
+      "a02"
+    ]
+  },
+  "echo_mechanical": {
+    "tag": "机制清洗后",
+    "input_count": 41,
+    "input_chars": 1624,
+    "elapsed": 124.5,
+    "summary": "快递已放驿站\n晨跑心率飙到150\n个税汇算10月31日截止\n表示明天要辞职\n领导要求周五前交税\n胳膊起疹疑似海鲜过敏\n氯雷他定每天1片吃3天\n疹子好转不痒了\n与妻子因陪孩子吵架\n订了明日两张动物园票\n过敏急诊挂号860元\n明晚有家庭聚餐\n明天带娃水杯和帽子",
+    "hits": {
+      "海鲜过敏起疹+服药": true,
+      "个税汇算清缴截止10-31": true,
+      "与妻子因陪孩子吵架": true,
+      "明带娃去动物园": true,
+      "过敏急诊花费860": true,
+      "明晚家庭聚餐": true,
+      "记得带娃水杯帽子": true
+    },
+    "hit_count": 7
+  },
+  "echo_ai": {
+    "tag": "AI清洗后",
+    "input_count": 18,
+    "input_chars": 748,
+    "elapsed": 172.2,
+    "summary": "晨跑心率飙到150，仍坚持跑完\n个税汇算10月31日截止\n逾期不缴个税要交滞纳金\n领导要求个税周五前提交\n手臂起红疹，疑与海鲜有关\n服氯雷他定后疹子好转\n氯雷他定每日1片，吃3天\n过敏急诊挂号花了860元\n因不陪孩子与妻子吵架\n订了明天两张动物园门票\n明晚有家庭聚餐\n明天带娃要带水杯和帽子",
+    "hits": {
+      "海鲜过敏起疹+服药": true,
+      "个税汇算清缴截止10-31": true,
+      "与妻子因陪孩子吵架": true,
+      "明带娃去动物园": true,
+      "过敏急诊花费860": true,
+      "明晚家庭聚餐": true,
+      "记得带娃水杯帽子": true
+    },
+    "hit_count": 7
+  }
+}

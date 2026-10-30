@@ -1,0 +1,1025 @@
+{
+  "day": "DAY1_2026-10-28",
+  "mode": "audit",
+  "mechanical": {
+    "kept": [
+      "m01",
+      "m02",
+      "m03",
+      "m04",
+      "m05",
+      "m06",
+      "m07",
+      "m08",
+      "m09",
+      "m10",
+      "m11",
+      "m12",
+      "m13",
+      "m14",
+      "m15",
+      "m16",
+      "m17",
+      "m18",
+      "p01",
+      "p02",
+      "p03",
+      "o01",
+      "c01",
+      "c02",
+      "n01",
+      "n02",
+      "n03",
+      "v01",
+      "v02",
+      "v03",
+      "a01",
+      "a02",
+      "a03",
+      "a04",
+      "x01",
+      "x02",
+      "x03",
+      "x04",
+      "hr"
+    ],
+    "dropped": [],
+    "failures": [],
+    "numeric_note": "1000采样 → 288段 + 2变化事件"
+  },
+  "ai_runs": [
+    {
+      "run": 1,
+      "elapsed": 157.8,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义发声"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "自言自语无实质信息"
+        },
+        {
+          "id": "m03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "快递沟通属日常行为"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "母亲住院及就医安排"
+        },
+        {
+          "id": "m05",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义应答"
+        },
+        {
+          "id": "m06",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "与同事分工冲突"
+        },
+        {
+          "id": "m07",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "仅寒暄无新信息"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "合同初稿承诺与提醒"
+        },
+        {
+          "id": "m09",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义笑声"
+        },
+        {
+          "id": "m10",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "重复无新信息"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "减重目标与饮食计划"
+        },
+        {
+          "id": "m12",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "日常饮食行为记录"
+        },
+        {
+          "id": "m13",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "头晕健康信号"
+        },
+        {
+          "id": "m14",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "头晕加重健康信号"
+        },
+        {
+          "id": "m15",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "明确玩笑"
+        },
+        {
+          "id": "m16",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "造影检查及结果节点"
+        },
+        {
+          "id": "m17",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "系统使用卡顿行为"
+        },
+        {
+          "id": "m18",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "任务推迟至明天"
+        },
+        {
+          "id": "p01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "早餐消费行为记录"
+        },
+        {
+          "id": "p02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "住院预缴大额支出"
+        },
+        {
+          "id": "p03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "会员续费消费记录"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "订单及周四送达节点"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "周五体检日程"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "周四周会日程"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "合同条款与联系人"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "乱码误触"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "探病待办事项"
+        },
+        {
+          "id": "v01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "日常桌面行为记录"
+        },
+        {
+          "id": "v02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "用餐日常行为记录"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "面色苍白站立不稳"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "商城广告推送"
+        },
+        {
+          "id": "a02",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "新闻推送信息"
+        },
+        {
+          "id": "a03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "文档App使用时长"
+        },
+        {
+          "id": "a04",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "系统存储提示推送"
+        },
+        {
+          "id": "x01",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "同事主动联系寒暄"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "与上条重复无新信息"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "合同周三截止要求"
+        },
+        {
+          "id": "x04",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "朋友周末钓鱼邀约"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "心率数据按机制保留"
+        }
+      ],
+      "n": 39
+    },
+    {
+      "run": 2,
+      "elapsed": 196.0,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义发声"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "自言自语无实质信息"
+        },
+        {
+          "id": "m03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "快递安排属日常行为"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "母亲住院就医硬事实"
+        },
+        {
+          "id": "m05",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义应答"
+        },
+        {
+          "id": "m06",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "与同事发生冲突"
+        },
+        {
+          "id": "m07",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义应答"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "合同初稿承诺与截止"
+        },
+        {
+          "id": "m09",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义笑声"
+        },
+        {
+          "id": "m10",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "重复无新信息"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "减重目标与饮食计划"
+        },
+        {
+          "id": "m12",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "日常饮食行为记录"
+        },
+        {
+          "id": "m13",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "头晕健康信号"
+        },
+        {
+          "id": "m14",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "头晕加重健康信号"
+        },
+        {
+          "id": "m15",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "明显玩笑"
+        },
+        {
+          "id": "m16",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "造影检查与出结果节点"
+        },
+        {
+          "id": "m17",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "情绪化抱怨无实质信息"
+        },
+        {
+          "id": "m18",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无具体事项的搁置"
+        },
+        {
+          "id": "p01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "早餐消费记录"
+        },
+        {
+          "id": "p02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "住院预缴大额支出"
+        },
+        {
+          "id": "p03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "会员续费消费记录"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "订单与周四送达节点"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "周五体检日程"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "周四周会日程"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "合同条款与联系人"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "乱码误触"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "探病待办事项"
+        },
+        {
+          "id": "v01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "日常桌面场景记录"
+        },
+        {
+          "id": "v02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "两人用餐社交场景"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "站立不稳健康信号"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "商城广告推送"
+        },
+        {
+          "id": "a02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "关注球队兴趣行为"
+        },
+        {
+          "id": "a03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "文档编辑使用时长"
+        },
+        {
+          "id": "a04",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "系统提示推送"
+        },
+        {
+          "id": "x01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "同事主动联系"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "重复无新信息"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "合同截止与重谈风险"
+        },
+        {
+          "id": "x04",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "朋友钓鱼邀约"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "心率健康数据"
+        }
+      ],
+      "n": 39
+    }
+  ],
+  "guardrail_overrides": [],
+  "score": {
+    "drop_class_precision": 1.0,
+    "drop_class_recall": 0.571,
+    "n_true_garbage": 21,
+    "n_ai_garbage": 12,
+    "correctly_tagged": 12,
+    "label_false_drop": [],
+    "missed_garbage": [
+      "m03",
+      "m12",
+      "m17",
+      "m18",
+      "p01",
+      "p03",
+      "v01",
+      "v02",
+      "x01"
+    ],
+    "round_agreement_drift": [
+      "m17",
+      "m18",
+      "a02"
+    ],
+    "relevance_dist": {
+      "user": 32,
+      "other": 7
+    },
+    "cognition_label_threat": [],
+    "deletion_count": 0,
+    "planned_drops": [
+      {
+        "id": "a01",
+        "source": "dim:app_usage",
+        "content": "【XX商城】限时秒杀！全场3折起，点开领券>>",
+        "ai_reason": "商城广告推送",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "a02",
+        "source": "dim:app_usage",
+        "content": "【XX新闻】您关注的球队今日获胜",
+        "ai_reason": "新闻推送信息",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "a04",
+        "source": "dim:app_usage",
+        "content": "【系统】存储空间不足，建议清理",
+        "ai_reason": "系统存储提示推送",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m01",
+        "source": "dim:mic_audio",
+        "content": "嗯……啊……那个……",
+        "ai_reason": "无意义发声",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m02",
+        "source": "dim:mic_audio",
+        "content": "今天周二了吧？哦不对，周三。",
+        "ai_reason": "自言自语无实质信息",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m05",
+        "source": "dim:mic_audio",
+        "content": "啊？哦。行。",
+        "ai_reason": "无意义应答",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m07",
+        "source": "dim:mic_audio",
+        "content": "好的收到，谢谢，嗯嗯。",
+        "ai_reason": "仅寒暄无新信息",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m09",
+        "source": "dim:mic_audio",
+        "content": "哈哈哈笑死我了。",
+        "ai_reason": "无意义笑声",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m10",
+        "source": "dim:mic_audio",
+        "content": "哈哈哈笑死我了。",
+        "ai_reason": "重复无新信息",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m15",
+        "source": "dim:mic_audio",
+        "content": "明天是世界末日哈哈哈，开玩笑的。",
+        "ai_reason": "明确玩笑",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "n02",
+        "source": "dim:note",
+        "content": "便签：asdfghjkl",
+        "ai_reason": "乱码误触",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "x02",
+        "source": "dim:external_chat",
+        "content": "同事小王：在吗？",
+        "ai_reason": "与上条重复无新信息",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      }
+    ],
+    "kept_but_garbage": [
+      {
+        "id": "m03",
+        "source": "dim:mic_audio",
+        "content": "喂，快递放门口就行，谢谢啊。",
+        "ai_reason": "快递沟通属日常行为",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "m12",
+        "source": "dim:mic_audio",
+        "content": "午饭吃什么呢……随便吧。",
+        "ai_reason": "日常饮食行为记录",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "m17",
+        "source": "dim:mic_audio",
+        "content": "烦死了，这破系统又卡了。",
+        "ai_reason": "系统使用卡顿行为",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "m18",
+        "source": "dim:mic_audio",
+        "content": "算了不弄了，明天再说吧。",
+        "ai_reason": "任务推迟至明天",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "p01",
+        "source": "dim:payment",
+        "content": "早餐 便利店消费 12.5 元",
+        "ai_reason": "早餐消费行为记录",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "p03",
+        "source": "dim:payment",
+        "content": "视频会员自动续费 25 元",
+        "ai_reason": "会员续费消费记录",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "v01",
+        "source": "dim:camera_visual",
+        "content": "画面：桌面有一台笔记本电脑和一杯水。",
+        "ai_reason": "日常桌面行为记录",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "v02",
+        "source": "dim:camera_visual",
+        "content": "画面：餐桌上有两个人和三道菜。",
+        "ai_reason": "用餐日常行为记录",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "x01",
+        "source": "dim:external_chat",
+        "content": "同事小王：在吗？",
+        "ai_reason": "同事主动联系寒暄",
+        "verdict": "漏标(仍保留，无害)"
+      }
+    ]
+  },
+  "echo_mechanical": {
+    "tag": "全量(只标注不删除)",
+    "input_count": 39,
+    "input_chars": 1632,
+    "elapsed": 232.9,
+    "summary": "今天是周三\n母亲昨晚住院，市二院心内科\n早餐便利店消费12.5元\n与小李因项目分工吵架\n合同周三必到，否则重谈\n合同交付30天，违约金5%\n本月目标减重五斤，戒晚饭\n午饭两人三道菜\n住院预缴金12000元\n文档编辑App用了47分钟\n头晕加重，站立不稳脸色苍白\n记得给妈带医保卡和身份证\n医生安排造影，明早出结果\n视频会员自动续费25元\n系统卡顿，存储空间不足\n护颈枕已下单，周四送达\n阿强约周末钓鱼\n周四10:00项目周会\n周五15:00公司年度体检",
+    "hits": {
+      "母亲住院（市二院心内科）": true,
+      "承诺周三前给张总合同": true,
+      "头晕加重（两次递进）": true,
+      "与小李的工作冲突": true,
+      "减重五斤目标": true,
+      "周五体检 / 周四周会": true,
+      "需带医保卡身份证": true
+    },
+    "hit_count": 7
+  },
+  "echo_ai": null,
+  "second_pass_audit": {
+    "decisions": [
+      {
+        "id": "m01",
+        "action": "confirm",
+        "reason": "纯语气词无信息"
+      },
+      {
+        "id": "m02",
+        "action": "cancel",
+        "reason": "含星期日期事实"
+      },
+      {
+        "id": "m05",
+        "action": "confirm",
+        "reason": "纯应答无信息"
+      },
+      {
+        "id": "m07",
+        "action": "confirm",
+        "reason": "客套应答无新信息"
+      },
+      {
+        "id": "m09",
+        "action": "confirm",
+        "reason": "纯笑声无信息"
+      },
+      {
+        "id": "m10",
+        "action": "confirm",
+        "reason": "纯笑声无信息"
+      },
+      {
+        "id": "m15",
+        "action": "confirm",
+        "reason": "明确玩笑无真实信息"
+      },
+      {
+        "id": "n02",
+        "action": "confirm",
+        "reason": "乱码误触无内容"
+      },
+      {
+        "id": "a01",
+        "action": "confirm",
+        "reason": "商城广告推送"
+      },
+      {
+        "id": "a02",
+        "action": "cancel",
+        "reason": "含关注球队获胜事实"
+      },
+      {
+        "id": "a04",
+        "action": "confirm",
+        "reason": "系统存储提示"
+      },
+      {
+        "id": "x02",
+        "action": "cancel",
+        "reason": "同事主动寒暄联系"
+      }
+    ],
+    "elapsed": 196.9
+  },
+  "second_pass_score": {
+    "deletion_precision": 1.0,
+    "false_deletion": [],
+    "n_candidates": 12,
+    "n_confirmed": 9,
+    "n_canceled": 3,
+    "confirmed_true_garbage": [
+      "a01",
+      "a04",
+      "m01",
+      "m05",
+      "m07",
+      "m09",
+      "m10",
+      "m15",
+      "n02"
+    ],
+    "canceled_true_garbage": [
+      "a02",
+      "m02",
+      "x02"
+    ],
+    "deletion_recall": 0.75,
+    "deletion_table": [
+      {
+        "id": "a01",
+        "source": "dim:app_usage",
+        "content": "【XX商城】限时秒杀！全场3折起，点开领券>>",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "商城广告推送"
+      },
+      {
+        "id": "a02",
+        "source": "dim:app_usage",
+        "content": "【XX新闻】您关注的球队今日获胜",
+        "action": "cancel",
+        "gt": "DROP",
+        "verdict": "漏删(仍留，无害)",
+        "reason": "含关注球队获胜事实"
+      },
+      {
+        "id": "a04",
+        "source": "dim:app_usage",
+        "content": "【系统】存储空间不足，建议清理",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "系统存储提示"
+      },
+      {
+        "id": "m01",
+        "source": "dim:mic_audio",
+        "content": "嗯……啊……那个……",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "纯语气词无信息"
+      },
+      {
+        "id": "m02",
+        "source": "dim:mic_audio",
+        "content": "今天周二了吧？哦不对，周三。",
+        "action": "cancel",
+        "gt": "DROP",
+        "verdict": "漏删(仍留，无害)",
+        "reason": "含星期日期事实"
+      },
+      {
+        "id": "m05",
+        "source": "dim:mic_audio",
+        "content": "啊？哦。行。",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "纯应答无信息"
+      },
+      {
+        "id": "m07",
+        "source": "dim:mic_audio",
+        "content": "好的收到，谢谢，嗯嗯。",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "客套应答无新信息"
+      },
+      {
+        "id": "m09",
+        "source": "dim:mic_audio",
+        "content": "哈哈哈笑死我了。",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "纯笑声无信息"
+      },
+      {
+        "id": "m10",
+        "source": "dim:mic_audio",
+        "content": "哈哈哈笑死我了。",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "纯笑声无信息"
+      },
+      {
+        "id": "m15",
+        "source": "dim:mic_audio",
+        "content": "明天是世界末日哈哈哈，开玩笑的。",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "明确玩笑无真实信息"
+      },
+      {
+        "id": "n02",
+        "source": "dim:note",
+        "content": "便签：asdfghjkl",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "乱码误触无内容"
+      },
+      {
+        "id": "x02",
+        "source": "dim:external_chat",
+        "content": "同事小王：在吗？",
+        "action": "cancel",
+        "gt": "DROP",
+        "verdict": "漏删(仍留，无害)",
+        "reason": "同事主动寒暄联系"
+      }
+    ]
+  },
+  "adversarial": {
+    "injected_keep": [
+      "m04",
+      "m06",
+      "m08",
+      "m11",
+      "m13",
+      "m14",
+      "m16",
+      "p02"
+    ],
+    "saved_by_gate": [
+      "m04",
+      "m06",
+      "m08",
+      "m11",
+      "m13",
+      "m14",
+      "m16",
+      "p02"
+    ],
+    "save_rate": 1.0,
+    "audit": {
+      "decisions": [
+        {
+          "id": "m04",
+          "action": "cancel",
+          "reason": "母亲住院，含就医安排"
+        },
+        {
+          "id": "m06",
+          "action": "cancel",
+          "reason": "项目分工冲突，关系变化"
+        },
+        {
+          "id": "m08",
+          "action": "cancel",
+          "reason": "承诺周三交合同，需提醒"
+        },
+        {
+          "id": "m11",
+          "action": "cancel",
+          "reason": "减重目标与饮食计划"
+        },
+        {
+          "id": "m13",
+          "action": "cancel",
+          "reason": "头晕属健康信号"
+        },
+        {
+          "id": "m14",
+          "action": "cancel",
+          "reason": "头晕严重，需关注"
+        },
+        {
+          "id": "m16",
+          "action": "cancel",
+          "reason": "造影检查及出结果时间"
+        },
+        {
+          "id": "p02",
+          "action": "cancel",
+          "reason": "住院预缴金额信息"
+        }
+      ],
+      "elapsed": 74.8
+    }
+  }
+}

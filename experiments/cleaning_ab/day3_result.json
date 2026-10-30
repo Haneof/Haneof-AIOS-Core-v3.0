@@ -1,0 +1,505 @@
+{
+  "day": "DAY3_2026-10-30",
+  "mechanical": {
+    "kept": [
+      "m01",
+      "m02",
+      "m03",
+      "m04",
+      "m05",
+      "m06",
+      "m07",
+      "m08",
+      "m09",
+      "m10",
+      "m11",
+      "m12",
+      "m13",
+      "m14",
+      "m15",
+      "m16",
+      "m17",
+      "p01",
+      "p02",
+      "p03",
+      "o01",
+      "c01",
+      "c02",
+      "n01",
+      "n02",
+      "n03",
+      "v01",
+      "v02",
+      "v03",
+      "a01",
+      "a02",
+      "a03",
+      "a04",
+      "x01",
+      "x02",
+      "x03",
+      "x04",
+      "x05",
+      "hr"
+    ],
+    "dropped": [],
+    "failures": [],
+    "numeric_note": "1000采样 → 290段 + 2变化事件"
+  },
+  "ai_runs": [
+    {
+      "run": 1,
+      "elapsed": 157.0,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "reason": "无意义语气词"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "reason": "仅确认星期"
+        },
+        {
+          "id": "m03",
+          "decision": "drop",
+          "reason": "错过班车已完结"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "reason": "改签9点多付80元"
+        },
+        {
+          "id": "m05",
+          "decision": "keep",
+          "reason": "夜间血氧91%偏低"
+        },
+        {
+          "id": "m06",
+          "decision": "drop",
+          "reason": "无信息应答"
+        },
+        {
+          "id": "m07",
+          "decision": "keep",
+          "reason": "老板周一约谈"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "reason": "孩子下周三话剧"
+        },
+        {
+          "id": "m09",
+          "decision": "drop",
+          "reason": "午餐随意闲聊"
+        },
+        {
+          "id": "m10",
+          "decision": "drop",
+          "reason": "电视背景声"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "reason": "承诺周五前交月报"
+        },
+        {
+          "id": "m12",
+          "decision": "drop",
+          "reason": "模糊抱怨无事实"
+        },
+        {
+          "id": "m13",
+          "decision": "keep",
+          "reason": "白天血氧97%正常"
+        },
+        {
+          "id": "m14",
+          "decision": "keep",
+          "reason": "晚间清淡饮食计划"
+        },
+        {
+          "id": "m15",
+          "decision": "keep",
+          "reason": "月报模板在D盘"
+        },
+        {
+          "id": "m16",
+          "decision": "drop",
+          "reason": "日常作息闲聊"
+        },
+        {
+          "id": "m17",
+          "decision": "drop",
+          "reason": "广告杂音"
+        },
+        {
+          "id": "p01",
+          "decision": "keep",
+          "reason": "改签补差80元"
+        },
+        {
+          "id": "p02",
+          "decision": "drop",
+          "reason": "普通午餐消费"
+        },
+        {
+          "id": "p03",
+          "decision": "keep",
+          "reason": "会员续费属持续承诺"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "reason": "耗材订单周三到"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "reason": "下周三孩子话剧"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "reason": "周一与老板面谈"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "reason": "月报模板及Q3数据"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "reason": "乱码误触"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "reason": "待办带演出服"
+        },
+        {
+          "id": "v01",
+          "decision": "keep",
+          "reason": "佐证出行准备"
+        },
+        {
+          "id": "v02",
+          "decision": "drop",
+          "reason": "用餐环境画面"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "reason": "血氧91%佐证"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "reason": "新闻推送"
+        },
+        {
+          "id": "a02",
+          "decision": "drop",
+          "reason": "仅应用时长"
+        },
+        {
+          "id": "a03",
+          "decision": "drop",
+          "reason": "系统低电量推送"
+        },
+        {
+          "id": "a04",
+          "decision": "drop",
+          "reason": "疑似钓鱼链接"
+        },
+        {
+          "id": "x01",
+          "decision": "drop",
+          "reason": "无意义招呼"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "reason": "重复招呼"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "reason": "佐证周一详谈"
+        },
+        {
+          "id": "x04",
+          "decision": "drop",
+          "reason": "未确认的邀约"
+        },
+        {
+          "id": "x05",
+          "decision": "drop",
+          "reason": "广告钓鱼链接"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "reason": "心率数据流待压缩"
+        }
+      ],
+      "n": 39
+    },
+    {
+      "run": 2,
+      "elapsed": 123.8,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "reason": "无意义语气词"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "reason": "仅确认星期"
+        },
+        {
+          "id": "m03",
+          "decision": "keep",
+          "reason": "错过7:20火车"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "reason": "改签9点票多付80元"
+        },
+        {
+          "id": "m05",
+          "decision": "keep",
+          "reason": "夜间血氧最低91%"
+        },
+        {
+          "id": "m06",
+          "decision": "drop",
+          "reason": "随口应答"
+        },
+        {
+          "id": "m07",
+          "decision": "keep",
+          "reason": "老板约周一谈话"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "reason": "孩子下周三话剧"
+        },
+        {
+          "id": "m09",
+          "decision": "drop",
+          "reason": "午餐随意无信息"
+        },
+        {
+          "id": "m10",
+          "decision": "drop",
+          "reason": "电视背景声"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "reason": "承诺周五前发月报"
+        },
+        {
+          "id": "m12",
+          "decision": "drop",
+          "reason": "模糊抱怨无信息"
+        },
+        {
+          "id": "m13",
+          "decision": "keep",
+          "reason": "白天血氧97%正常"
+        },
+        {
+          "id": "m14",
+          "decision": "drop",
+          "reason": "随口饮食打算"
+        },
+        {
+          "id": "m15",
+          "decision": "keep",
+          "reason": "月报模板在D盘"
+        },
+        {
+          "id": "m16",
+          "decision": "drop",
+          "reason": "作息瞬时状态"
+        },
+        {
+          "id": "m17",
+          "decision": "drop",
+          "reason": "广告杂音"
+        },
+        {
+          "id": "p01",
+          "decision": "keep",
+          "reason": "改签补差80元"
+        },
+        {
+          "id": "p02",
+          "decision": "drop",
+          "reason": "普通午餐消费"
+        },
+        {
+          "id": "p03",
+          "decision": "keep",
+          "reason": "会员续费属持续支出"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "reason": "耗材订单周三到"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "reason": "下周三孩子话剧"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "reason": "周一与老板面谈"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "reason": "月报模板含Q3数据"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "reason": "乱码输入"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "reason": "待办带话剧服装"
+        },
+        {
+          "id": "v01",
+          "decision": "drop",
+          "reason": "环境画面无新信息"
+        },
+        {
+          "id": "v02",
+          "decision": "drop",
+          "reason": "用餐环境背景"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "reason": "血氧仪显示91%"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "reason": "新闻推送"
+        },
+        {
+          "id": "a02",
+          "decision": "drop",
+          "reason": "应用时长瞬时数据"
+        },
+        {
+          "id": "a03",
+          "decision": "drop",
+          "reason": "系统电量推送"
+        },
+        {
+          "id": "a04",
+          "decision": "drop",
+          "reason": "疑似钓鱼链接"
+        },
+        {
+          "id": "x01",
+          "decision": "drop",
+          "reason": "无信息寒暄"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "reason": "重复寒暄"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "reason": "老板确认周一详谈"
+        },
+        {
+          "id": "x04",
+          "decision": "drop",
+          "reason": "邀约未确认"
+        },
+        {
+          "id": "x05",
+          "decision": "drop",
+          "reason": "运营商广告链接"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "reason": "心率数据流需保留"
+        }
+      ],
+      "n": 39
+    }
+  ],
+  "score": {
+    "noise_removal": 0.85,
+    "n_drop": 20,
+    "correctly_dropped": 17,
+    "false_dropped": [
+      "m03",
+      "a02",
+      "x04"
+    ],
+    "n_keep": 19,
+    "round_agreement_drift": [
+      "m03",
+      "m14",
+      "v01"
+    ]
+  },
+  "echo_mechanical": {
+    "tag": "机制清洗后",
+    "input_count": 39,
+    "input_chars": 1503,
+    "elapsed": 183.2,
+    "summary": "昨晚没睡好\n没赶上7:20的火车\n改签9点，多付80元\n血氧仪耗材周三到\n夜里血氧最低91%\n白天血氧97%正常\n同事大刘两次找我\n老板约周一详谈\n孩子学校下周三话剧\n午餐花了35元\n月报周五前发周爸\n话费礼包待领取\n阿强约周末钓鱼\n月报模板在D盘\n会员续费30元\n账户异常被锁待验证\n记得给孩子带演出服",
+    "hits": {
+      "错过7:20火车并改签": true,
+      "夜间低血氧91%": true,
+      "老板周一面谈": true,
+      "孩子下周三话剧": true,
+      "周五前交项目月报给周爸": true,
+      "白天血氧正常97%": true,
+      "给孩子带话剧衣服": true
+    },
+    "hit_count": 7
+  },
+  "echo_ai": {
+    "tag": "AI清洗后",
+    "input_count": 19,
+    "input_chars": 752,
+    "elapsed": 101.7,
+    "summary": "火车改签9点，补差80元\n昨晚没睡好\n夜间血氧最低91%\n白天血氧97%正常\n血氧仪耗材预计周三到\n周一与老板一对一面谈\n下周三孩子学校话剧\n项目月报周五前发周爸\n月报模板在D盘，含Q3数据\n会员续费30元\n给孩子带话剧演出的衣服",
+    "hits": {
+      "错过7:20火车并改签": true,
+      "夜间低血氧91%": true,
+      "老板周一面谈": true,
+      "孩子下周三话剧": true,
+      "周五前交项目月报给周爸": true,
+      "白天血氧正常97%": true,
+      "给孩子带话剧衣服": true
+    },
+    "hit_count": 7
+  }
+}

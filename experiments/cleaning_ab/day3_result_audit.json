@@ -1,0 +1,1030 @@
+{
+  "day": "DAY3_2026-10-30",
+  "mode": "audit",
+  "mechanical": {
+    "kept": [
+      "m01",
+      "m02",
+      "m03",
+      "m04",
+      "m05",
+      "m06",
+      "m07",
+      "m08",
+      "m09",
+      "m10",
+      "m11",
+      "m12",
+      "m13",
+      "m14",
+      "m15",
+      "m16",
+      "m17",
+      "p01",
+      "p02",
+      "p03",
+      "o01",
+      "c01",
+      "c02",
+      "n01",
+      "n02",
+      "n03",
+      "v01",
+      "v02",
+      "v03",
+      "a01",
+      "a02",
+      "a03",
+      "a04",
+      "x01",
+      "x02",
+      "x03",
+      "x04",
+      "x05",
+      "hr"
+    ],
+    "dropped": [],
+    "failures": [],
+    "numeric_note": "1000采样 → 290段 + 2变化事件"
+  },
+  "ai_runs": [
+    {
+      "run": 1,
+      "elapsed": 161.6,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义发声"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无信息闲聊"
+        },
+        {
+          "id": "m03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "错过火车行程"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "改签时间与费用"
+        },
+        {
+          "id": "m05",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "夜间血氧偏低"
+        },
+        {
+          "id": "m06",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义应答"
+        },
+        {
+          "id": "m07",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "老板约谈事件"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "孩子话剧安排"
+        },
+        {
+          "id": "m09",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无信息闲聊"
+        },
+        {
+          "id": "m10",
+          "decision": "drop",
+          "relevance": "media",
+          "reason": "电视背景噪声"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "承诺周爸月报"
+        },
+        {
+          "id": "m12",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "模糊抱怨无信息"
+        },
+        {
+          "id": "m13",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "白天血氧正常"
+        },
+        {
+          "id": "m14",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "晚餐清淡计划"
+        },
+        {
+          "id": "m15",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "月报模板位置"
+        },
+        {
+          "id": "m16",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "作息与早起"
+        },
+        {
+          "id": "m17",
+          "decision": "drop",
+          "relevance": "media",
+          "reason": "电视广告杂音"
+        },
+        {
+          "id": "p01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "改签支出80元"
+        },
+        {
+          "id": "p02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "午餐消费记录"
+        },
+        {
+          "id": "p03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "会员续费消费"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "耗材订单周三到"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "话剧日程"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "老板面谈日程"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "月报模板与数据"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "乱码便签"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "话剧服装待办"
+        },
+        {
+          "id": "v01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "出行行李行为"
+        },
+        {
+          "id": "v02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "独自用餐行为"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "血氧仪读数91"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "新闻推送"
+        },
+        {
+          "id": "a02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "邮件App使用40分"
+        },
+        {
+          "id": "a03",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "系统电量推送"
+        },
+        {
+          "id": "a04",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "钓鱼验证推送"
+        },
+        {
+          "id": "x01",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "同事发起联系"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "重复无新信息"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "老板面谈安慰"
+        },
+        {
+          "id": "x04",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "朋友钓鱼邀约"
+        },
+        {
+          "id": "x05",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "运营商营销短信"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "全天心率数据"
+        }
+      ],
+      "n": 39
+    },
+    {
+      "run": 2,
+      "elapsed": 166.8,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义发声"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无信息自言自语"
+        },
+        {
+          "id": "m03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "误车行程事实"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "改签贵了80元"
+        },
+        {
+          "id": "m05",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "夜间血氧91%偏低"
+        },
+        {
+          "id": "m06",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义应答"
+        },
+        {
+          "id": "m07",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "老板约谈安排"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "孩子话剧待办"
+        },
+        {
+          "id": "m09",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无信息闲聊"
+        },
+        {
+          "id": "m10",
+          "decision": "drop",
+          "relevance": "media",
+          "reason": "电视背景声"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "承诺周五交月报"
+        },
+        {
+          "id": "m12",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无信息抱怨"
+        },
+        {
+          "id": "m13",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "白天血氧97%正常"
+        },
+        {
+          "id": "m14",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "晚餐清淡计划"
+        },
+        {
+          "id": "m15",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "月报模板位置"
+        },
+        {
+          "id": "m16",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "作息与早起"
+        },
+        {
+          "id": "m17",
+          "decision": "drop",
+          "relevance": "media",
+          "reason": "电视广告杂音"
+        },
+        {
+          "id": "p01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "改签扣款80元"
+        },
+        {
+          "id": "p02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "午餐支出35元"
+        },
+        {
+          "id": "p03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "会员续费30元"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "耗材订单周三到"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "孩子话剧日程"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "老板面谈日程"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "月报模板与Q3数据"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "乱码误触"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "准备话剧服装"
+        },
+        {
+          "id": "v01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "出行准备行为"
+        },
+        {
+          "id": "v02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "独自用餐行为"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "血氧仪显示91%"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "新闻系统推送"
+        },
+        {
+          "id": "a02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "邮件App使用40分钟"
+        },
+        {
+          "id": "a03",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "系统电量推送"
+        },
+        {
+          "id": "a04",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "疑似钓鱼链接"
+        },
+        {
+          "id": "x01",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "同事主动联系"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "重复无新信息"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "老板安抚互动"
+        },
+        {
+          "id": "x04",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "朋友钓鱼邀约"
+        },
+        {
+          "id": "x05",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "运营商广告链接"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "心率健康遥测"
+        }
+      ],
+      "n": 39
+    }
+  ],
+  "guardrail_overrides": [],
+  "score": {
+    "drop_class_precision": 1.0,
+    "drop_class_recall": 0.65,
+    "n_true_garbage": 20,
+    "n_ai_garbage": 13,
+    "correctly_tagged": 13,
+    "label_false_drop": [],
+    "missed_garbage": [
+      "m14",
+      "m16",
+      "p02",
+      "p03",
+      "v01",
+      "v02",
+      "x01"
+    ],
+    "round_agreement_drift": [],
+    "relevance_dist": {
+      "user": 31,
+      "media": 2,
+      "other": 6
+    },
+    "cognition_label_threat": [],
+    "deletion_count": 0,
+    "planned_drops": [
+      {
+        "id": "a01",
+        "source": "dim:app_usage",
+        "content": "【XX新闻】您关注球队获胜",
+        "ai_reason": "新闻推送",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "a03",
+        "source": "dim:app_usage",
+        "content": "【系统】电量低",
+        "ai_reason": "系统电量推送",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "a04",
+        "source": "dim:app_usage",
+        "content": "【安全】账户异常已被锁定，点击 t.cn/xx 验证",
+        "ai_reason": "钓鱼验证推送",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m01",
+        "source": "dim:mic_audio",
+        "content": "呃……那个……",
+        "ai_reason": "无意义发声",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m02",
+        "source": "dim:mic_audio",
+        "content": "今天周一？对周一。",
+        "ai_reason": "无信息闲聊",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m06",
+        "source": "dim:mic_audio",
+        "content": "啊行好。",
+        "ai_reason": "无意义应答",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m09",
+        "source": "dim:mic_audio",
+        "content": "中午吃啥随便。",
+        "ai_reason": "无信息闲聊",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m10",
+        "source": "dim:mic_audio",
+        "content": "电视里放着新闻，听不清说了啥。",
+        "ai_reason": "电视背景噪声",
+        "relevance": "media",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m12",
+        "source": "dim:mic_audio",
+        "content": "烦死了又卡。",
+        "ai_reason": "模糊抱怨无信息",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m17",
+        "source": "dim:mic_audio",
+        "content": "（电视声）……广告……（杂音）",
+        "ai_reason": "电视广告杂音",
+        "relevance": "media",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "n02",
+        "source": "dim:note",
+        "content": "便签：zxcvbnm",
+        "ai_reason": "乱码便签",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "x02",
+        "source": "dim:external_chat",
+        "content": "同事大刘：在吗",
+        "ai_reason": "重复无新信息",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "x05",
+        "source": "dim:external_chat",
+        "content": "【10086】话费礼包待领 t.cn/yy",
+        "ai_reason": "运营商营销短信",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      }
+    ],
+    "kept_but_garbage": [
+      {
+        "id": "m14",
+        "source": "dim:mic_audio",
+        "content": "晚上吃点清淡的。",
+        "ai_reason": "晚餐清淡计划",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "m16",
+        "source": "dim:mic_audio",
+        "content": "睡了明天还得早起。",
+        "ai_reason": "作息与早起",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "p02",
+        "source": "dim:payment",
+        "content": "午餐 35 元",
+        "ai_reason": "午餐消费记录",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "p03",
+        "source": "dim:payment",
+        "content": "会员续费 30 元",
+        "ai_reason": "会员续费消费",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "v01",
+        "source": "dim:camera_visual",
+        "content": "画面：玄关地上有行李箱和鞋。",
+        "ai_reason": "出行行李行为",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "v02",
+        "source": "dim:camera_visual",
+        "content": "画面：餐桌一人一菜。",
+        "ai_reason": "独自用餐行为",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "x01",
+        "source": "dim:external_chat",
+        "content": "同事大刘：在吗",
+        "ai_reason": "同事发起联系",
+        "verdict": "漏标(仍保留，无害)"
+      }
+    ]
+  },
+  "echo_mechanical": {
+    "tag": "全量(只标注不删除)",
+    "input_count": 39,
+    "input_chars": 1503,
+    "elapsed": 153.4,
+    "summary": "错过7:20火车，改签9点\n改签补差80元\n昨晚没睡好\n夜间血氧最低91%\n白天血氧正常97%\n血氧仪耗材已下单，周三到\n周一与老板一对一面谈\n下周三孩子学校有话剧\n给孩子准备话剧演出衣服\n项目月报周五前发周爸\n月报模板在D盘，含Q3数据\n账户异常被锁定，需验证\n午餐花费35元\n会员续费30元\n朋友阿强约周末钓鱼\n关注球队获胜\n邮件App使用40分钟",
+    "hits": {
+      "错过7:20火车并改签": true,
+      "夜间低血氧91%": true,
+      "老板周一面谈": true,
+      "孩子下周三话剧": true,
+      "周五前交项目月报给周爸": true,
+      "白天血氧正常97%": true,
+      "给孩子带话剧衣服": true
+    },
+    "hit_count": 7
+  },
+  "echo_ai": null,
+  "second_pass_audit": {
+    "decisions": [
+      {
+        "id": "m01",
+        "action": "confirm",
+        "reason": "纯语气填充无信息"
+      },
+      {
+        "id": "m02",
+        "action": "confirm",
+        "reason": "随口确认星期无价值"
+      },
+      {
+        "id": "m06",
+        "action": "confirm",
+        "reason": "纯应答无实质信息"
+      },
+      {
+        "id": "m09",
+        "action": "cancel",
+        "reason": "记录用户午餐日常行为"
+      },
+      {
+        "id": "m10",
+        "action": "confirm",
+        "reason": "电视背景声无内容"
+      },
+      {
+        "id": "m12",
+        "action": "cancel",
+        "reason": "含设备反复卡顿状况"
+      },
+      {
+        "id": "m17",
+        "action": "confirm",
+        "reason": "电视广告杂音"
+      },
+      {
+        "id": "n02",
+        "action": "confirm",
+        "reason": "乱码便签无意义"
+      },
+      {
+        "id": "a01",
+        "action": "cancel",
+        "reason": "含关注球队获胜信息"
+      },
+      {
+        "id": "a03",
+        "action": "confirm",
+        "reason": "系统电量推送无价值"
+      },
+      {
+        "id": "a04",
+        "action": "cancel",
+        "reason": "含账户被锁定重要事件"
+      },
+      {
+        "id": "x02",
+        "action": "cancel",
+        "reason": "同事寒暄含关系信息"
+      },
+      {
+        "id": "x05",
+        "action": "confirm",
+        "reason": "运营商营销广告"
+      }
+    ],
+    "elapsed": 186.4
+  },
+  "second_pass_score": {
+    "deletion_precision": 1.0,
+    "false_deletion": [],
+    "n_candidates": 13,
+    "n_confirmed": 8,
+    "n_canceled": 5,
+    "confirmed_true_garbage": [
+      "a03",
+      "m01",
+      "m02",
+      "m06",
+      "m10",
+      "m17",
+      "n02",
+      "x05"
+    ],
+    "canceled_true_garbage": [
+      "a01",
+      "a04",
+      "m09",
+      "m12",
+      "x02"
+    ],
+    "deletion_recall": 0.615,
+    "deletion_table": [
+      {
+        "id": "a01",
+        "source": "dim:app_usage",
+        "content": "【XX新闻】您关注球队获胜",
+        "action": "cancel",
+        "gt": "DROP",
+        "verdict": "漏删(仍留，无害)",
+        "reason": "含关注球队获胜信息"
+      },
+      {
+        "id": "a03",
+        "source": "dim:app_usage",
+        "content": "【系统】电量低",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "系统电量推送无价值"
+      },
+      {
+        "id": "a04",
+        "source": "dim:app_usage",
+        "content": "【安全】账户异常已被锁定，点击 t.cn/xx 验证",
+        "action": "cancel",
+        "gt": "DROP",
+        "verdict": "漏删(仍留，无害)",
+        "reason": "含账户被锁定重要事件"
+      },
+      {
+        "id": "m01",
+        "source": "dim:mic_audio",
+        "content": "呃……那个……",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "纯语气填充无信息"
+      },
+      {
+        "id": "m02",
+        "source": "dim:mic_audio",
+        "content": "今天周一？对周一。",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "随口确认星期无价值"
+      },
+      {
+        "id": "m06",
+        "source": "dim:mic_audio",
+        "content": "啊行好。",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "纯应答无实质信息"
+      },
+      {
+        "id": "m09",
+        "source": "dim:mic_audio",
+        "content": "中午吃啥随便。",
+        "action": "cancel",
+        "gt": "DROP",
+        "verdict": "漏删(仍留，无害)",
+        "reason": "记录用户午餐日常行为"
+      },
+      {
+        "id": "m10",
+        "source": "dim:mic_audio",
+        "content": "电视里放着新闻，听不清说了啥。",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "电视背景声无内容"
+      },
+      {
+        "id": "m12",
+        "source": "dim:mic_audio",
+        "content": "烦死了又卡。",
+        "action": "cancel",
+        "gt": "DROP",
+        "verdict": "漏删(仍留，无害)",
+        "reason": "含设备反复卡顿状况"
+      },
+      {
+        "id": "m17",
+        "source": "dim:mic_audio",
+        "content": "（电视声）……广告……（杂音）",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "电视广告杂音"
+      },
+      {
+        "id": "n02",
+        "source": "dim:note",
+        "content": "便签：zxcvbnm",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "乱码便签无意义"
+      },
+      {
+        "id": "x02",
+        "source": "dim:external_chat",
+        "content": "同事大刘：在吗",
+        "action": "cancel",
+        "gt": "DROP",
+        "verdict": "漏删(仍留，无害)",
+        "reason": "同事寒暄含关系信息"
+      },
+      {
+        "id": "x05",
+        "source": "dim:external_chat",
+        "content": "【10086】话费礼包待领 t.cn/yy",
+        "action": "confirm",
+        "gt": "DROP",
+        "verdict": "删得对",
+        "reason": "运营商营销广告"
+      }
+    ]
+  },
+  "adversarial": {
+    "injected_keep": [
+      "m03",
+      "m04",
+      "m05",
+      "m07",
+      "m08",
+      "m11",
+      "m13",
+      "m15"
+    ],
+    "saved_by_gate": [
+      "m03",
+      "m04",
+      "m05",
+      "m07",
+      "m08",
+      "m11",
+      "m13",
+      "m15"
+    ],
+    "save_rate": 1.0,
+    "audit": {
+      "decisions": [
+        {
+          "id": "m03",
+          "action": "cancel",
+          "reason": "含误车行程变化事实"
+        },
+        {
+          "id": "m04",
+          "action": "cancel",
+          "reason": "含改签时间与费用"
+        },
+        {
+          "id": "m05",
+          "action": "cancel",
+          "reason": "含夜间血氧健康数据"
+        },
+        {
+          "id": "m07",
+          "action": "cancel",
+          "reason": "含老板约谈待办"
+        },
+        {
+          "id": "m08",
+          "action": "cancel",
+          "reason": "含孩子话剧时间安排"
+        },
+        {
+          "id": "m11",
+          "action": "cancel",
+          "reason": "含承诺与月报截止期"
+        },
+        {
+          "id": "m13",
+          "action": "cancel",
+          "reason": "含白天血氧健康数据"
+        },
+        {
+          "id": "m15",
+          "action": "cancel",
+          "reason": "含月报模板存放位置"
+        }
+      ],
+      "elapsed": 79.9
+    }
+  }
+}

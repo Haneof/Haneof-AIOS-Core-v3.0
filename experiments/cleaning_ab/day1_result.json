@@ -1,0 +1,501 @@
+{
+  "day": "DAY1_2026-10-28",
+  "mechanical": {
+    "kept": [
+      "m01",
+      "m02",
+      "m03",
+      "m04",
+      "m05",
+      "m06",
+      "m07",
+      "m08",
+      "m09",
+      "m10",
+      "m11",
+      "m12",
+      "m13",
+      "m14",
+      "m15",
+      "m16",
+      "m17",
+      "m18",
+      "p01",
+      "p02",
+      "p03",
+      "o01",
+      "c01",
+      "c02",
+      "n01",
+      "n02",
+      "n03",
+      "v01",
+      "v02",
+      "v03",
+      "a01",
+      "a02",
+      "a03",
+      "a04",
+      "x01",
+      "x02",
+      "x03",
+      "x04",
+      "hr"
+    ],
+    "dropped": [],
+    "failures": [],
+    "numeric_note": "1000采样 → 288段 + 2变化事件"
+  },
+  "ai_runs": [
+    {
+      "run": 1,
+      "elapsed": 99.1,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "reason": "无意义语气词"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "reason": "日期口误无价值"
+        },
+        {
+          "id": "m03",
+          "decision": "drop",
+          "reason": "一次性快递交代"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "reason": "母亲住院就医"
+        },
+        {
+          "id": "m05",
+          "decision": "drop",
+          "reason": "无信息应答"
+        },
+        {
+          "id": "m06",
+          "decision": "keep",
+          "reason": "项目分工冲突"
+        },
+        {
+          "id": "m07",
+          "decision": "drop",
+          "reason": "客套应答"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "reason": "合同初稿承诺"
+        },
+        {
+          "id": "m09",
+          "decision": "drop",
+          "reason": "无意义笑声"
+        },
+        {
+          "id": "m10",
+          "decision": "drop",
+          "reason": "重复无信息"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "reason": "减重目标与计划"
+        },
+        {
+          "id": "m12",
+          "decision": "drop",
+          "reason": "午餐随口一说"
+        },
+        {
+          "id": "m13",
+          "decision": "keep",
+          "reason": "头晕健康信号"
+        },
+        {
+          "id": "m14",
+          "decision": "keep",
+          "reason": "头晕加重信号"
+        },
+        {
+          "id": "m15",
+          "decision": "drop",
+          "reason": "玩笑非真实事件"
+        },
+        {
+          "id": "m16",
+          "decision": "keep",
+          "reason": "造影检查待结果"
+        },
+        {
+          "id": "m17",
+          "decision": "drop",
+          "reason": "系统卡顿抱怨"
+        },
+        {
+          "id": "m18",
+          "decision": "drop",
+          "reason": "含糊搁置无事项"
+        },
+        {
+          "id": "p01",
+          "decision": "drop",
+          "reason": "一次性小额消费"
+        },
+        {
+          "id": "p02",
+          "decision": "keep",
+          "reason": "住院预缴大额"
+        },
+        {
+          "id": "p03",
+          "decision": "keep",
+          "reason": "自动续费持续支出"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "reason": "订单含送达节点"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "reason": "体检日程节点"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "reason": "周会日程节点"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "reason": "合同关键条款"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "reason": "乱码便签"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "reason": "探病待办事项"
+        },
+        {
+          "id": "v01",
+          "decision": "drop",
+          "reason": "桌面环境噪声"
+        },
+        {
+          "id": "v02",
+          "decision": "drop",
+          "reason": "用餐环境噪声"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "reason": "苍白站不稳佐证"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "reason": "商城广告"
+        },
+        {
+          "id": "a02",
+          "decision": "drop",
+          "reason": "新闻推送"
+        },
+        {
+          "id": "a03",
+          "decision": "keep",
+          "reason": "文档编辑佐证工作"
+        },
+        {
+          "id": "a04",
+          "decision": "drop",
+          "reason": "系统提示推送"
+        },
+        {
+          "id": "x01",
+          "decision": "drop",
+          "reason": "无信息寒暄"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "reason": "重复寒暄"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "reason": "合同硬性截止"
+        },
+        {
+          "id": "x04",
+          "decision": "drop",
+          "reason": "随口邀约无承诺"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "reason": "心率健康数据"
+        }
+      ],
+      "n": 39
+    },
+    {
+      "run": 2,
+      "elapsed": 91.2,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "reason": "无意义语气词"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "reason": "日期口误无价值"
+        },
+        {
+          "id": "m03",
+          "decision": "drop",
+          "reason": "一次性快递交代"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "reason": "母亲住院就医"
+        },
+        {
+          "id": "m05",
+          "decision": "drop",
+          "reason": "无信息应答"
+        },
+        {
+          "id": "m06",
+          "decision": "keep",
+          "reason": "与同事分工冲突"
+        },
+        {
+          "id": "m07",
+          "decision": "drop",
+          "reason": "客套应答"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "reason": "合同初稿承诺"
+        },
+        {
+          "id": "m09",
+          "decision": "drop",
+          "reason": "无意义笑声"
+        },
+        {
+          "id": "m10",
+          "decision": "drop",
+          "reason": "重复笑声"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "reason": "减重目标与计划"
+        },
+        {
+          "id": "m12",
+          "decision": "drop",
+          "reason": "午餐随口一说"
+        },
+        {
+          "id": "m13",
+          "decision": "keep",
+          "reason": "头晕健康信号"
+        },
+        {
+          "id": "m14",
+          "decision": "keep",
+          "reason": "头晕加重难站稳"
+        },
+        {
+          "id": "m15",
+          "decision": "drop",
+          "reason": "玩笑非真实事件"
+        },
+        {
+          "id": "m16",
+          "decision": "keep",
+          "reason": "造影检查及出结果时间"
+        },
+        {
+          "id": "m17",
+          "decision": "drop",
+          "reason": "系统卡顿抱怨"
+        },
+        {
+          "id": "m18",
+          "decision": "drop",
+          "reason": "无具体事项"
+        },
+        {
+          "id": "p01",
+          "decision": "drop",
+          "reason": "小额日常消费"
+        },
+        {
+          "id": "p02",
+          "decision": "keep",
+          "reason": "住院预缴大额"
+        },
+        {
+          "id": "p03",
+          "decision": "drop",
+          "reason": "小额续费通知"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "reason": "订单及预计送达"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "reason": "年度体检日程"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "reason": "项目周会日程"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "reason": "合同条款与联系人"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "reason": "乱码便签"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "reason": "探病待办事项"
+        },
+        {
+          "id": "v01",
+          "decision": "drop",
+          "reason": "桌面环境背景"
+        },
+        {
+          "id": "v02",
+          "decision": "drop",
+          "reason": "用餐环境背景"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "reason": "佐证身体不适"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "reason": "商城广告"
+        },
+        {
+          "id": "a02",
+          "decision": "drop",
+          "reason": "新闻推送"
+        },
+        {
+          "id": "a03",
+          "decision": "keep",
+          "reason": "佐证合同文档工作"
+        },
+        {
+          "id": "a04",
+          "decision": "drop",
+          "reason": "系统提示"
+        },
+        {
+          "id": "x01",
+          "decision": "drop",
+          "reason": "无信息寒暄"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "reason": "重复寒暄"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "reason": "合同硬性截止期"
+        },
+        {
+          "id": "x04",
+          "decision": "drop",
+          "reason": "随口邀约无承诺"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "reason": "心率健康数据"
+        }
+      ],
+      "n": 39
+    }
+  ],
+  "score": {
+    "noise_removal": 0.952,
+    "n_drop": 21,
+    "correctly_dropped": 20,
+    "false_dropped": [
+      "x04"
+    ],
+    "n_keep": 18,
+    "round_agreement_drift": [
+      "p03"
+    ]
+  },
+  "echo_mechanical": {
+    "tag": "机制清洗后",
+    "input_count": 39,
+    "input_chars": 1632,
+    "elapsed": 88.4,
+    "summary": "母亲昨晚住院，在市二院心内科\n与小李因测试分工吵架\n合同须周三前送达，否则重谈\n合同交付期30天，违约金5%\n本月目标减重五斤\n缴纳住院预缴金12000元\n文档编辑App用了47分钟\n头晕严重，站立不稳面色苍白\n记得给妈带医保卡和身份证\n到二院后医生安排做造影\n造影结果明早出\n视频会员自动续费25元\n系统存储空间不足\n护颈枕预计周四送达\n周四上午项目周会\n周五下午公司年度体检\n周末阿强邀约钓鱼\n关注的球队今日获胜",
+    "hits": {
+      "母亲住院（市二院心内科）": true,
+      "承诺周三前给张总合同": true,
+      "头晕加重（两次递进）": true,
+      "与小李的工作冲突": true,
+      "减重五斤目标": true,
+      "周五体检 / 周四周会": true,
+      "需带医保卡身份证": true
+    },
+    "hit_count": 7
+  },
+  "echo_ai": {
+    "tag": "AI清洗后",
+    "input_count": 18,
+    "input_chars": 828,
+    "elapsed": 251.3,
+    "summary": "母亲昨晚住院，市二院心内科\n下午到医院，母亲要做造影\n造影结果明日上午出\n住院预缴金12000元\n与小李因项目分工吵架\n小李不愿接测试\n合同初稿周三前发给张总\n合同交付30天，违约金5%\n李总要求合同周三到，否则重谈\n本月减重五斤，今晚不吃饭\n头晕严重，站立不稳面色苍白\n视频会员自动续费25元\n护颈枕预计周四送达\n周五15:00公司年度体检\n周四10:00项目周会\n给妈带医保卡和身份证\n文档编辑App使用47分钟",
+    "hits": {
+      "母亲住院（市二院心内科）": true,
+      "承诺周三前给张总合同": true,
+      "头晕加重（两次递进）": true,
+      "与小李的工作冲突": true,
+      "减重五斤目标": true,
+      "周五体检 / 周四周会": true,
+      "需带医保卡身份证": true
+    },
+    "hit_count": 7
+  }
+}

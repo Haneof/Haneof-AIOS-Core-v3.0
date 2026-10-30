@@ -2344,4 +2344,15 @@ Next READY task: C15-RCC-PREFLIGHT-001 — new window only; this window must not
 - CI: C15 `35887196676` SUCCESS; C14 semantic-repair `35887196757` SUCCESS; no local tests/Resident run.
 - Source/evidence scope: zero Core/tests/workflows/sealed-fixture/historical-evidence modification; #117/#121 exact heads unchanged.
 - Receipt: `governance/C15_RCC_RES_B_CORRECTIVE_INTEGRATION_RECEIPT_2026-09-24.md`.
+
+## 2026-10-30 — PM-CLEANING-AB-EXPERIMENT-001 DATA-CLEANING DUAL-AI GATE CONCLUDED
+
+- **Task:** `PM-CLEANING-AB-EXPERIMENT-001 = DONE / CONCLUDED`。受 `governance/baseline.json` 的 `task_id` 授权（`src/`、`tests/` 变更无需额外 trailer）；本块为历史记录，非新的 launch authority。
+- **架构决策：** 数据清洗采用「机制全量存真 + 第一遍 AI 标注 + 确定性护栏 + 第二遍 AI 删除门禁」混合架构。机制层零删除（宪法冻结 ingest 层删原文）；AI 只产标签与理由；仅第二遍门禁 `confirm` 才触发真实删除。
+- **验收（3 个模拟日，119 条文本 + 3 条心率流，n=3）：** 二次门禁删除纯度 1.000、误删 0、对抗注入救回率 24/24=1.0、认知回声 21/21，达到用户设定 99%–100% 门槛 → 启用二次审查 + 执行垃圾删除。
+- **代码落地：** 新增 `src/aios_core/cleaning/` —— `GarbageRetractionService.retract()` 经认知层 `CognitionRevisionService.revise(mode="retract")` 真实删除 confirm 的垃圾，带 `evidence_refs`（原始记录作反证），前向不可变、可审计，符合宪法第六/十条。端到端测试 `tests/cleaning/test_garbage_retraction.py` 通过（confirm→retract→claim 状态 retracted，且已 retract 不可二次 retract）。
+- **harness 实操演示：** `experiments/cleaning_ab/harness.py --mode audit --execute` 对 confirm 候选真实 retract；DAY1 实测 9 条全部 retracted。
+- **诚实局限：** 两遍用同一模型端点（自洽双签，非异构独立模型）；n=3 仍小；ground truth 自标；当前整体清洁率约 40%（零损失优先取舍，门禁保守取消部分真垃圾）；纯噪声若认知层未抽 Claim 则无 Claim 可 retract（本身不进认知）。
+- **下一步：** 门禁可靠后，可令第一遍标注更激进提 recall（误标由门禁+护栏兜底）；可选换异构模型跑第二遍验证稳定性。
+- 证据：`experiments/cleaning_ab/RESULT_v5.md`、`/workspace/AIOS_数据清洗AB实测_v5_二次审核门禁_2026-10-30.md`。
 - Next unique READY after this state-writeback PR is merged: **C15-RCC-RES-B-PREFLIGHT-001**. No Resident experiment is released.

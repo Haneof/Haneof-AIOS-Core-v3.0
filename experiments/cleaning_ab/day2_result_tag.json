@@ -1,0 +1,779 @@
+{
+  "day": "DAY2_2026-10-29",
+  "mode": "tag",
+  "mechanical": {
+    "kept": [
+      "m01",
+      "m02",
+      "m03",
+      "m04",
+      "m05",
+      "m06",
+      "m07",
+      "m08",
+      "m09",
+      "m10",
+      "m11",
+      "m12",
+      "m13",
+      "m14",
+      "m15",
+      "m16",
+      "m17",
+      "m18",
+      "p01",
+      "p02",
+      "p03",
+      "o01",
+      "c01",
+      "c02",
+      "n01",
+      "n02",
+      "n03",
+      "v01",
+      "v02",
+      "v03",
+      "a01",
+      "a02",
+      "a03",
+      "a04",
+      "x01",
+      "x02",
+      "x03",
+      "x04",
+      "x05",
+      "x06",
+      "hr"
+    ],
+    "dropped": [],
+    "failures": [],
+    "numeric_note": "1000采样 → 292段 + 4变化事件"
+  },
+  "ai_runs": [
+    {
+      "run": 1,
+      "elapsed": 593.6,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义语气词"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义日期自语"
+        },
+        {
+          "id": "m03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "快递存放行为记录"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "跑步心率健康信号"
+        },
+        {
+          "id": "m05",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "个税截止待办"
+        },
+        {
+          "id": "m06",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "明显玩笑"
+        },
+        {
+          "id": "m07",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义应答"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "皮疹健康信号"
+        },
+        {
+          "id": "m09",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "服药记录"
+        },
+        {
+          "id": "m10",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "日常用餐行为"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "皮疹好转反馈"
+        },
+        {
+          "id": "m12",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "家庭关系冲突"
+        },
+        {
+          "id": "m13",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义结束语"
+        },
+        {
+          "id": "m14",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "明日亲子出行计划"
+        },
+        {
+          "id": "m15",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "日常用餐行为"
+        },
+        {
+          "id": "m16",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "急诊挂号重要金额"
+        },
+        {
+          "id": "m17",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "输入法卡顿反馈"
+        },
+        {
+          "id": "m18",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "睡前作息记录"
+        },
+        {
+          "id": "p01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "日常消费记录"
+        },
+        {
+          "id": "p02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "急诊挂号重要金额"
+        },
+        {
+          "id": "p03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "会员续费消费"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "明日门票订单"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "个税截止日程"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "家庭聚餐日程"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "用药方案记录"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "乱码误触"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "明日出行待办"
+        },
+        {
+          "id": "v01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "日常环境记录"
+        },
+        {
+          "id": "v02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "两人用餐场景"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "皮疹健康信号"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "商城广告推送"
+        },
+        {
+          "id": "a02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "阅读时长行为"
+        },
+        {
+          "id": "a03",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "系统提示推送"
+        },
+        {
+          "id": "a04",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "银行扣款金额"
+        },
+        {
+          "id": "x01",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "同事寒暄互动"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "纯重复消息"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "涉用户截止期"
+        },
+        {
+          "id": "x04",
+          "decision": "keep",
+          "relevance": "other",
+          "reason": "朋友咖啡邀约"
+        },
+        {
+          "id": "x05",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "运营商广告"
+        },
+        {
+          "id": "x06",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "疑似钓鱼推送"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "心率行为数据"
+        }
+      ],
+      "n": 41
+    },
+    {
+      "run": 2,
+      "elapsed": 213.5,
+      "decisions": [
+        {
+          "id": "m01",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义语气词"
+        },
+        {
+          "id": "m02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "自问自答无信息"
+        },
+        {
+          "id": "m03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "快递放驿站日常安排"
+        },
+        {
+          "id": "m04",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "跑步心率健康信号"
+        },
+        {
+          "id": "m05",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "个税清缴截止待办"
+        },
+        {
+          "id": "m06",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "明显玩笑夸张"
+        },
+        {
+          "id": "m07",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义应答"
+        },
+        {
+          "id": "m08",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "皮疹健康信号"
+        },
+        {
+          "id": "m09",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "服药记录"
+        },
+        {
+          "id": "m10",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "日常午餐行为"
+        },
+        {
+          "id": "m11",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "皮疹好转反馈"
+        },
+        {
+          "id": "m12",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "与妻子争吵关系事件"
+        },
+        {
+          "id": "m13",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "无意义结束语"
+        },
+        {
+          "id": "m14",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "明日亲子游计划"
+        },
+        {
+          "id": "m15",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "日常晚餐行为"
+        },
+        {
+          "id": "m16",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "急诊挂号金额"
+        },
+        {
+          "id": "m17",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "输入法卡顿反馈"
+        },
+        {
+          "id": "m18",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "就寝作息记录"
+        },
+        {
+          "id": "p01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "早餐消费记录"
+        },
+        {
+          "id": "p02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "急诊挂号消费"
+        },
+        {
+          "id": "p03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "会员续费消费"
+        },
+        {
+          "id": "o01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "明日门票订单"
+        },
+        {
+          "id": "c01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "个税截止日程"
+        },
+        {
+          "id": "c02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "家庭聚餐日程"
+        },
+        {
+          "id": "n01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "用药方案记录"
+        },
+        {
+          "id": "n02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "乱码误触"
+        },
+        {
+          "id": "n03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "明日带娃待办"
+        },
+        {
+          "id": "v01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "床头日常场景"
+        },
+        {
+          "id": "v02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "两人用餐场景"
+        },
+        {
+          "id": "v03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "手臂皮疹画面"
+        },
+        {
+          "id": "a01",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "商城广告推送"
+        },
+        {
+          "id": "a02",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "阅读行为时长"
+        },
+        {
+          "id": "a03",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "系统清理推送"
+        },
+        {
+          "id": "a04",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "本人账户支出"
+        },
+        {
+          "id": "x01",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "同事寒暄互动"
+        },
+        {
+          "id": "x02",
+          "decision": "drop",
+          "relevance": "user",
+          "reason": "纯重复无新信息"
+        },
+        {
+          "id": "x03",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "税务截止提醒"
+        },
+        {
+          "id": "x04",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "朋友咖啡邀约"
+        },
+        {
+          "id": "x05",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "运营商营销短信"
+        },
+        {
+          "id": "x06",
+          "decision": "drop",
+          "relevance": "other",
+          "reason": "钓鱼验证短信"
+        },
+        {
+          "id": "hr",
+          "decision": "keep",
+          "relevance": "user",
+          "reason": "全天心率健康数据"
+        }
+      ],
+      "n": 41
+    }
+  ],
+  "guardrail_overrides": [],
+  "score": {
+    "drop_class_precision": 1.0,
+    "drop_class_recall": 0.524,
+    "n_true_garbage": 21,
+    "n_ai_garbage": 11,
+    "correctly_tagged": 11,
+    "label_false_drop": [],
+    "missed_garbage": [
+      "m03",
+      "m10",
+      "m15",
+      "m17",
+      "m18",
+      "p01",
+      "p03",
+      "v01",
+      "v02",
+      "x01"
+    ],
+    "round_agreement_drift": [],
+    "relevance_dist": {
+      "user": 33,
+      "other": 8
+    },
+    "cognition_label_threat": [],
+    "deletion_count": 0,
+    "planned_drops": [
+      {
+        "id": "a01",
+        "source": "dim:app_usage",
+        "content": "【XX商城】限时秒杀3折，点领券>>",
+        "ai_reason": "商城广告推送",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "a03",
+        "source": "dim:app_usage",
+        "content": "【系统】存储不足建议清理",
+        "ai_reason": "系统提示推送",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m01",
+        "source": "dim:mic_audio",
+        "content": "额……那个……那个……",
+        "ai_reason": "无意义语气词",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m02",
+        "source": "dim:mic_audio",
+        "content": "今天周六对吧……不对周日。",
+        "ai_reason": "无意义日期自语",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m06",
+        "source": "dim:mic_audio",
+        "content": "哈哈哈我明天就辞职不干了哈哈。",
+        "ai_reason": "明显玩笑",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m07",
+        "source": "dim:mic_audio",
+        "content": "啊行嗯好的。",
+        "ai_reason": "无意义应答",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "m13",
+        "source": "dim:mic_audio",
+        "content": "算了不说了。",
+        "ai_reason": "无意义结束语",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "n02",
+        "source": "dim:note",
+        "content": "便签：qwertyuiop",
+        "ai_reason": "乱码误触",
+        "relevance": "user",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "x02",
+        "source": "dim:external_chat",
+        "content": "同事老赵：在吗",
+        "ai_reason": "纯重复消息",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "x05",
+        "source": "dim:external_chat",
+        "content": "【10086】尊敬的客户，您的话费礼包待领取，点击 t.cn/xxx",
+        "ai_reason": "运营商广告",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      },
+      {
+        "id": "x06",
+        "source": "dim:external_chat",
+        "content": "【安全中心】您的账户已被锁定，立即验证 t.cn/lock",
+        "ai_reason": "疑似钓鱼推送",
+        "relevance": "other",
+        "gt": "DROP",
+        "verdict": "删得对"
+      }
+    ],
+    "kept_but_garbage": [
+      {
+        "id": "m03",
+        "source": "dim:mic_audio",
+        "content": "喂快递放驿站了啊谢谢。",
+        "ai_reason": "快递存放行为记录",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "m10",
+        "source": "dim:mic_audio",
+        "content": "午饭随便吃点吧。",
+        "ai_reason": "日常用餐行为",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "m15",
+        "source": "dim:mic_audio",
+        "content": "晚上吃啥呢随便。",
+        "ai_reason": "日常用餐行为",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "m17",
+        "source": "dim:mic_audio",
+        "content": "烦这破输入法又卡。",
+        "ai_reason": "输入法卡顿反馈",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "m18",
+        "source": "dim:mic_audio",
+        "content": "睡了。",
+        "ai_reason": "睡前作息记录",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "p01",
+        "source": "dim:payment",
+        "content": "早餐 咖啡 18 元",
+        "ai_reason": "日常消费记录",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "p03",
+        "source": "dim:payment",
+        "content": "视频会员续费 25 元",
+        "ai_reason": "会员续费消费",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "v01",
+        "source": "dim:camera_visual",
+        "content": "画面：床头柜上有手机和眼镜。",
+        "ai_reason": "日常环境记录",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "v02",
+        "source": "dim:camera_visual",
+        "content": "画面：餐桌两人三菜。",
+        "ai_reason": "两人用餐场景",
+        "verdict": "漏标(仍保留，无害)"
+      },
+      {
+        "id": "x01",
+        "source": "dim:external_chat",
+        "content": "同事老赵：在吗",
+        "ai_reason": "同事寒暄互动",
+        "verdict": "漏标(仍保留，无害)"
+      }
+    ]
+  },
+  "echo_mechanical": {
+    "tag": "全量(只标注不删除)",
+    "input_count": 41,
+    "input_chars": 1624,
+    "elapsed": 277.2,
+    "summary": "早餐咖啡18元\n快递已放驿站\n晨跑心率飙到150\n个税清缴10月31日截止\n说想明天辞职\n领导要求周五前交税\n胳膊起疹子疑海鲜过敏\n氯雷他定每天1片吃3天\n疹子好转不痒了\n与妻子因陪孩子吵架\n订明天两张动物园票\n过敏急诊挂号860元\n朋友邀周末喝咖啡\n明晚家庭聚餐\n明天带娃水杯和帽子\n收到账户锁定验证短信\n视频会员续费25元",
+    "hits": {
+      "海鲜过敏起疹+服药": true,
+      "个税汇算清缴截止10-31": true,
+      "与妻子因陪孩子吵架": true,
+      "明带娃去动物园": true,
+      "过敏急诊花费860": true,
+      "明晚家庭聚餐": true,
+      "记得带娃水杯帽子": true
+    },
+    "hit_count": 7
+  },
+  "echo_ai": null
+}
