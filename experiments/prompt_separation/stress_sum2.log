@@ -1,0 +1,12 @@
+=== 压力验证 | task=summarize | endpoint=https://integrate.api.nvidia.com/v1 | model=minimaxai/minimax-m3.1-flash ===
+  [stress-summarize-dim:calendar] 成功：34.6s，75 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=4000
+  [dim:calendar] 5 源 → 总结 75 字符 / ~47 token，事实命中 4/4
+  [stress-summarize-dim:payment] 成功：51.8s，171 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=4000
+  [dim:payment] 6 源 → 总结 171 字符 / ~107 token，事实命中 2/2
+  [stress-summarize-dim:external_chat] 成功：63.1s，125 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=4000
+  [dim:external_chat] 14 源 → 总结 125 字符 / ~78 token，事实命中 5/6
+  [stress-summarize-dim:note] 成功：198.0s，98 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=4000
+  [dim:note] 5 源 → 总结 98 字符 / ~61 token，事实命中 4/4
+B 段完成，347.5s
+结果已写入 /root/.codebuddy/artifact/2f8a7d30-9c21-4f0b-1d56-85ac64ebe000/aios-core-v3/experiments/prompt_separation/stress_result.json
+调用统计：{'calls': 4, 'ok': 4, 'failed': 0, 'gateway_504': 0, 'rate_429': 0, 'empty_body': 0, 'truncated': 0, 'internal_retry_attempts': 0, 'model_fallback_used': 0, 'token_escalation_used': 0}

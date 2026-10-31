@@ -1,0 +1,684 @@
+{
+  "summarize": {
+    "cap": 4000,
+    "dimensions": {
+      "dim:calendar": {
+        "dim": "dim:calendar",
+        "n_sources": 5,
+        "prompt_chars": 1220,
+        "est_in_tokens": 762,
+        "max_tokens": 4000,
+        "rounds": 1,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "ok": true,
+        "output_chars": 75,
+        "est_output_tokens": 47,
+        "summary": "后天飞大理旅拍，早八航班；周四交宣传片初剪版给甲方；周五城市宣传片终剪交付，并发大理脚本给张导。下周六阿杰婚礼，地点在青城山；月底港澳通行证续签截止。",
+        "summary_chars": 75,
+        "fact_hits": [
+          {
+            "dim": "dim:calendar",
+            "fact": "城市宣传片双截止(初剪周四/终剪周五)",
+            "matched_keywords": [
+              "宣传片",
+              "初剪",
+              "周五",
+              "终剪"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:calendar",
+            "fact": "大理旅拍(航班+脚本+行李)",
+            "matched_keywords": [
+              "大理",
+              "航班",
+              "脚本",
+              "张导"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:calendar",
+            "fact": "港澳通行证月底续签",
+            "matched_keywords": [
+              "通行证",
+              "续签",
+              "港澳",
+              "月底"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:calendar",
+            "fact": "阿杰下周六婚礼(青城山)",
+            "matched_keywords": [
+              "婚礼",
+              "青城山",
+              "阿杰"
+            ],
+            "hit": true
+          }
+        ],
+        "hit_count": 4,
+        "fact_count": 4
+      },
+      "dim:payment": {
+        "dim": "dim:payment",
+        "n_sources": 6,
+        "prompt_chars": 1278,
+        "est_in_tokens": 799,
+        "max_tokens": 4000,
+        "rounds": 1,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "ok": true,
+        "output_chars": 171,
+        "est_output_tokens": 107,
+        "summary": "11:00购买存储卡 x3 高速卡，369元（{5, 2026-11-03 11:00}）；13:05镜头维修预付1800元（{2, 2026-11-03 13:05}）；16:40补缴工作室房租300元（{6, 2026-11-03 16:40}）；21:00购买成都-大理往返机票1460元（{4, 2026-11-03 21:00}）。",
+        "summary_chars": 171,
+        "fact_hits": [
+          {
+            "dim": "dim:payment",
+            "fact": "镜头摔裂维修1800",
+            "matched_keywords": [
+              "镜头",
+              "维修",
+              "1800"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:payment",
+            "fact": "大理旅拍(航班+脚本+行李)",
+            "matched_keywords": [
+              "大理",
+              "机票"
+            ],
+            "hit": true
+          }
+        ],
+        "hit_count": 2,
+        "fact_count": 2
+      },
+      "dim:external_chat": {
+        "dim": "dim:external_chat",
+        "n_sources": 14,
+        "prompt_chars": 1836,
+        "est_in_tokens": 1148,
+        "max_tokens": 4000,
+        "rounds": 1,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "ok": true,
+        "output_chars": 125,
+        "est_output_tokens": 78,
+        "summary": "张导要求大理脚本周五前发来，别拖；小周转述王总说片子必须带航拍，并提醒大理风大注意安全。客户王总将预算加到两万，要求片子大气。房东通知房租下月涨三百。周末邀约集中：朋友大鹏约钓鱼，朋友阿杰邀参加青城山婚礼并请带相机帮忙拍；妈妈邀回家吃饭，称好久没见。",
+        "summary_chars": 125,
+        "fact_hits": [
+          {
+            "dim": "dim:external_chat",
+            "fact": "城市宣传片双截止(初剪周四/终剪周五)",
+            "matched_keywords": [
+              "周五",
+              "王总",
+              "航拍"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:external_chat",
+            "fact": "大理旅拍(航班+脚本+行李)",
+            "matched_keywords": [
+              "大理",
+              "脚本",
+              "张导"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:external_chat",
+            "fact": "阿杰下周六婚礼(青城山)",
+            "matched_keywords": [
+              "婚礼",
+              "青城山",
+              "阿杰"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:external_chat",
+            "fact": "宣传片预算加到2万",
+            "matched_keywords": [
+              "两万",
+              "预算"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:external_chat",
+            "fact": "家庭:周末回老家看妈",
+            "matched_keywords": [
+              "妈",
+              "周末"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:external_chat",
+            "fact": "钓鱼短信/账户锁定(必须DROP)",
+            "matched_keywords": [],
+            "hit": false
+          }
+        ],
+        "hit_count": 5,
+        "fact_count": 6
+      },
+      "dim:note": {
+        "dim": "dim:note",
+        "n_sources": 5,
+        "prompt_chars": 1223,
+        "est_in_tokens": 764,
+        "max_tokens": 4000,
+        "rounds": 1,
+        "model": "minimaxai/minimax-m3.1-flash",
+        "ok": true,
+        "output_chars": 98,
+        "est_output_tokens": 61,
+        "summary": "宣传片要点：时长90秒、清新风、含航拍，周五交付[1]；周末回老家，记得给妈打电话[5]；大理行李清单：相机x2、镜头、三脚架、无人机、充电宝、存储卡[4]；记得带港澳通行证和身份证去续签[3]。",
+        "summary_chars": 98,
+        "fact_hits": [
+          {
+            "dim": "dim:note",
+            "fact": "城市宣传片双截止(初剪周四/终剪周五)",
+            "matched_keywords": [
+              "宣传片",
+              "周五",
+              "航拍"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:note",
+            "fact": "大理旅拍(航班+脚本+行李)",
+            "matched_keywords": [
+              "大理",
+              "行李",
+              "无人机"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:note",
+            "fact": "港澳通行证月底续签",
+            "matched_keywords": [
+              "通行证",
+              "续签",
+              "港澳"
+            ],
+            "hit": true
+          },
+          {
+            "dim": "dim:note",
+            "fact": "家庭:周末回老家看妈",
+            "matched_keywords": [
+              "妈",
+              "老家",
+              "周末"
+            ],
+            "hit": true
+          }
+        ],
+        "hit_count": 4,
+        "fact_count": 4
+      }
+    },
+    "fact_hits": [
+      {
+        "dim": "dim:calendar",
+        "fact": "城市宣传片双截止(初剪周四/终剪周五)",
+        "matched_keywords": [
+          "宣传片",
+          "初剪",
+          "周五",
+          "终剪"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:calendar",
+        "fact": "大理旅拍(航班+脚本+行李)",
+        "matched_keywords": [
+          "大理",
+          "航班",
+          "脚本",
+          "张导"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:calendar",
+        "fact": "港澳通行证月底续签",
+        "matched_keywords": [
+          "通行证",
+          "续签",
+          "港澳",
+          "月底"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:calendar",
+        "fact": "阿杰下周六婚礼(青城山)",
+        "matched_keywords": [
+          "婚礼",
+          "青城山",
+          "阿杰"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:payment",
+        "fact": "镜头摔裂维修1800",
+        "matched_keywords": [
+          "镜头",
+          "维修",
+          "1800"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:payment",
+        "fact": "大理旅拍(航班+脚本+行李)",
+        "matched_keywords": [
+          "大理",
+          "机票"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:external_chat",
+        "fact": "城市宣传片双截止(初剪周四/终剪周五)",
+        "matched_keywords": [
+          "周五",
+          "王总",
+          "航拍"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:external_chat",
+        "fact": "大理旅拍(航班+脚本+行李)",
+        "matched_keywords": [
+          "大理",
+          "脚本",
+          "张导"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:external_chat",
+        "fact": "阿杰下周六婚礼(青城山)",
+        "matched_keywords": [
+          "婚礼",
+          "青城山",
+          "阿杰"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:external_chat",
+        "fact": "宣传片预算加到2万",
+        "matched_keywords": [
+          "两万",
+          "预算"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:external_chat",
+        "fact": "家庭:周末回老家看妈",
+        "matched_keywords": [
+          "妈",
+          "周末"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:external_chat",
+        "fact": "钓鱼短信/账户锁定(必须DROP)",
+        "matched_keywords": [],
+        "hit": false
+      },
+      {
+        "dim": "dim:note",
+        "fact": "城市宣传片双截止(初剪周四/终剪周五)",
+        "matched_keywords": [
+          "宣传片",
+          "周五",
+          "航拍"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:note",
+        "fact": "大理旅拍(航班+脚本+行李)",
+        "matched_keywords": [
+          "大理",
+          "行李",
+          "无人机"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:note",
+        "fact": "港澳通行证月底续签",
+        "matched_keywords": [
+          "通行证",
+          "续签",
+          "港澳"
+        ],
+        "hit": true
+      },
+      {
+        "dim": "dim:note",
+        "fact": "家庭:周末回老家看妈",
+        "matched_keywords": [
+          "妈",
+          "老家",
+          "周末"
+        ],
+        "hit": true
+      }
+    ],
+    "hit_total": 15,
+    "fact_total": 16,
+    "summaries": {
+      "dim:calendar": "后天飞大理旅拍，早八航班；周四交宣传片初剪版给甲方；周五城市宣传片终剪交付，并发大理脚本给张导。下周六阿杰婚礼，地点在青城山；月底港澳通行证续签截止。",
+      "dim:payment": "11:00购买存储卡 x3 高速卡，369元（{5, 2026-11-03 11:00}）；13:05镜头维修预付1800元（{2, 2026-11-03 13:05}）；16:40补缴工作室房租300元（{6, 2026-11-03 16:40}）；21:00购买成都-大理往返机票1460元（{4, 2026-11-03 21:00}）。",
+      "dim:external_chat": "张导要求大理脚本周五前发来，别拖；小周转述王总说片子必须带航拍，并提醒大理风大注意安全。客户王总将预算加到两万，要求片子大气。房东通知房租下月涨三百。周末邀约集中：朋友大鹏约钓鱼，朋友阿杰邀参加青城山婚礼并请带相机帮忙拍；妈妈邀回家吃饭，称好久没见。",
+      "dim:note": "宣传片要点：时长90秒、清新风、含航拍，周五交付[1]；周末回老家，记得给妈打电话[5]；大理行李清单：相机x2、镜头、三脚架、无人机、充电宝、存储卡[4]；记得带港澳通行证和身份证去续签[3]。"
+    },
+    "elapsed_s": 347.5
+  },
+  "_meta": {
+    "script": "experiments/prompt_separation/verify_stress.py",
+    "updated_at": "2026-10-31 10:50:55",
+    "endpoint": "https://integrate.api.nvidia.com/v1",
+    "primary_model": "minimaxai/minimax-m3.1-flash",
+    "run_key": "2026-10-31 10:22:14",
+    "stats": {
+      "calls": 11,
+      "ok": 11,
+      "failed": 0,
+      "gateway_504": 0,
+      "rate_429": 0,
+      "empty_body": 2,
+      "truncated": 4,
+      "internal_retry_attempts": 6,
+      "model_fallback_used": 0,
+      "token_escalation_used": 0
+    },
+    "note": "token 用字符数估算（中文约 1.6 字符/token）；max_tokens_effective 是声明值与实测地板取大，escalate 到 4000/6000 时 token_escalation_used 会计数。",
+    "edge_notes": "batch=80 悬崖证据见 annotate_sweep.edge_batch_80（源自 stress_run.log 与 6000 探针实测，非 result 内重跑）"
+  },
+  "digest": {
+    "n_sources": 4,
+    "prompt_chars": 1594,
+    "est_in_tokens": 996,
+    "max_tokens": 4000,
+    "rounds": 1,
+    "model": "minimaxai/minimax-m3.1-flash",
+    "ok": true,
+    "output_chars": 282,
+    "est_output_tokens": 176,
+    "digest": "今日11:00购3张高速存储卡369元，13:05预付镜头维修1800元，16:40补缴工作室房租300元，21:00购成都—大理往返机票1460元，为后天早八飞大理旅拍备行；行李含相机×2、镜头、三脚架、无人机、充电宝、存储卡。宣传片定为90秒、清新风并含航拍，周四交初剪、周五交终剪，张导要求周五前发大理脚本；王总把预算加到两万并要求片子大气，小周转述须带航拍、提醒大理风大注意安全。房东称下月房租涨300元。周末邀约集中：大鹏约钓鱼，下周六阿杰请参加青城山婚礼并带相机帮忙拍，妈妈邀周末回老家吃饭，记得给妈打电话；月底港澳通行证续签截止，须带通行证和身份证。",
+    "digest_chars": 282,
+    "elapsed_s": 78.3
+  },
+  "annotate_sweep": {
+    "caps": {
+      "declared": 3000,
+      "floor": 2500
+    },
+    "batches_by_size": {
+      "20": [
+        {
+          "batch": 20,
+          "bno": 1,
+          "n_records": 20,
+          "prompt_chars": 2983,
+          "est_in_tokens": 1864,
+          "max_tokens_declared": 3000,
+          "max_tokens_effective": 3000,
+          "max_tokens": 3000,
+          "rounds": 1,
+          "model": "minimaxai/minimax-m3.1-flash",
+          "ok": true,
+          "output_chars": 1367,
+          "est_output_tokens": 854,
+          "token_escalation": false,
+          "parsed": true,
+          "n_decisions": 20
+        },
+        {
+          "batch": 20,
+          "bno": 2,
+          "n_records": 20,
+          "prompt_chars": 2950,
+          "est_in_tokens": 1844,
+          "max_tokens_declared": 3000,
+          "max_tokens_effective": 3000,
+          "max_tokens": 3000,
+          "rounds": 1,
+          "model": "minimaxai/minimax-m3.1-flash",
+          "ok": true,
+          "output_chars": 1373,
+          "est_output_tokens": 858,
+          "token_escalation": false,
+          "parsed": true,
+          "n_decisions": 20
+        },
+        {
+          "batch": 20,
+          "bno": 3,
+          "n_records": 20,
+          "prompt_chars": 2672,
+          "est_in_tokens": 1670,
+          "max_tokens_declared": 3000,
+          "max_tokens_effective": 3000,
+          "max_tokens": 3000,
+          "rounds": 1,
+          "model": "minimaxai/minimax-m3.1-flash",
+          "ok": true,
+          "output_chars": 1345,
+          "est_output_tokens": 841,
+          "token_escalation": false,
+          "parsed": true,
+          "n_decisions": 20
+        },
+        {
+          "batch": 20,
+          "bno": 4,
+          "n_records": 20,
+          "prompt_chars": 2689,
+          "est_in_tokens": 1681,
+          "max_tokens_declared": 3000,
+          "max_tokens_effective": 3000,
+          "max_tokens": 3000,
+          "rounds": 1,
+          "model": "minimaxai/minimax-m3.1-flash",
+          "ok": true,
+          "output_chars": 1365,
+          "est_output_tokens": 853,
+          "token_escalation": false,
+          "parsed": true,
+          "n_decisions": 20
+        },
+        {
+          "batch": 20,
+          "bno": 5,
+          "n_records": 20,
+          "prompt_chars": 3078,
+          "est_in_tokens": 1924,
+          "max_tokens_declared": 3000,
+          "max_tokens_effective": 3000,
+          "max_tokens": 3000,
+          "rounds": 1,
+          "model": "minimaxai/minimax-m3.1-flash",
+          "ok": true,
+          "output_chars": 1353,
+          "est_output_tokens": 846,
+          "token_escalation": false,
+          "parsed": true,
+          "n_decisions": 20
+        },
+        {
+          "batch": 20,
+          "bno": 6,
+          "n_records": 20,
+          "prompt_chars": 3157,
+          "est_in_tokens": 1973,
+          "max_tokens_declared": 3000,
+          "max_tokens_effective": 3000,
+          "max_tokens": 3000,
+          "rounds": 1,
+          "model": "minimaxai/minimax-m3.1-flash",
+          "ok": true,
+          "output_chars": 1373,
+          "est_output_tokens": 858,
+          "token_escalation": false,
+          "parsed": true,
+          "n_decisions": 20
+        },
+        {
+          "batch": 20,
+          "bno": 7,
+          "n_records": 7,
+          "prompt_chars": 2122,
+          "est_in_tokens": 1326,
+          "max_tokens_declared": 3000,
+          "max_tokens_effective": 3000,
+          "max_tokens": 3000,
+          "rounds": 1,
+          "model": "minimaxai/minimax-m3.1-flash",
+          "ok": true,
+          "output_chars": 471,
+          "est_output_tokens": 294,
+          "token_escalation": false,
+          "parsed": true,
+          "n_decisions": 7
+        }
+      ],
+      "40": [
+        {
+          "batch": 40,
+          "bno": 1,
+          "n_records": 40,
+          "prompt_chars": 4259,
+          "est_in_tokens": 2662,
+          "max_tokens_declared": 3000,
+          "max_tokens_effective": 3000,
+          "max_tokens": 3000,
+          "rounds": 1,
+          "model": "minimaxai/minimax-m3.1-flash",
+          "ok": true,
+          "output_chars": 2714,
+          "est_output_tokens": 1696,
+          "token_escalation": false,
+          "parsed": true,
+          "n_decisions": 40
+        },
+        {
+          "batch": 40,
+          "bno": 2,
+          "n_records": 40,
+          "prompt_chars": 3687,
+          "est_in_tokens": 2304,
+          "max_tokens_declared": 3000,
+          "max_tokens_effective": 3000,
+          "max_tokens": 3000,
+          "rounds": 1,
+          "model": "minimaxai/minimax-m3.1-flash",
+          "ok": true,
+          "output_chars": 2684,
+          "est_output_tokens": 1678,
+          "token_escalation": false,
+          "parsed": true,
+          "n_decisions": 40
+        },
+        {
+          "batch": 40,
+          "bno": 3,
+          "n_records": 40,
+          "prompt_chars": 4681,
+          "est_in_tokens": 2926,
+          "max_tokens_declared": 3000,
+          "max_tokens_effective": 3000,
+          "max_tokens": 3000,
+          "rounds": 1,
+          "model": "minimaxai/minimax-m3.1-flash",
+          "ok": true,
+          "output_chars": 2727,
+          "est_output_tokens": 1704,
+          "token_escalation": false,
+          "parsed": true,
+          "n_decisions": 40
+        },
+        {
+          "batch": 40,
+          "bno": 4,
+          "n_records": 7,
+          "prompt_chars": 2122,
+          "est_in_tokens": 1326,
+          "max_tokens_declared": 3000,
+          "max_tokens_effective": 3000,
+          "max_tokens": 3000,
+          "rounds": 1,
+          "model": "minimaxai/minimax-m3.1-flash",
+          "ok": true,
+          "output_chars": 471,
+          "est_output_tokens": 294,
+          "token_escalation": false,
+          "parsed": true,
+          "n_decisions": 7
+        }
+      ]
+    },
+    "metrics_by_size": {
+      "20": {
+        "drop_purity": 1.0,
+        "false_drop_count": 0,
+        "drop_recall": 0.873,
+        "n_true_noise": 79,
+        "n_ai_drop": 69,
+        "n_correct_drop": 69
+      },
+      "40": {
+        "drop_purity": 1.0,
+        "false_drop_count": 0,
+        "drop_recall": 0.886,
+        "n_true_noise": 79,
+        "n_ai_drop": 70,
+        "n_correct_drop": 70
+      }
+    },
+    "elapsed_s": 1721.0,
+    "edge_batch_80": {
+      "note": "未在 result 内重跑（会触发失控重试），以下为本次真实端点实测证据：",
+      "at_max_tokens_3000": {
+        "outcome": "TRUNCATED / 空正文 finish_reason=length",
+        "evidence": "stress_run.log: [stress-annotate-B80-b1#1] 连续 截断/空正文（8/16/32/64/128s 退避）",
+        "escalation_to_4000_and_backup": "仍连续失败，未恢复（当前 ANNOTATE 升级天花板仅 4000，不足）"
+      },
+      "at_max_tokens_6000": {
+        "outcome": "SUCCESS",
+        "output_chars": 5443,
+        "est_output_tokens": 3402,
+        "parsed_items": 80,
+        "first_item_correct": true,
+        "elapsed_s": 227,
+        "evidence": "inline probe (probe-80-at-6000) 真实端点实测"
+      },
+      "conclusion": "输出 token 随条数线性 ~21.5/条；3000 上限安全线约 <=40 条；80 条需 ~3400 输出+思考开销，4000 勉强、6000 才稳。"
+    }
+  }
+}

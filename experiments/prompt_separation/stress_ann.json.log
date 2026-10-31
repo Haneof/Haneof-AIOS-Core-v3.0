@@ -1,0 +1,37 @@
+=== 压力验证 | task=annotate | endpoint=https://integrate.api.nvidia.com/v1 | model=minimaxai/minimax-m3.1-flash ===
+A. ANNOTATE 压力扫描 | 日=STRESS_DAY_2026-11-03 | 非数值记录=127 | 声明上限=3000 | 批次=[20, 40]
+  —— batch=20：分 7 批 ——
+  [stress-annotate-B20-b1] 成功：75.9s，1367 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=3000
+  [B20 批次1] 解析 20 条，输出 1367 字符 / ~854 token，max_tokens=3000，轮次=1
+  [stress-annotate-B20-b2] 成功：110.2s，1373 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=3000
+  [B20 批次2] 解析 20 条，输出 1373 字符 / ~858 token，max_tokens=3000，轮次=1
+  [stress-annotate-B20-b3] 成功：29.6s，1345 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=3000
+  [B20 批次3] 解析 20 条，输出 1345 字符 / ~841 token，max_tokens=3000，轮次=1
+  [stress-annotate-B20-b4] 成功：56.0s，1365 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=3000
+  [B20 批次4] 解析 20 条，输出 1365 字符 / ~853 token，max_tokens=3000，轮次=1
+  [stress-annotate-B20-b5#1] 第 1 次失败：RuntimeError 空正文 finish_reason=length → 8s 后重试
+  [stress-annotate-B20-b5] 成功：214.1s，1353 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=3000
+  [B20 批次5] 解析 20 条，输出 1353 字符 / ~846 token，max_tokens=3000，轮次=1
+  [stress-annotate-B20-b6#1] 第 1 次失败：RuntimeError 空正文 finish_reason=length → 8s 后重试
+  [stress-annotate-B20-b6#1] 第 2 次失败：RuntimeError 输出被截断 finish_reason=length → 16s 后重试
+  [stress-annotate-B20-b6] 成功：369.3s，1373 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=3000
+  [B20 批次6] 解析 20 条，输出 1373 字符 / ~858 token，max_tokens=3000，轮次=1
+  [stress-annotate-B20-b7] 成功：46.6s，471 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=3000
+  [B20 批次7] 解析 7 条，输出 471 字符 / ~294 token，max_tokens=3000，轮次=1
+  batch=20 打分：{'drop_purity': 1.0, 'false_drop_count': 0, 'drop_recall': 0.873, 'n_true_noise': 79, 'n_ai_drop': 69, 'n_correct_drop': 69}
+  —— batch=40：分 4 批 ——
+  [stress-annotate-B40-b1#1] 第 1 次失败：RuntimeError 输出被截断 finish_reason=length → 8s 后重试
+  [stress-annotate-B40-b1#1] 第 2 次失败：RuntimeError 输出被截断 finish_reason=length → 16s 后重试
+  [stress-annotate-B40-b1] 成功：397.8s，2714 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=3000
+  [B40 批次1] 解析 40 条，输出 2714 字符 / ~1696 token，max_tokens=3000，轮次=1
+  [stress-annotate-B40-b2] 成功：142.5s，2684 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=3000
+  [B40 批次2] 解析 40 条，输出 2684 字符 / ~1678 token，max_tokens=3000，轮次=1
+  [stress-annotate-B40-b3#1] 第 1 次失败：RuntimeError 输出被截断 finish_reason=length → 8s 后重试
+  [stress-annotate-B40-b3] 成功：218.9s，2727 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=3000
+  [B40 批次3] 解析 40 条，输出 2727 字符 / ~1704 token，max_tokens=3000，轮次=1
+  [stress-annotate-B40-b4] 成功：60.1s，471 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=3000
+  [B40 批次4] 解析 7 条，输出 471 字符 / ~294 token，max_tokens=3000，轮次=1
+  batch=40 打分：{'drop_purity': 1.0, 'false_drop_count': 0, 'drop_recall': 0.886, 'n_true_noise': 79, 'n_ai_drop': 70, 'n_correct_drop': 70}
+A 段完成，1721.0s
+结果已写入 /root/.codebuddy/artifact/2f8a7d30-9c21-4f0b-1d56-85ac64ebe000/aios-core-v3/experiments/prompt_separation/stress_result.json
+调用统计：{'calls': 11, 'ok': 11, 'failed': 0, 'gateway_504': 0, 'rate_429': 0, 'empty_body': 2, 'truncated': 4, 'internal_retry_attempts': 6, 'model_fallback_used': 0, 'token_escalation_used': 0}

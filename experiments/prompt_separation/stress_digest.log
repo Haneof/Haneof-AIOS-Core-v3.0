@@ -1,0 +1,6 @@
+=== 压力验证 | task=digest | endpoint=https://integrate.api.nvidia.com/v1 | model=minimaxai/minimax-m3.1-flash ===
+  [stress-digest] 成功：78.3s，282 字符，model=minimaxai/minimax-m3.1-flash，max_tokens=4000
+  DIGEST 合并 4 维 → 输出 282 字符 / ~176 token，max_tokens=4000
+C 段完成
+结果已写入 /root/.codebuddy/artifact/2f8a7d30-9c21-4f0b-1d56-85ac64ebe000/aios-core-v3/experiments/prompt_separation/stress_result.json
+调用统计：{'calls': 1, 'ok': 1, 'failed': 0, 'gateway_504': 0, 'rate_429': 0, 'empty_body': 0, 'truncated': 0, 'internal_retry_attempts': 0, 'model_fallback_used': 0, 'token_escalation_used': 0}
