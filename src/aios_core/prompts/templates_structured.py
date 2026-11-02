@@ -30,7 +30,7 @@ from .contracts import (
     untrusted_block,
 )
 
-__all__ = ["AnnotatePrompt", "GatePrompt", "ExtractPrompt"]
+__all__ = ["AnnotatePrompt", "GatePrompt", "ExtractPrompt", "CrossLinkPrompt"]
 
 
 class AnnotatePrompt(PromptSpec):
@@ -240,6 +240,118 @@ class ExtractPrompt(PromptSpec):
                 untrusted_block("AI 回复：" + assistant_reply),
             ]
         )
+
+
+class CrossLinkPrompt(PromptSpec):
+    """Attribute facts to *additional* dimensions. Output: one JSON array.
+
+    Why this is not part of SUMMARIZE or DIGEST. Both of those are *summaries*,
+    and 《维度总结宪法》二 states plainly that a summary answers "what happened in
+    this dimension over this window" and does **not** answer "what does it mean".
+    《全维投影宪法》八 pushes the conclusion further: cross-axis *observation* is
+    world access, cross-axis *meaning* is AI cognition — and its 禁止事项 4
+    forbids writing cross-dimension narrative as a factual Summary. So the
+    judgement gets its own task, and its product is a revisable Claim, never
+    summary prose.
+
+    Why the output is an attribution and not a conclusion. 《多维世界宪法》3.2:
+    "一个事件可以同时属于多个维度." A chat line saying "阿杰请我下周六去婚礼"
+    is one fact that legitimately belongs to both the conversation axis and the
+    social axis. Saying *that* is attribution. Saying "he values this friendship"
+    is inference — a different object, with different correction rules. This
+    template asks only for the former, and forbids the latter in as many words,
+    because the two are one careless sentence apart.
+
+    Why the target must come from the supplied catalogue. An unconstrained
+    target lets the model invent ``dim:friendship_feelings`` for a single chat
+    line. 《维度注册宪法》二 gives new axes a lifecycle (Candidate → …) that a
+    one-off label may not skip, so a link may only point at an axis that already
+    exists. Proposing a *new* axis is a different task with different evidence
+    requirements.
+
+    Why the source text is never copied. A relayed statement ("我心脏跳得好快")
+    is not a measurement. Writing it into the health axis as if it were a
+    reading is the exact contamination the fact/cognition split exists to
+    prevent; the link carries a *pointer* plus a short restatement, and the
+    original record keeps its own axis unchanged.
+    """
+
+    task = TaskKind.CROSS_LINK
+    output_contract = "json[id,target_dimension,statement,confidence,reason]"
+    json_example = (
+        '[{"id": "m03", "target_dimension": "dim:social",'
+        ' "statement": "阿杰邀请用户参加下周六的婚礼", "confidence": 0.82,'
+        ' "reason": "社交邀约"},'
+        ' {"id": "m11", "target_dimension": "dim:expense",'
+        ' "statement": "用户当天在菜市场支出 80 元", "confidence": 0.9,'
+        ' "reason": "金额支出"}]'
+    )
+
+    def body(self, params: PromptRenderParams) -> str:
+        catalogue = _catalogue_block(params.dimensions)
+        limit = int(params.get("max_links") or 20)
+
+        parts: list[str] = [
+            "你是个人 AI 记忆系统的「跨维度归属」环节。",
+            "",
+            "【你在做什么】",
+            "下面是一批已经存好的事实，每条都带着它自己的来源维度。你要判断的是：",
+            "其中哪些事实，**同时也属于另一个已经存在的维度**。",
+            "",
+            "这不是总结，也不是下结论。你只回答一件事：「这条事实，除了它现在的维度，"
+            "还是哪个维度的材料？」",
+            "",
+            "【能做与不能做】",
+            "- 能做：把一条聊天、记事本、日历里的事实，指到它同时归属的维度上。",
+            "- 不能做：不要评价人、不要推断动机、不要写「说明他最近……」「可能是因为……」"
+            "这类结论。那不是归属，是判断，有别的环节负责，而且必须带证据、可被推翻。",
+            "- 不能做：不要复制原文，也不要改写事实。statement 只是让目标维度看得懂的一句话，"
+            "必须能对回原来那条记录。",
+            "- 不能做：不要编造。原来的记录里没有的金额、时间、人名，一个字都不要添。",
+            "- 不能做：不要把「用户说他心跳快」当成「心率数据」。转述不是测量，"
+            "除非目标维度本身就是对话或主观陈述类。",
+            "",
+            "【目标维度的硬约束】",
+            "target_dimension 只能从下面这份现有维度目录里选，必须原样使用目录里的 key。"
+            "目录里没有的维度一律不许出现——新维度要单独走提案流程，不能在这里顺手造一个。",
+            "",
+            "【宁缺毋滥】",
+            f"最多输出 {limit} 条，按确定程度从高到低。只收你真的有把握的；"
+            "一条事实不属于任何别的维度，是很常见的情况，这时不要为它硬找一个目标。"
+            "整批都没有合适归属时，输出空数组 []。",
+            "",
+            "confidence：0~1 的数，表示「这条事实确实也属于该维度」的把握，不是重要程度。",
+            "reason：不超过 12 字，说明为什么归到那个维度。",
+            "",
+            "只输出 JSON，不要任何解释文字。输出格式（一个 JSON 数组，每条链接一个对象）：",
+            self.json_example,
+            "",
+            "【现有维度目录】",
+            catalogue or "（未提供维度目录——此时只允许输出空数组 []）",
+            "",
+            "【待判断的事实】",
+            render_records(params.records) or "（无）",
+        ]
+        return "\n".join(parts)
+
+
+def _catalogue_block(profiles: tuple[DimensionProfile, ...]) -> str:
+    """Render the closed set of axes a link may target.
+
+    Keys only, plus a human name when one exists: the model needs enough to
+    recognise the axis, and nothing that invites it to reason about the axis
+    itself. An empty catalogue is a hard stop, stated in the prompt, because a
+    link with an invented target cannot be applied.
+    """
+
+    lines: list[str] = []
+    for profile in profiles:
+        key = (profile.dimension_key or "").strip()
+        if not key:
+            continue
+        name = (profile.name or "").strip()
+        lines.append(f"- {key}：{name}" if name else f"- {key}")
+    return "\n".join(lines)
 
 
 def _dimension_block(params: PromptRenderParams) -> str:

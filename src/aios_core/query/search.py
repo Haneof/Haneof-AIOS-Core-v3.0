@@ -115,6 +115,71 @@ def derive_dimension(payload: dict, object_type: str) -> str:
 
     return "dim_unclassified"
 
+
+def derive_dimensions(payload: dict, object_type: str) -> tuple[str, ...]:
+    """Return *all* explicit dimensions a subject belongs to, primary first.
+
+    《多维世界宪法》3.2：「一个事件可以同时属于多个维度。」 ``derive_dimension``
+     deliberately returns one axis so every existing single-value check keeps its
+    meaning; this companion exposes the additional axes without weakening it.
+
+    A record's ``dimension`` stays its **source** axis. ``also_dimensions`` is the
+    set of axes the same fact additionally belongs to — populated by the
+    CROSS_LINK cognition task, never inferred here from keywords (R5/R6
+    boundary). Listing the same key twice, or repeating the primary, is
+    harmless and collapses.
+    """
+
+    primary = derive_dimension(payload, object_type)
+    extras: list[str] = []
+
+    def collect(value: object) -> None:
+        if isinstance(value, str) and value.strip():
+            extras.append(value.strip())
+        elif isinstance(value, (list, tuple)):
+            for item in value:
+                if isinstance(item, str) and item.strip():
+                    extras.append(item.strip())
+
+    def collect_dimension_list(value: object) -> None:
+        # ``dimensions`` is historically a list whose first item is the primary;
+        # everything after it is an additional axis.
+        if isinstance(value, (list, tuple)):
+            collect(list(value)[1:])
+
+    collect(payload.get("also_dimensions"))
+    collect_dimension_list(payload.get("dimensions"))
+    metadata = payload.get("metadata")
+    if isinstance(metadata, dict):
+        collect(metadata.get("also_dimensions"))
+        collect_dimension_list(metadata.get("dimensions"))
+
+    seen = {primary}
+    ordered: list[str] = [primary]
+    for key in extras:
+        if key not in seen:
+            seen.add(key)
+            ordered.append(key)
+    return tuple(ordered)
+
+
+def _also_dimensions_column(keys: Sequence[str]) -> str:
+    """Serialize additional axes for the projection column (comma-delimited)."""
+
+    return ",".join(keys)
+
+
+def _also_dimension_clause(alias: str) -> str:
+    """SQL predicate: the row's *additional* axes contain the bound parameter.
+
+    Values are dimension keys (``dim:xxx``), so a plain ``instr`` on the
+    comma-delimited column cannot produce a partial-key false positive unless
+    the key itself is a prefix of another — the surrounding commas prevent that.
+    """
+
+    return f"instr(',' || {alias}.also_dimensions || ',', ',' || ? || ',') > 0"
+
+
 def tokens_for(text: str) -> set[str]:
     """ASCII 词元 + CJK 二元组（bi-gram）。
 
@@ -304,6 +369,7 @@ class WorldSearchIndex:
                     occurred_start_us INTEGER,
                     occurred_end_us INTEGER,
                     dimension TEXT DEFAULT '',
+                    also_dimensions TEXT DEFAULT '',
                     PRIMARY KEY(object_id, revision)
                 );
                 CREATE TABLE IF NOT EXISTS search_annotations(
@@ -339,6 +405,12 @@ class WorldSearchIndex:
             )
             try:
                 conn.execute("ALTER TABLE search_occurred ADD COLUMN dimension TEXT DEFAULT ''")
+            except Exception:
+                pass
+            try:
+                conn.execute(
+                    "ALTER TABLE search_occurred ADD COLUMN also_dimensions TEXT DEFAULT ''"
+                )
             except Exception:
                 pass
 
@@ -461,8 +533,14 @@ class WorldSearchIndex:
 
         haystack = "\n".join(texts)
         joined = haystack.lower()
-        dim = derive_dimension(payload, object_type)
+        dimensions = derive_dimensions(payload, object_type)
+        dim = dimensions[0]
+        also_dimensions = _also_dimensions_column(dimensions[1:])
         tokens.add(_id_token("dim", dim))
+        for extra_dim in dimensions[1:]:
+            # Fine-grained recall ("this record also belongs to dim:social")
+            # must stay reachable even when the caller filters by keyword only.
+            tokens.add(_id_token("dim", extra_dim))
         if tokens:
             conn.executemany(
                 "INSERT OR IGNORE INTO search_postings(token, object_id, revision) VALUES(?,?,?)",
@@ -473,10 +551,10 @@ class WorldSearchIndex:
         conn.execute(
             """
             INSERT OR REPLACE INTO search_occurred(
-                object_id, revision, subject_id, object_type, occurred_start_us, occurred_end_us, dimension
-            ) VALUES(?,?,?,?,?,?,?)
+                object_id, revision, subject_id, object_type, occurred_start_us, occurred_end_us, dimension, also_dimensions
+            ) VALUES(?,?,?,?,?,?,?,?)
             """,
-            (object_id, revision, subject_id, object_type, start_us, end_us, dim),
+            (object_id, revision, subject_id, object_type, start_us, end_us, dim, also_dimensions),
         )
         conn.execute(
             "INSERT OR REPLACE INTO search_doc(object_id, revision, haystack, excerpt) VALUES(?,?,?,?)",
@@ -945,8 +1023,10 @@ class WorldSearchIndex:
                 clauses.append("o.subject_id = ?")
                 params.append(str(subject))
             if dimension:
-                clauses.append("o.dimension = ?")
-                params.append(dimension)
+                # 宪法 3.2：一条事实可以同时属于多个维度。主维度命中之外，
+                # 也允许通过 also_dimensions 命中（CROSS_LINK 产生）。
+                clauses.append(f"(o.dimension = ? OR {_also_dimension_clause('o')})")
+                params.extend([dimension, dimension])
             if claim_id:
                 clauses.append("(o.object_id = ? OR o.object_id IN (SELECT object_id FROM search_postings WHERE token = ?))")
                 params.extend([claim_id, _id_token("ref", claim_id)])
@@ -1225,7 +1305,8 @@ class WorldSearchIndex:
                 fetched = conn.execute(
                     f"""
                     SELECT o.object_id, o.revision, o.object_type, o.subject_id,
-                           o.dimension, o.occurred_start_us, o.occurred_end_us,
+                           o.dimension, o.also_dimensions,
+                           o.occurred_start_us, o.occurred_end_us,
                            d.excerpt, a.created_at AS annotation_created_at
                     FROM search_occurred o
                     JOIN search_doc d
@@ -1317,8 +1398,13 @@ class WorldSearchIndex:
 
             if subject is not None and str(row["subject_id"]) != subject:
                 continue
-            if dimension is not None and str(row["dimension"] or "") != dimension:
-                continue
+            if dimension is not None:
+                primary = str(row["dimension"] or "")
+                extras = str(row["also_dimensions"] or "")
+                if primary != dimension and dimension not in (
+                    part for part in extras.split(",") if part
+                ):
+                    continue
             if object_type_filter and object_type not in object_type_filter:
                 continue
 

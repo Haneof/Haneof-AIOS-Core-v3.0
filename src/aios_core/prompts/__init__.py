@@ -45,7 +45,7 @@ from .task_runtime import (
     resolve_model,
     resolve_runtime,
 )
-from .templates_structured import AnnotatePrompt, ExtractPrompt, GatePrompt
+from .templates_structured import AnnotatePrompt, CrossLinkPrompt, ExtractPrompt, GatePrompt
 from .templates_text import DialoguePrompt, DigestPrompt, SummarizePrompt
 
 __all__ = [
@@ -57,6 +57,7 @@ __all__ = [
     "PROMPT_REGISTRY",
     "STRUCTURED_TASKS",
     "AnnotatePrompt",
+    "CrossLinkPrompt",
     "DialoguePrompt",
     "DigestPrompt",
     "DimensionProfile",

@@ -34,11 +34,29 @@ class DimensionSummarySource(BaseModel):
     occurred_at: datetime | None = None
     text: str
     metadata: dict[str, Any] = Field(default_factory=dict)
+    # What kind of material this is, so a summary can never quietly present a
+    # belief as an observation. ``observation``/``event`` are facts about the
+    # world; ``cognition`` is a Claim that another task attributed to this axis
+    # (see summaries/cross_link.py). 《证据宪法》二 forbids rewriting an
+    # Observation; keeping the class explicit is what lets the summary cite a
+    # belief *as* a belief.
+    source_class: str = "observation"
 
     @model_validator(mode="after")
     def validate_time(self) -> "DimensionSummarySource":
         if self.occurred_at is not None:
             as_utc(self.occurred_at, "occurred_at")
+        if self.source_class not in {"observation", "cognition"}:
+            raise ValueError("source_class must be 'observation' or 'cognition'")
+        # Derived, not declared: a Claim is cognition by construction, and
+        # everything else is a fact of some axis. Letting a caller choose would
+        # allow an observation to be dressed up as a belief (or the reverse).
+        expected = "cognition" if self.object_type == "claim" else "observation"
+        if self.source_class != expected:
+            raise ValueError(
+                "source_class does not match object_type: a claim is cognition, "
+                "every other object type is an observation"
+            )
         return self
 
 
@@ -47,6 +65,9 @@ class DimensionSummaryInput(BaseModel):
 
     subject_id: str = ""  # Legacy unbound inputs must be prepared again before commit.
     include_summary_sources: bool = False
+    # Off by default. When on, Claims that another task attributed to this axis
+    # join the source list — as cognition, never as fact.
+    include_cognition_sources: bool = False
     dimension: str = Field(min_length=1)
     granularity: str = Field(min_length=1)
     window_start: datetime
@@ -234,6 +255,12 @@ class DimensionSummaryService:
                 raise ValueError("summary source is not current/admissible")
             if derive_dimension(raw, source.object_type) != prepared.dimension:
                 raise ValueError("summary source belongs to a different dimension")
+            # A belief may be cited, but never presented as a fact of this axis.
+            # The class is derived from the object type, not trusted from the
+            # caller, so a mislabelled source cannot pass as an observation.
+            expected_class = "cognition" if source.object_type == "claim" else "observation"
+            if source.source_class != expected_class:
+                raise ValueError("summary source_class does not match its object type")
             if (self.source_admission is not None
                     and not self.source_admission(source.object_id, source.object_type, raw)):
                 raise ValueError("summary source rejected by source admission policy")
@@ -258,6 +285,7 @@ class DimensionSummaryService:
             dimension=prepared.dimension, granularity=prepared.granularity,
             window_start=prepared.window_start, window_end=prepared.window_end,
             include_summary_sources=prepared.include_summary_sources,
+            include_cognition_sources=prepared.include_cognition_sources,
             max_source_objects=prepared.max_source_objects,
         )
         current_refs = {(item.object_id, item.revision) for item in current.sources}
@@ -272,6 +300,7 @@ class DimensionSummaryService:
         window_start: datetime,
         window_end: datetime,
         include_summary_sources: bool = False,
+        include_cognition_sources: bool = False,
         max_source_objects: int | None = None,
     ) -> DimensionSummaryInput:
         start = as_utc(window_start, "window_start")
@@ -309,12 +338,23 @@ class DimensionSummaryService:
             hits.extend(page.hits)
             saturated |= len(page.hits) >= scan_limit
 
-        eligible: list[tuple[Any, dict[str, Any]]] = []
+        eligible: list[tuple[Any, dict[str, Any], str]] = []
         admission_filtered = False
         for hit in hits:
             if hit.object_id == target_summary_id:
                 continue
             payload = self.store.get_payload(hit.object_id, revision=hit.revision)
+            source_class = "observation"
+            if hit.object_type == "claim":
+                # A Claim that CROSS_LINK attributed to this axis is *cognition*,
+                # not a fact of this axis. Off unless the caller asked for it —
+                # otherwise every summary would silently start citing beliefs.
+                if not include_cognition_sources:
+                    continue
+                meta = payload.get("metadata") or {}
+                if str(meta.get("dimension") or "") != dimension:
+                    continue
+                source_class = "cognition"
             if hit.object_type == "summary":
                 if not include_summary_sources:
                     continue
@@ -332,12 +372,12 @@ class DimensionSummaryService:
                     and not self.source_admission(hit.object_id, hit.object_type, payload)):
                 admission_filtered = True
                 continue
-            eligible.append((hit, payload))
+            eligible.append((hit, payload, source_class))
 
         truncated = (saturated or len(eligible) > effective_cap
                      or source_world_revision != self.store.current_world_revision())
         sources: list[DimensionSummarySource] = []
-        for hit, payload in eligible[:effective_cap]:
+        for hit, payload, source_class in eligible[:effective_cap]:
             metadata = payload.get("metadata")
             sources.append(
                 DimensionSummarySource(
@@ -347,6 +387,7 @@ class DimensionSummaryService:
                     occurred_at=_occurred_start(payload),
                     text=_text_from_payload(payload),
                     metadata=dict(metadata) if isinstance(metadata, dict) else {},
+                    source_class=source_class,
                 )
             )
 
@@ -359,6 +400,7 @@ class DimensionSummaryService:
         return DimensionSummaryInput(
             subject_id=self.subject_id,
             include_summary_sources=include_summary_sources,
+            include_cognition_sources=include_cognition_sources,
             dimension=dimension,
             granularity=granularity,
             window_start=start,
@@ -557,6 +599,15 @@ class DimensionSummaryService:
             coverage={
                 "dimension": prepared.dimension,
                 "source_count": len(prepared.sources),
+                # Split on purpose: a reader must be able to tell how much of a
+                # summary rests on facts of this axis and how much rests on
+                # another task's beliefs about it.
+                "observation_source_count": sum(
+                    1 for item in prepared.sources if item.source_class == "observation"
+                ),
+                "cognition_source_count": sum(
+                    1 for item in prepared.sources if item.source_class == "cognition"
+                ),
                 "truncated": prepared.truncated,
                 "max_source_objects": prepared.max_source_objects,
                 "admission_filtered": prepared.admission_filtered,

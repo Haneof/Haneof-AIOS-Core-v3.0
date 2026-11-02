@@ -31,13 +31,20 @@ from .constitutional_prefix import is_constitutional_prefix
 
 
 class TaskKind(StrEnum):
-    """The six AI jobs AIOS performs, identified by input/output contract."""
+    """The seven AI jobs AIOS performs, identified by input/output contract."""
 
     ANNOTATE = "annotate"        # label a batch of raw records (keep/drop + relevance)
     GATE = "gate"                # second-pass review of delete candidates
     EXTRACT = "extract"          # pull durable facts out of one dialogue turn
     SUMMARIZE = "summarize"      # describe one dimension over one time window
     DIGEST = "digest"            # merge lower-scale summaries into a cross-dimension view
+    # Cross-axis attribution: "this fact also belongs to another dimension".
+    # Kept apart from SUMMARIZE/DIGEST on constitutional grounds, not taste —
+    # 《维度总结宪法》二 forbids summaries from making cognitive judgements, and
+    # 《全维投影宪法》禁止事项 4 forbids writing cross-dimension narrative as a
+    # factual Summary. The judgement therefore needs its own task whose output
+    # is a revisable Claim, never summary prose.
+    CROSS_LINK = "cross_link"    # attribute facts to additional dimensions
     DIALOGUE = "dialogue"        # talk to the user, with tool calls
 
 

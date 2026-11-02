@@ -43,7 +43,16 @@ supposed to close.
 """
 
 STRUCTURED_TASKS: frozenset[TaskKind] = frozenset(
-    {TaskKind.ANNOTATE, TaskKind.GATE, TaskKind.EXTRACT}
+    {
+        TaskKind.ANNOTATE,
+        TaskKind.GATE,
+        TaskKind.EXTRACT,
+        # CROSS_LINK answers with a JSON array of attributions. It is parsed
+        # here for the same reason the other three are: a reply that is not
+        # usable JSON is "no answer", and must not be mistaken for "nothing
+        # belongs anywhere" (the empty array, which *is* an answer).
+        TaskKind.CROSS_LINK,
+    }
 )
 
 _JSON_BLOCK = re.compile(r"```(?:json)?\s*(.*?)```", re.DOTALL)

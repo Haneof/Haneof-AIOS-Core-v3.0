@@ -111,6 +111,29 @@ DEFAULT_RUNTIME: dict[TaskKind, TaskRuntimeConfig] = {
         # One dimension failing must not stop the other dimensions' digests.
         failure_policy=FailurePolicy.FAIL_SOFT,
     ),
+    TaskKind.CROSS_LINK: TaskRuntimeConfig(
+        task=TaskKind.CROSS_LINK,
+        # An attribution is a judgement, not a label: the model has to hold a
+        # record, its source axis and a catalogue of candidate axes in mind at
+        # once. That is STANDARD work, but the *output* is a short JSON array —
+        # so it keeps ANNOTATE's budget rather than DIGEST's.
+        model_tier=ModelTier.STANDARD,
+        # Cold, like the other structured jobs: an attribution that flips between
+        # runs is worse than one that is slightly conservative — the same batch is
+        # re-judged next cycle either way.
+        temperature=0.0,
+        # Same reasoning-token cliff as every structured task here: the answer
+        # is short, the thinking is not, and 1200-2000 came back empty on this
+        # endpoint. Matched to ANNOTATE's measured floor.
+        max_output_tokens=3000,
+        timeout_seconds=180.0,
+        max_retries=2,
+        # Missing links cost nothing permanent — the fact stays on its own axis
+        # and the next cycle may link it. Crucially, a failed call must never be
+        # read as "nothing belongs anywhere", so the caller distinguishes an
+        # empty array (a real answer) from a failed call (no answer).
+        failure_policy=FailurePolicy.SKIP_RETRY_NEXT,
+    ),
     TaskKind.DIALOGUE: TaskRuntimeConfig(
         task=TaskKind.DIALOGUE,
         model_tier=ModelTier.STRONG,

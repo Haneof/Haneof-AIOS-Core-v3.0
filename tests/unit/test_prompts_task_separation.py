@@ -59,7 +59,12 @@ from aios_core.prompts.templates_text import (
 )
 
 ALL_TASKS = list(TaskKind)
-STRUCTURED_TASKS = (TaskKind.ANNOTATE, TaskKind.GATE, TaskKind.EXTRACT)
+STRUCTURED_TASKS = (
+    TaskKind.ANNOTATE,
+    TaskKind.GATE,
+    TaskKind.EXTRACT,
+    TaskKind.CROSS_LINK,
+)
 
 
 @dataclass
@@ -128,6 +133,18 @@ SAMPLE_PARAMS: dict[TaskKind, PromptRenderParams] = {
         window_start="2026-09-08",
         window_end="2026-09-14",
     ),
+    TaskKind.CROSS_LINK: PromptRenderParams(
+        records=(
+            {"id": "m03", "text": "阿杰邀请我下周六去婚礼", "dimension": "chat"},
+            {"id": "m04", "text": "菜市场花了八十块", "dimension": "chat"},
+        ),
+        dimensions=(
+            DimensionProfile(dimension_key="dim:social", name="社交关系"),
+            DimensionProfile(dimension_key="dim:expense", name="生活开支"),
+        ),
+        window_start="2026-09-14",
+        window_end="2026-09-14",
+    ),
     TaskKind.DIALOGUE: PromptRenderParams(
         extra={
             "user_input": "这周我做了什么？",
@@ -149,7 +166,7 @@ def test_registry_covers_every_task_kind_exactly():
     真实对话暴露失忆。多登记同样要失败，避免出现没人调用的孤儿提示词。"""
 
     assert set(PROMPT_REGISTRY) == set(TaskKind)
-    assert len(PROMPT_REGISTRY) == len(ALL_TASKS) == 6
+    assert len(PROMPT_REGISTRY) == len(ALL_TASKS) == 7
 
 
 def test_every_registered_entry_is_a_matching_prompt_spec():
