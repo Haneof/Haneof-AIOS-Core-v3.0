@@ -3,11 +3,14 @@
 对应《维度注册宪法》十四 + 周期复盘 §2 的落地：
 
   * 发现与注册归「总结 / 周期复盘 AI」（DimensionDiscoveryService），不在实时对话；
-  * 注册门（注册门）是**认知门槛**——必须核对已有维度、证明模式「反复出现且连贯、
-    而非孤立事件」、给出用户价值与维护成本；系统只做结构校验，**不设固定数字阈值**
-    （宪法二/五，P16 ``recurrence_gated_not_single_event``）；
-  * 证据 id 必须来自真实信号，不得伪造；
-  * 噪声（无复发模式）应得到**空数组**，而不是硬凑一个新轴；
+  * 注册门是**认知门槛**——必须核对已有维度（宪法八）、论证时间连续性与
+    用户价值 / 维护成本、说明未来如何更新（宪法四）；系统只做结构校验，
+    **不设固定数字阈值**，是否反复出现、单条证据够不够由 AI 判断
+    （宪法二/五）。P16 ``recurrence_gated_not_single_event`` 只是某个隐藏场景的
+    评估标准，不是「每个轴都必须复发 N 次」的通用注册规则；
+  * 宪法五：单条证据可以合法形成 Candidate，代码不得数次数；
+  * 证据 id 必须来自真实信号，不得伪造；注册门列出的已有轴 key 也不得伪造；
+  * 噪声（无持续观察价值）应得到**空数组**，而不是硬凑一个新轴；
   * 同一提案幂等：重复 commit 不写第二份维度定义。
 
 这些断言把「漏登记 / 绕过注册门 / 伪造证据 / 噪声却立轴」当场变红，而不是在真实
@@ -150,7 +153,7 @@ def _window():
 def _gate() -> dict:
     return {
         "duplicate_checked_keys": [EXISTING_KEY],
-        "recurrence_rationale": "该身体信号在两周内反复出现 4 次且未自行缓解。",
+        "recurrence_rationale": "该身体信号跨多日持续、未自行缓解，值得作为长期趋势观察。",
         "is_novel_axis_reason": "现有通道型维度会把跨通道的身体信号拆散，看不到整体趋势。",
     }
 
@@ -163,10 +166,11 @@ def _proposal(dimension_key: str, *, evidence_ids, name="身体状态") -> dict:
         "data_shape": "time series of {symptom, trigger, severity}",
         "evidence_record_ids": [{"object_id": oid, "revision": 1} for oid in evidence_ids],
         "why_existing_dimensions_are_insufficient": "现有轴都是来源通道，无法承载跨通道的连续身体信号。",
-        "continuity_rationale": "该信号在两周内反复出现 4 次。",
+        "continuity_rationale": "该信号跨多日持续且未自行缓解，具有长期观察价值。",
         "user_value_rationale": "让后续复盘把身体信号当趋势看，而非孤立抱怨。",
         "maintenance_cost_rationale": "每周一次总结即可。",
         "confidence": 0.7,
+        "update_method": "每轮复盘把新出现的身体信号 Claim 追加进该轴，按周聚合，不改写原始事实。",
         "gate": _gate(),
     }
 
@@ -234,7 +238,7 @@ def test_parse_rejects_proposal_without_gate(tmp_path):
 def test_parse_rejects_proposal_with_empty_recurrence_rationale(tmp_path):
     svc, prepared = _prepared_with_signals(tmp_path, "clm_a")
     bad = _proposal("dim:physical_condition", evidence_ids=["clm_a"])
-    bad["gate"] = {"duplicate_checked_keys": [], "recurrence_rationale": "",
+    bad["gate"] = {"duplicate_checked_keys": [EXISTING_KEY], "recurrence_rationale": "",
                    "is_novel_axis_reason": "x"}
 
     with pytest.raises(ValueError):
@@ -272,6 +276,56 @@ def test_parse_rejects_dimension_key_without_dim_prefix(tmp_path):
         svc.parse_items(prepared, [bad])
 
 
+def test_parse_accepts_single_evidence_candidate(tmp_path):
+    """宪法五：单条证据可以合法形成 Candidate，代码不得数次数。"""
+    svc, prepared = _prepared_with_signals(tmp_path, "clm_only")
+    items = svc.parse_items(prepared, [
+        _proposal("dim:physical_condition", evidence_ids=["clm_only"])
+    ])
+    assert len(items) == 1
+    assert len(items[0].evidence_record_ids) == 1
+
+
+def test_parse_rejects_gate_without_duplicate_check_when_catalogue_exists(tmp_path):
+    """宪法八/十四：目录非空却没核对任何现有轴，注册门视为结构不完整。"""
+    store, index = _store(tmp_path)
+    _seed_dimension(store, dimension_key=EXISTING_KEY, name="人机互动")
+    _seed_claim(store, _claim("clm_a", "信号", at=NOW - timedelta(days=1)))
+    svc = _service(store, index)
+    prepared = svc.prepare(window_start=NOW - timedelta(days=7),
+                           window_end=NOW + timedelta(hours=1))
+
+    bad = _proposal("dim:physical_condition", evidence_ids=["clm_a"])
+    bad["gate"] = {**_gate(), "duplicate_checked_keys": []}
+    with pytest.raises(ValueError, match="existing axes reviewed"):
+        svc.parse_items(prepared, [bad])
+
+
+def test_parse_rejects_fabricated_duplicate_checked_key(tmp_path):
+    """注册门列出的已有轴也必须是目录里真实存在的 key（防伪造，宪法八）。"""
+    store, index = _store(tmp_path)
+    _seed_dimension(store, dimension_key=EXISTING_KEY, name="人机互动")
+    _seed_claim(store, _claim("clm_a", "信号", at=NOW - timedelta(days=1)))
+    svc = _service(store, index)
+    prepared = svc.prepare(window_start=NOW - timedelta(days=7),
+                           window_end=NOW + timedelta(hours=1))
+
+    bad = _proposal("dim:physical_condition", evidence_ids=["clm_a"])
+    bad["gate"] = {**_gate(), "duplicate_checked_keys": ["dim:never_existed"]}
+    with pytest.raises(ValueError, match="not in the catalogue"):
+        svc.parse_items(prepared, [bad])
+
+
+def test_parse_rejects_missing_update_method(tmp_path):
+    """宪法四：Dimension Proposal 必须说明「未来如何更新」。"""
+    svc, prepared = _prepared_with_signals(tmp_path, "clm_a")
+    bad = _proposal("dim:physical_condition", evidence_ids=["clm_a"])
+    del bad["update_method"]
+
+    with pytest.raises(ValueError):
+        svc.parse_items(prepared, [bad])
+
+
 # --------------------------------------------------------------------------
 # 3. commit：立为 Candidate，且注册门耐久写入
 # --------------------------------------------------------------------------
@@ -301,6 +355,8 @@ def test_commit_writes_candidate_with_recorded_gate(tmp_path):
     gate = definition["metadata"]["proposal"]["registration_gate"]
     assert gate["recurrence_rationale"]
     assert gate["is_novel_axis_reason"]
+    # 宪法四「未来如何更新」必须真正落到维度定义，而不只是提示词里说说。
+    assert definition["update_method"] == items[0].update_method
 
 
 def test_commit_is_idempotent_no_duplicate_dimension(tmp_path):

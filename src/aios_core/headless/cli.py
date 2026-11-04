@@ -236,6 +236,7 @@ def _build_recovery_config(args: argparse.Namespace) -> HeadlessConfig:
 def _warn_on_missing_summary_handlers(
     round_summary_handler: Any,
     dimension_summary_handler: Any,
+    dimension_discovery_handler: Any = None,
 ) -> None:
     """总结 handler 缺省时显式告警，不允许分层记忆静默空转。
 
@@ -256,17 +257,27 @@ def _warn_on_missing_summary_handlers(
         missing.append("--round-summary-handler")
     if dimension_summary_handler is None:
         missing.append("--dimension-summary-handler")
-    if not missing:
-        return
 
-    print(
-        "[aios-core] WARNING: 未提供 "
-        + " / ".join(missing)
-        + "，分层记忆将不会产生任何 SUMMARY。"
-        "recent_turns 滑出窗口后，模型既看不到原始对话、也没有总结可读，"
-        "长会话连续性会断档。若这是有意的轻量运行，可忽略本提示。",
-        file=sys.stderr,
-    )
+    if missing:
+        print(
+            "[aios-core] WARNING: 未提供 "
+            + " / ".join(missing)
+            + "，分层记忆将不会产生任何 SUMMARY。"
+            "recent_turns 滑出窗口后，模型既看不到原始对话、也没有总结可读，"
+            "长会话连续性会断档。若这是有意的轻量运行，可忽略本提示。",
+            file=sys.stderr,
+        )
+
+    # 《维度注册宪法》十四：发现归总结环节。discovery 挂在维度总结调度器上，
+    # 因此只配 discovery handler 而没配 dimension summary handler 时，本轮
+    # 根本不会触发发现——必须显式说出来，不能让"已接入"变成静默空转。
+    if dimension_discovery_handler is not None and dimension_summary_handler is None:
+        print(
+            "[aios-core] WARNING: 已配置 --dimension-discovery-handler，但未提供 "
+            "--dimension-summary-handler；新维度发现属于总结环节、挂在维度总结"
+            "调度器上，本轮不会运行。请同时配置维度总结 handler。",
+            file=sys.stderr,
+        )
 
 
 def _build_core(args: argparse.Namespace) -> HeadlessCore:
@@ -295,7 +306,9 @@ def _build_core(args: argparse.Namespace) -> HeadlessCore:
         else load_model_handler(args.dimension_discovery_handler)
     )
 
-    _warn_on_missing_summary_handlers(round_summary, dimension_summary)
+    _warn_on_missing_summary_handlers(
+        round_summary, dimension_summary, dimension_discovery
+    )
 
     return HeadlessCore(
         config=HeadlessConfig(

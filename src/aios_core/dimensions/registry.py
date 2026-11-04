@@ -99,11 +99,14 @@ _ALLOWED_TRANSITIONS: Mapping[DimensionLifecycle, frozenset[DimensionLifecycle]]
 class DimensionProposalGate(BaseModel):
     """The registration gate (注册门) a proposal must clear.
 
-    《维度注册宪法》十四 requires every new-axis proposal to prove it checked the
-    existing axes, showed why they are insufficient, and showed the pattern is
-    *recurring and coherent, not a one-off event*. The system enforces only that
-    these fields are present and non-blank; whether the recurrence is real is the
-    AI's call — no fixed numeric threshold (宪法二/五).
+    《维度注册宪法》十四 requires every new-axis proposal to show it checked the
+    existing axes (宪法八), explain why they are insufficient, and argue the
+    observation need has *time continuity* (宪法四) rather than being a bare
+    one-off remark. The system enforces only that these fields are present and
+    non-blank; whether the continuity is real, how many occurrences suffice,
+    and whether a single evidence is enough, are the AI's call — no fixed
+    numeric threshold (宪法二), and 宪法五 explicitly lets one evidence form a
+    Candidate when the AI acknowledges it is still unverified.
     """
 
     model_config = ConfigDict(extra="forbid", frozen=True)

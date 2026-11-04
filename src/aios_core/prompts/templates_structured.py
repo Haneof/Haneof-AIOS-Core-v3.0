@@ -389,12 +389,14 @@ class DimensionDiscoveryPrompt(PromptSpec):
     Why a gate (注册门). The user asked for a bar ("不能瞎注册，有门槛") but the
     constitution forbids fixed numeric thresholds (《维度注册宪法》二废掉 2 来源 /
     3 天 / 70%; 五允许单条证据成 Candidate). So the bar is *cognitive, not
-    numeric*: every proposal must carry a gate block proving the AI checked the
-    existing axes, showed why they are insufficient, and — crucially — showed the
-    pattern is *recurring and coherent, not a one-off event*. The system only
-    checks structure (key unique, evidence pinned, gate fields present); whether
-    the recurrence is real is the AI's call. This is the machine-readable form of
-    the P16 ``recurrence_gated_not_single_event`` criterion.
+    numeric*: every proposal must carry a gate block showing the AI checked the
+    existing axes (宪法八), explained why they are insufficient, and argued the
+    observation need has *time continuity* rather than being a bare one-off
+    remark (宪法四/十四). The system checks structure only (key unique, evidence
+    pinned, gate fields present); whether the pattern really recurs, and whether
+    one evidence is enough, is the AI's call — the code never counts occurrences.
+    P16's ``recurrence_gated_not_single_event`` is a criterion for one hidden
+    evaluation scenario, NOT a general rule that every axis must recur N times.
 
     Why the proposal is a Candidate, never an active fact. Mirrors 宪法五: a
     proposal is "AI 提出了一个有证据、结构完整的新观察轴候选", not proof of
@@ -411,7 +413,8 @@ class DimensionDiscoveryPrompt(PromptSpec):
     output_contract = (
         "json[dimension_key,name,description,data_shape,evidence_record_ids,"
         "why_existing_dimensions_are_insufficient,continuity_rationale,"
-        "user_value_rationale,maintenance_cost_rationale,confidence,gate]"
+        "user_value_rationale,maintenance_cost_rationale,confidence,"
+        "update_method,gate]"
     )
     json_example = (
         '[{"dimension_key": "dim:physical_condition", "name": "身体状态",'
@@ -421,12 +424,15 @@ class DimensionDiscoveryPrompt(PromptSpec):
         ' {"object_id": "obs_reflux_4", "revision": 1}],'
         ' "why_existing_dimensions_are_insufficient": "现有轴都是来源通道（对话/记事本/日历），'
         '无法承载这个跨通道的连续身体信号。",'
-        ' "continuity_rationale": "该信号在四周内反复出现 7 次且未自行缓解。",'
+        ' "continuity_rationale": "该信号跨多个星期持续出现且未自行缓解，值得作为长期趋势观察。",'
         ' "user_value_rationale": "让后续复盘把身体信号当趋势看，而非孤立抱怨。",'
         ' "maintenance_cost_rationale": "每周一次总结即可。",'
         ' "confidence": 0.7,'
+        ' "update_method": "每轮周期复盘把新出现的身体信号 Claim 追加进该轴，'
+        '由维度总结按周聚合，不改写原始事实。",'
         ' "gate": {"duplicate_checked_keys": ["dim:user_ai_interaction", "dim:note", "dim:calendar"],'
-        ' "recurrence_rationale": "四周内反复出现 7 次，是连贯模式而非孤立事件。",'
+        ' "recurrence_rationale": "该信号跨多个星期持续、未自行缓解，'
+        '是值得长期维护的观察需求而非一次性的闲聊。",'
         ' "is_novel_axis_reason": "现有通道型维度会把这个跨通道信号拆散，看不到整体。"}}]'
     )
 
@@ -438,29 +444,34 @@ class DimensionDiscoveryPrompt(PromptSpec):
             "你是个人 AI 记忆系统的「新维度发现」环节——这是总结 / 周期复盘 AI 的职责，不是实时对话做的事。",
             "",
             "【你在做什么】",
-            "你看两份材料：【现有维度目录】和【近期跨维信号】（一段真实世界里反复出现的事实 / "
+            "你看两份材料：【现有维度目录】和【近期跨维信号】（一段真实世界里的事实 / "
             "跨维链接 / 结论）。你要判断的是：这些材料是否已经积累出一个"
-            "「反复出现、连贯、现有轴都承载不了」的长期观察需求，值得新立一个观察轴（Candidate）。",
+            "「具有时间连续性、现有轴都承载不了」的长期观察需求，值得新立一个观察轴（Candidate）。",
             "",
             "这不是总结，也不是下结论。你是判断「世界是否值得多一条观察世界的轴」。",
             "",
             "【能做与不能做】",
-            "- 能：基于反复出现的信号，提出一个新观察轴候选。",
+            "- 能：基于已积累的世界材料，提出一个新观察轴候选。",
             "- 不能：不要修改任何原始事实；不要编造证据；不要评价人、不要推断动机；"
-            "不要把单条事实说成维度；不要写「说明他最近……」这类结论——那是判断，有别的环节负责。",
+            "不要把一条事实直接当成一个维度；不要写「说明他最近……」这类结论——那是判断，有别的环节负责。",
             "- 不能：不要跳过注册门。每个提案都必须把 gate 块填完整，缺一项都不行。",
             "",
             "【注册门（门槛）——宪法硬约束】",
+            "门槛是**论证**，不是数字。宪法二禁止用固定次数 / 天数 / 置信度替你判断维度意义；"
+            "宪法五明确允许单条证据形成 Candidate。是否「反复出现」、几次才算充分，由你判断，"
+            "系统只做结构校验，不会去数次数。",
             "每个提案必须包含独立的 gate 块，且每一项都要写：",
-            "- duplicate_checked_keys：你逐一核对过的现有维度 key 列表，证明你确实看过、且它们都承载不了这个模式"
-            "（系统只做精确的 key 冲突检查，语义是否「看起来重复」由你判断）。",
-            "- recurrence_rationale：为什么这是**反复出现的连贯模式**，而不是孤立的一次事件。"
-            "单条事实不足以立轴——你必须证明它反复出现。",
+            "- duplicate_checked_keys：你逐一核对过的现有维度 key 列表，"
+            "只能写【现有维度目录】里真实存在的 key，证明你确实看过、且它们都承载不了这个模式"
+            "（系统只做精确的 key 冲突检查，语义是否「看起来重复」由你判断，宪法八）。",
+            "- recurrence_rationale：论证这个观察需求为什么具有**时间连续性**、值得长期维护，"
+            "而不是把一句闲聊直接升级成观察轴。单条证据也可以成 Candidate，"
+            "但你必须明确承认它只是候选、待真实运行继续验证。",
             "- is_novel_axis_reason：为什么现有轴不足。",
             "- 另需 why_existing_dimensions_are_insufficient / continuity_rationale / "
-            "user_value_rationale / maintenance_cost_rationale 分别说明。",
-            "- 单条证据也可以成 Candidate，但你必须明确承认它只是候选、待真实运行继续验证，"
-            "不得写成 Active，也不得当成事实。",
+            "user_value_rationale / maintenance_cost_rationale 分别说明（宪法四）。",
+            "- update_method：这个轴未来如何更新——哪些信号、由哪个环节、以什么节奏写入（宪法四要求项）。",
+            "- 立案结果只能是 Candidate，不得写成 Active，也不得当成事实（宪法五）。",
             "",
             "【证据硬约束】",
             "evidence_record_ids 只能引用【近期跨维信号】里真实存在的记录（用那里的 id 和 revision），"
@@ -470,12 +481,13 @@ class DimensionDiscoveryPrompt(PromptSpec):
             f"最多输出 {limit} 条。一遍复盘没有值得立的轴，是很常见、很正确的结果，"
             "这时输出空数组 []，不要硬凑。整批都没有合适候选时，输出空数组 []。",
             "",
-            "confidence：0~1，表示「这个新轴确实值得立」的把握，不是重要程度。",
+            "confidence：0~1，表示「这个新轴确实值得立」的把握，不是重要程度；系统不设通过阈值。",
             "只输出 JSON，不要任何解释文字。输出格式（一个 JSON 数组，每条提案一个对象）：",
             self.json_example,
             "",
             "【现有维度目录】",
-            catalogue or "（未提供维度目录——此时只允许输出空数组 []）",
+            catalogue or "（当前没有已注册的维度目录——请在 is_novel_axis_reason 里如实说明；"
+            "是否立轴仍由你判断，系统不替你否决）",
             "",
             "【近期跨维信号】",
             render_records(params.records) or "（无）",

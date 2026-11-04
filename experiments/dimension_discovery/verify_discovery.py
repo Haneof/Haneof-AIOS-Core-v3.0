@@ -1,8 +1,10 @@
 """端到端验证：新维度发现（DISCOVER_DIMENSION）接入生产流水线。
 
 对应《维度注册宪法》十四 + 周期复盘 §2：发现与注册归「总结 / 周期复盘 AI」，
-不在实时对话；注册门是**认知门槛**，不设固定数字阈值（P16
-``recurrence_gated_not_single_event`` / ``noise_resilience_no_false_pattern``）。
+不在实时对话；注册门是**认知门槛**（宪法四/八：核对已有轴、论证时间连续性、
+说明未来如何更新），不设固定数字阈值（宪法二）；单条证据也可成 Candidate
+（宪法五）。P16 ``recurrence_gated_not_single_event`` /
+``noise_resilience_no_false_pattern`` 只是隐藏场景的评估标准，不是通用注册规则。
 
 本脚本用 mock discovery handler 复现两个 P16 场景：
   1. 反复身体信号（跨多天、多 claim）→ 立 1 个 Candidate 轴，注册门耐久写入；
@@ -106,8 +108,9 @@ def _discovery_handler_factory(mode: str):
         if mode == "noise":
             return "[]"  # 诚实地说：没有值得立的轴
         signals = list(prepared.signals)
-        if len(signals) < 2:
+        if not signals:
             return "[]"
+        # 宪法五：单条证据也能成 Candidate，mock 不设次数门槛，只引用真实信号。
         cited = [{"object_id": s.object_id, "revision": s.revision} for s in signals[:2]]
         proposal = [{
             "dimension_key": "dim:physical_condition",
@@ -116,13 +119,14 @@ def _discovery_handler_factory(mode: str):
             "data_shape": "time series of {symptom, trigger, severity}",
             "evidence_record_ids": cited,
             "why_existing_dimensions_are_insufficient": "现有轴都是来源通道，无法承载跨通道的连续身体信号。",
-            "continuity_rationale": "该信号在两周内反复出现 5 次且未自行缓解。",
+            "continuity_rationale": "该信号跨多日持续且未自行缓解，具有长期观察价值。",
             "user_value_rationale": "让后续复盘把身体信号当趋势看，而非孤立抱怨。",
             "maintenance_cost_rationale": "每周一次总结即可。",
             "confidence": 0.7,
+            "update_method": "每轮复盘把新出现的身体信号 Claim 追加进该轴，按周聚合，不改写原始事实。",
             "gate": {
                 "duplicate_checked_keys": [EXISTING_KEY],
-                "recurrence_rationale": "两周内反复出现 5 次，是连贯模式而非孤立事件。",
+                "recurrence_rationale": "该信号跨多日持续、未自行缓解，是值得长期维护的观察需求而非一次性闲聊。",
                 "is_novel_axis_reason": "现有通道型维度会把这个跨通道信号拆散，看不到整体。",
             },
         }]

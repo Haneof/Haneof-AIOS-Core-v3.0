@@ -76,6 +76,9 @@ class DimensionDiscoveryItem(BaseModel):
     user_value_rationale: str = Field(min_length=1)
     maintenance_cost_rationale: str = Field(min_length=1)
     confidence: float = Field(ge=0.0, le=1.0)
+    # 宪法四「未来如何更新」：registry 一直支持 update_method，但 discovery
+    # 路径此前没收，导致经本路径立案的 Candidate 永远缺这一项。
+    update_method: str = Field(min_length=1)
     gate: DiscoveryGate
 
     @model_validator(mode="after")
@@ -285,6 +288,25 @@ class DimensionDiscoveryService:
                 )
             used_keys.add(item.dimension_key)
 
+            # 宪法八 / 十四：目录非空时，提案必须列出自己逐一核对过的现有轴，
+            # 且只能列目录里真实存在的 key（防伪造，与证据 id 校验同构）。这
+            # 是结构校验，不是语义相似度裁决。目录为空时无可核对，由 AI 在
+            # is_novel_axis_reason 里如实说明，系统不替它否决。
+            if catalogue_keys:
+                checked = tuple(
+                    str(k).strip() for k in item.gate.duplicate_checked_keys
+                    if str(k).strip()
+                )
+                if not checked:
+                    raise ValueError(
+                        "registration gate must list the existing axes reviewed"
+                    )
+                unknown = tuple(k for k in checked if k not in catalogue_keys)
+                if unknown:
+                    raise ValueError(
+                        f"duplicate_checked_keys not in the catalogue: {unknown}"
+                    )
+
             # Evidence must come from the supplied signal, never an invented id.
             for ref in item.evidence_record_ids:
                 if (ref.object_id, ref.revision) not in signal_keys:
@@ -334,6 +356,7 @@ class DimensionDiscoveryService:
                 user_value_rationale=item.user_value_rationale.strip(),
                 maintenance_cost_rationale=item.maintenance_cost_rationale.strip(),
                 confidence=float(item.confidence),
+                update_method=item.update_method.strip(),
                 registration_gate=DimensionProposalGate(
                     duplicate_checked_keys=tuple(
                         str(k).strip() for k in item.gate.duplicate_checked_keys

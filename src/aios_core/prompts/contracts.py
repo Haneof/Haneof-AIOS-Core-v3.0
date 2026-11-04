@@ -49,11 +49,14 @@ class TaskKind(StrEnum):
     # world has accumulated (existing dimensions + recent cross-links/claims/
     # summaries) and may propose a *new* observation axis as a Candidate. This is
     # the summary/periodic-review AI's job, not the live chat AI's — 《维度注册
-    # 宪法》十四 says discovery+registration live in review, and the P16
-    # dimension-discovery scenario requires a *recurring* pattern, not a one-off
-    # event. Output is a JSON array of proposals, each carrying a "注册门" gate
-    # block; the system only checks structure (key unique, evidence pinned, gate
-    # fields present), never a fixed numeric threshold (《维度注册宪法》二/五).
+    # 宪法》十四 assigns discovery+registration to review, not to a chat tool.
+    # Output is a JSON array of proposals, each carrying a "注册门" gate block.
+    # The system checks structure only (key unique, evidence pinned, gate fields
+    # present): whether a pattern recurs, and whether one evidence is enough, is
+    # the AI's judgement — 宪法二 forbids fixed thresholds and 宪法五 explicitly
+    # allows a single evidence to form a Candidate. P16's
+    # ``recurrence_gated_not_single_event`` is an evaluation criterion for one
+    # hidden scenario, NOT a general registration rule.
     DISCOVER_DIMENSION = "discover_dimension"  # discover + propose new observation axes
     DIALOGUE = "dialogue"        # talk to the user, with tool calls
 
