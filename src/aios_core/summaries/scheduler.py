@@ -14,11 +14,15 @@ import json
 import re
 from typing import Any, Callable, Mapping, Sequence
 
-from aios_core.contracts.enums import ObjectType
+from aios_core.contracts.enums import AttentionClass, ObjectType, WakeSource
 from aios_core.contracts.time import as_utc
 from aios_core.query.search import derive_dimension, WorldSearchIndex
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.contracts.refs import ObjectRef
+from aios_core.wake.service import WakeBus, WakeSignalRequest
+import logging
+
+log = logging.getLogger(__name__)
 
 from .cognitive_derivation import CognitiveDerivationReconcileResult, CognitiveDerivationScheduler
 from .daily_digest import DIGEST_DIMENSION, DailyDigestService
@@ -182,6 +186,7 @@ class MultiScaleSummaryScheduler:
         enable_daily_digest: bool = True,
         discovery_service: DimensionDiscoveryService | None = None,
         discovery_handler: Callable[[DimensionDiscoveryInput], str] | None = None,
+        wake_bus: WakeBus | None = None,
     ) -> None:
         """``source_admission`` is forwarded to the summary service (identical
         policy in prepare and commit). ``dimension_source_caps`` overrides
@@ -223,6 +228,11 @@ class MultiScaleSummaryScheduler:
         # resident dialogue (《维度注册宪法》十四: discovery lives in review).
         self.discovery_service = discovery_service
         self.discovery_handler = discovery_handler
+        # Discovery, like cognitive derivation, is a durable cognition step; wire a
+        # Wake bus so each sweep can leave an auditable trail (周期复盘宪法四/五).
+        self.wake_bus = wake_bus or WakeBus(
+            store=store, index=index, subject_id=subject_id
+        )
 
     def reconcile_cognitive_derivation(self) -> CognitiveDerivationReconcileResult:
         """Re-ensure durable C14 opportunities after process restart."""
@@ -662,4 +672,39 @@ class MultiScaleSummaryScheduler:
                     world_revision=int(self.store.current_world_revision()),
                 ),
             )
+        # 审计锚点（周期复盘宪法四/五）：无论有无提案，每轮 discovery 都在世界里
+        # 落一条 Wake 记录，使「这一轮有没有做过新轴判断、结果如何」可被查询——
+        # 否则发现归总结 AI 后，这件事只存在于内存返回值里，线上无法审计。
+        # dedupe_key 含 now，每轮不同，确保每轮都落一条独立审计记录。
+        if self.wake_bus is not None:
+            try:
+                self.wake_bus.emit(
+                    WakeSignalRequest(
+                        wake_source=WakeSource.DIMENSION_DISCOVERY,
+                        rule_id="discovery.cycle",
+                        observed_at=now,
+                        evidence_refs=tuple(
+                            ObjectRef(object_id=s.object_id, revision=s.revision)
+                            for s in prepared.signals[:10]
+                        ),
+                        priority=50,
+                        dedupe_key=f"discovery:{self.subject_id}:{now.isoformat()}",
+                        cooldown_seconds=0,
+                        attention_class=AttentionClass.BACKGROUND,
+                        metadata={
+                            "trigger_kind": "dimension_discovery_cycle",
+                            "window_start": prepared.window_start.isoformat(),
+                            "window_end": prepared.window_end.isoformat(),
+                            "signal_count": len(prepared.signals),
+                            "proposals": len(commit.proposal_receipts),
+                            "reused_dimension_keys": list(commit.reused_dimension_keys),
+                            "failed": [list(f) for f in commit.failed],
+                            "routing_only": True,
+                            "semantic_conclusions": False,
+                        },
+                    )
+                )
+            except Exception:  # noqa: BLE001
+                log.warning("dimension discovery audit Wake emit failed", exc_info=True)
+
         return (commit,)

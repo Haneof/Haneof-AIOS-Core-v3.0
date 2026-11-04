@@ -244,6 +244,7 @@ class WakeSource(StrEnum):
     PERIODIC_REVIEW = "periodic_review"
     ATTENTION_BUNDLE = "attention_bundle"
     COGNITIVE_DERIVATION = "cognitive_derivation"
+    DIMENSION_DISCOVERY = "dimension_discovery"
 
 
 class WakeState(StrEnum):

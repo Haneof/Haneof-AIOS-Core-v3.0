@@ -142,7 +142,10 @@ class DimensionDiscoveryService:
         subject_id: str = "user_1",
         max_proposals: int = 8,
         max_signal_objects: int = 300,
-        signal_lookback_days: int = 14,
+        # 宪法十二「长期观察」：14 天会切断跨月/跨季模式，AI 无从论证注册门
+        # 要求的「时间连续性」。放宽到 90 天；信号上限仍为 max_signal_objects，
+        # 超出部分按时间就近截断（prepare 内处理）。
+        signal_lookback_days: int = 90,
     ) -> None:
         if max_proposals < 1:
             raise ValueError("max_proposals must be >= 1")

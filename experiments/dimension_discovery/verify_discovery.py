@@ -229,6 +229,30 @@ def main() -> int:
     print(f"[场景3 run_due 全量扫描] discovery_commits={sweep_commits} "
           f"proposals={sweep_proposals} -> {'OK' if sweep_ok else 'FAIL'}")
 
+    # 场景 4：审计锚点（周期复盘宪法四/五）—— 每轮 discovery 必须在世界里落一条
+    # Wake 记录，使「这一轮有没有做过新轴判断、结果如何」可被查询。否则发现归
+    # 总结 AI 后，这件事只存在于内存返回值里，线上无法审计。
+    store4, index4 = _store()
+    _seed_dimension(store4, dimension_key=EXISTING_KEY, name="人机互动")
+    _seed_claim(store4, _claim("audit_seed", "反酸烧心，今晚又犯了", at=NOW - timedelta(days=1)))
+    scheduler4 = _scheduler(store4, index4, _discovery_handler_factory("recurrent"))
+    scheduler4._run_discovery(now=NOW)
+    wakes = [
+        p for p in store4.list_payloads(object_type=ObjectType.WAKE)
+        if (p.get("metadata") or {}).get("trigger_kind") == "dimension_discovery_cycle"
+    ]
+    if not wakes:
+        failures.append("场景4：discovery 未在世界里落审计 Wake 记录")
+    elif wakes[0].get("wake_source") != "dimension_discovery":
+        failures.append(
+            f"场景4：审计 Wake 的 wake_source 错：{wakes[0].get('wake_source')}"
+        )
+    else:
+        meta = wakes[0].get("metadata", {})
+        if meta.get("proposals") != 1:
+            failures.append(f"场景4：审计 Wake 的 proposals 计数错：{meta.get('proposals')}")
+    print(f"[场景4 审计锚点] wake_records={len(wakes)} -> {'OK' if not failures else 'FAIL'}")
+
     if failures:
         print("\nFAILURES:")
         for f in failures:
