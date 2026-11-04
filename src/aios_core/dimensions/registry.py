@@ -96,6 +96,26 @@ _ALLOWED_TRANSITIONS: Mapping[DimensionLifecycle, frozenset[DimensionLifecycle]]
 }
 
 
+class DimensionProposalGate(BaseModel):
+    """The registration gate (注册门) a proposal must clear.
+
+    《维度注册宪法》十四 requires every new-axis proposal to prove it checked the
+    existing axes, showed why they are insufficient, and showed the pattern is
+    *recurring and coherent, not a one-off event*. The system enforces only that
+    these fields are present and non-blank; whether the recurrence is real is the
+    AI's call — no fixed numeric threshold (宪法二/五).
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    # Existing dimension keys the proposer reviewed and judged insufficient. The
+    # system only does exact dimension_key conflict; semantic "looks like a
+    # duplicate" is the AI's judgement (宪法八).
+    duplicate_checked_keys: tuple[str, ...] = ()
+    recurrence_rationale: str = Field(min_length=1)
+    is_novel_axis_reason: str = Field(min_length=1)
+
+
 class DimensionProposalRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -111,6 +131,10 @@ class DimensionProposalRequest(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0)
     update_method: str | None = None
     expected_value: str | None = None
+    # The 注册门 gate block. Optional at this layer so legacy / internal callers
+    # are not forced to supply it; the DiscoveryService always does, and propose()
+    # records it durably in the dimension definition's proposal metadata.
+    registration_gate: DimensionProposalGate | None = None
 
     @model_validator(mode="after")
     def validate_request(self) -> "DimensionProposalRequest":
@@ -390,6 +414,11 @@ class DimensionRegistryService:
                     "user_value_rationale": request.user_value_rationale.strip(),
                     "maintenance_cost_rationale": request.maintenance_cost_rationale.strip(),
                     "confidence": request.confidence,
+                    "registration_gate": (
+                        request.registration_gate.model_dump(mode="json")
+                        if request.registration_gate is not None
+                        else None
+                    ),
                 },
                 "proposal_evidence_set_ref": {
                     "object_id": evidence.object_id,

@@ -1,6 +1,7 @@
 """Dynamic dimension registration for AIOS v3.0."""
 
 from .registry import (
+    DimensionProposalGate,
     DimensionProposalReceipt,
     DimensionProposalRequest,
     DimensionRegistryService,
@@ -9,6 +10,7 @@ from .registry import (
 )
 
 __all__ = [
+    "DimensionProposalGate",
     "DimensionProposalReceipt",
     "DimensionProposalRequest",
     "DimensionRegistryService",

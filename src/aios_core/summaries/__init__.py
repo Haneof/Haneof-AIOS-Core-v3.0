@@ -58,3 +58,15 @@ __all__ += [
     "DerivedLineageClass",
     "DerivedLineageView",
 ]
+
+from .dimension_discovery import (
+    DimensionDiscoveryCommit,
+    DimensionDiscoveryInput,
+    DimensionDiscoveryService,
+)
+
+__all__ += [
+    "DimensionDiscoveryCommit",
+    "DimensionDiscoveryInput",
+    "DimensionDiscoveryService",
+]

@@ -171,3 +171,45 @@ class ResilientSummaryHandler:
 
 def build_summary_handler(model_id: str) -> ResilientSummaryHandler:
     return ResilientSummaryHandler(model_id)
+
+
+_DISCOVERY_SYSTEM = (
+    "You are the new-axis discovery component of AIOS, a long-lived cognitive "
+    "world store. The user message contains your complete instructions plus the "
+    "constitutional prefix. Follow them exactly. Output a single JSON array "
+    "(possibly empty) and nothing else."
+)
+
+
+class ResilientDiscoveryHandler:
+    """Discovery handler: renders the DISCOVER_DIMENSION prompt, calls the model.
+
+    Mirrors ``ResilientSummaryHandler`` for the discovery task. The prepared
+    ``DimensionDiscoveryInput`` is rendered through the prompt registry (which
+    appends the constitutional prefix), and the full text is sent as the user turn.
+    """
+
+    def __init__(self, model_id: str) -> None:
+        self.model_id = model_id
+
+    def __call__(self, prepared: "DimensionDiscoveryInput") -> str:
+        from aios_core.prompts.contracts import TaskKind
+        from aios_core.prompts.registry import render_task_prompt
+
+        prompt = render_task_prompt(
+            TaskKind.DISCOVER_DIMENSION,
+            params=prepared.to_render_params(),
+        )
+        return complete_text(_DISCOVERY_SYSTEM, prompt)
+
+    def provenance_snapshot(self) -> dict[str, Any]:
+        return {
+            "primary": PRIMARY_MODEL,
+            "secondary": SECONDARY_MODEL,
+            "rate": _LIMITER.snapshot(),
+            "at": time.time(),
+        }
+
+
+def build_discovery_handler(model_id: str) -> ResilientDiscoveryHandler:
+    return ResilientDiscoveryHandler(model_id)

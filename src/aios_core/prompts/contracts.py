@@ -31,7 +31,7 @@ from .constitutional_prefix import is_constitutional_prefix
 
 
 class TaskKind(StrEnum):
-    """The seven AI jobs AIOS performs, identified by input/output contract."""
+    """The AI jobs AIOS performs, identified by input/output contract."""
 
     ANNOTATE = "annotate"        # label a batch of raw records (keep/drop + relevance)
     GATE = "gate"                # second-pass review of delete candidates
@@ -45,6 +45,16 @@ class TaskKind(StrEnum):
     # factual Summary. The judgement therefore needs its own task whose output
     # is a revisable Claim, never summary prose.
     CROSS_LINK = "cross_link"    # attribute facts to additional dimensions
+    # New-axis discovery + registration gate. The Resident AI looks at what the
+    # world has accumulated (existing dimensions + recent cross-links/claims/
+    # summaries) and may propose a *new* observation axis as a Candidate. This is
+    # the summary/periodic-review AI's job, not the live chat AI's — 《维度注册
+    # 宪法》十四 says discovery+registration live in review, and the P16
+    # dimension-discovery scenario requires a *recurring* pattern, not a one-off
+    # event. Output is a JSON array of proposals, each carrying a "注册门" gate
+    # block; the system only checks structure (key unique, evidence pinned, gate
+    # fields present), never a fixed numeric threshold (《维度注册宪法》二/五).
+    DISCOVER_DIMENSION = "discover_dimension"  # discover + propose new observation axes
     DIALOGUE = "dialogue"        # talk to the user, with tool calls
 
 
@@ -99,8 +109,9 @@ class DimensionProfile:
     """Per-dimension data, injected into templates. Data, not prompt text.
 
     A newly proposed dimension gets a profile the moment it is registered; the
-    constitution already forces ``data_shape`` on ``propose_dimension``, so the
-    hook exists. Cleaning is batched across dimensions by default — only a
+    Dimension Registration Constitution forces ``data_shape`` on every proposal
+    (now filed by the summary AI via the discovery task, not a live-chat tool),
+    so the hook exists. Cleaning is batched across dimensions by default — only a
     dimension whose noise is genuinely different opts into a dedicated pass.
     """
 

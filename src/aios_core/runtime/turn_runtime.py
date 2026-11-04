@@ -39,7 +39,6 @@ from aios_core.narrative.segmenter import NarrativeSegmenter
 from aios_core.query.topic_associator import DynamicTopicAssociator
 from aios_core.tools.proposal_pipeline import ToolProposalPipeline
 from aios_core.dimensions import (
-    DimensionProposalRequest,
     DimensionRegistryService,
     DimensionTransitionRequest,
 )
@@ -82,6 +81,8 @@ from aios_core.review import (
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.summaries import (
     CognitiveDerivationScheduler,
+    DimensionDiscoveryInput,
+    DimensionDiscoveryService,
     DimensionSummaryInput,
     MultiScaleSummaryScheduler,
     SummaryScale,
@@ -275,6 +276,7 @@ class FusedTurnRuntime:
         max_tool_rounds: int = 4,
         round_summary_handler: Callable[[RoundSummaryRequest], str] | None = None,
         dimension_summary_handler: Callable[[DimensionSummaryInput], str] | None = None,
+        dimension_discovery_handler: Callable[["DimensionDiscoveryInput"], str] | None = None,
         durable_fact_extractor: Callable[[str, str], Sequence[Mapping[str, Any]]] | None = None,
         recent_turn_limit: int = 8,
         summary_chunk_turns: int = 12,
@@ -300,6 +302,7 @@ class FusedTurnRuntime:
             subject_id=self.subject_id,
         )
         self.round_summary_handler = round_summary_handler
+        self.dimension_discovery_handler = dimension_discovery_handler
         self.durable_fact_extractor = durable_fact_extractor
         self.recent_turn_limit = int(recent_turn_limit)
         self.summary_chunk_turns = int(summary_chunk_turns)
@@ -394,6 +397,17 @@ class FusedTurnRuntime:
                 summary_handler=dimension_summary_handler,
                 subject_id=subject_id,
                 source_subject_ids=(self.subject_id, self.ai_world.ai_subject_id),
+                discovery_service=(
+                    None
+                    if dimension_discovery_handler is None
+                    else DimensionDiscoveryService(
+                        store=store,
+                        index=index,
+                        dimension_registry=self.dimensions,
+                        subject_id=subject_id,
+                    )
+                ),
+                discovery_handler=dimension_discovery_handler,
             )
         )
         self.periodic_review = PeriodicReviewService(
@@ -796,32 +810,6 @@ class FusedTurnRuntime:
             self._upsert_relation,
         )
 
-        registry.register(
-            CapabilitySpec(
-                name="propose_dimension",
-                description=(
-                    "Submit an evidence-grounded candidate observation axis. "
-                    "The system validates structure; the model supplies semantic rationale."
-                ),
-                kind=CapabilityKind.WRITE,
-                side_effecting=True,
-                input_schema={
-                    "dimension_key": "string starting dim:",
-                    "name": "string",
-                    "description": "string",
-                    "data_shape": "string",
-                    "evidence_refs": "array[{object_id:string,revision:integer}]",
-                    "why_existing_dimensions_are_insufficient": "string",
-                    "continuity_rationale": "string",
-                    "user_value_rationale": "string",
-                    "maintenance_cost_rationale": "string",
-                    "confidence": "number[0,1]",
-                    "update_method": "string?",
-                    "expected_value": "string?",
-                },
-            ),
-            self._propose_dimension,
-        )
         registry.register(
             CapabilitySpec(
                 name="transition_dimension",
@@ -2518,42 +2506,6 @@ class FusedTurnRuntime:
         )
         return asdict(receipt)
 
-    def _propose_dimension(
-        self,
-        dimension_key: str,
-        name: str,
-        description: str,
-        data_shape: str,
-        evidence_refs: Sequence[Mapping[str, Any]],
-        why_existing_dimensions_are_insufficient: str,
-        continuity_rationale: str,
-        user_value_rationale: str,
-        maintenance_cost_rationale: str,
-        confidence: float,
-        update_method: str | None = None,
-        expected_value: str | None = None,
-    ) -> dict[str, Any]:
-        if self._active_turn_time is None:
-            raise RuntimeError("propose_dimension is only available during an active AIOS turn")
-        receipt = self.dimensions.propose(
-            DimensionProposalRequest(
-                dimension_key=dimension_key,
-                name=name,
-                description=description,
-                data_shape=data_shape,
-                evidence_refs=self._coerce_refs(evidence_refs),
-                why_existing_dimensions_are_insufficient=why_existing_dimensions_are_insufficient,
-                continuity_rationale=continuity_rationale,
-                user_value_rationale=user_value_rationale,
-                maintenance_cost_rationale=maintenance_cost_rationale,
-                confidence=float(confidence),
-                update_method=update_method,
-                expected_value=expected_value,
-            ),
-            proposed_at=self._active_turn_time,
-        )
-        return asdict(receipt)
-
     def _transition_dimension(
         self,
         dimension_ref: Mapping[str, Any],
@@ -3315,7 +3267,6 @@ class FusedTurnRuntime:
             "propose_entity",
             "revise_entity",
             "upsert_relation",
-            "propose_dimension",
             "transition_dimension",
             "propose_goal",
             "transition_goal",

@@ -1240,39 +1240,16 @@ class GrokStreamingProvider:
                     "history — the old claim stays, the new one supersedes it.",
                     "- The claim is a pointer, not a replacement: drill_down_conversation "
                     "still holds the user's exact words.",
-                    "DIMENSION DISCOVERY DISCIPLINE:",
-                    "- The WORLD MAP below lists the dimensions that currently exist. "
-                    "They are filing axes, not a fixed ontology: when you keep "
-                    "encountering the SAME KIND of durable fact across separate "
-                    "occasions and no existing dimension fits it, you are allowed — "
-                    "and expected — to propose a new observation axis rather than "
-                    "shoehorning it into an existing dimension.",
-                    "- Call propose_dimension with evidence pinned to the observations "
-                    "that made you notice the pattern. You must state why the existing "
-                    "dimensions are insufficient; a dimension with no rationale is noise.",
-                    "- Do NOT propose a dimension for a single event, a passing remark, "
-                    "or something an existing dimension already covers. Wait for "
-                    "recurrence.",
-                    "- Example call (copy the exact argument names):",
-                    "```json",
-                    '{"call": "propose_dimension", "arguments": {',
-                    '  "dimension_key": "dim:physical_recovery",',
-                    '  "name": "Physical recovery",',
-                    '  "description": "Sleep duration, neck/cervical pain and exercise '
-                    'habit as one recurring axis of the user\'s life.",',
-                    '  "data_shape": "time series of {sleep_hours, pain_level, exercise}",',
-                    '  "evidence_refs": [{"object_id": "<observation id>", "revision": 1}],',
-                    '  "why_existing_dimensions_are_insufficient": "Sleep, pain and '
-                    'exercise show up across separate dimensions, so the recurring '
-                    'recovery pattern is never visible as one thing.",',
-                    '  "continuity_rationale": "Reported on at least four separate '
-                    'occasions over three weeks.",',
-                    '  "user_value_rationale": "Lets later turns reason about recovery '
-                    'trends instead of isolated complaints.",',
-                    '  "maintenance_cost_rationale": "One summary per week.",',
-                    '  "confidence": 0.7',
-                    '}}',
-                    "```",
+                    "DIMENSION DISCOVERY IS NOT A LIVE-CHAT TOOL:",
+                    "- New observation axes are discovered and filed as CANDIDATE "
+                    "dimensions by the Resident AI during periodic review / summary "
+                    "(see the Dimension Registration Constitution, §14), never by "
+                    "shoehorning a proposal into the live conversation. Do not call any "
+                    "dimension-proposal capability here.",
+                    "- If you keep noticing the SAME KIND of durable fact recurring and "
+                    "no existing dimension fits it, the correct move is to record the "
+                    "observation as a claim (pinned to its evidence) and let summary "
+                    "time surface the axis — not to register a dimension inline.",
                     "CONSTITUTIONAL RULES:",
                     "0. The RECENT CONVERSATION block below is the verbatim dialogue. "
                     "If the answer is already visible there, answer from it directly — "

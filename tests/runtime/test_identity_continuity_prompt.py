@@ -348,8 +348,8 @@ def test_static_prefix_is_contiguous_and_byte_stable_across_calls() -> None:
     catalog = (
         {"name": "commit_ai_world_claim", "description": "persist a durable claim",
          "input_schema": {"statement": "string", "confidence": "number[0,1]"}},
-        {"name": "propose_dimension", "description": "propose a new axis",
-         "input_schema": {"dimension_key": "string"}},
+        {"name": "transition_dimension", "description": "move an axis across lifecycle",
+         "input_schema": {"dimension_ref": "ObjectRef", "new_lifecycle": "string"}},
     )
     identity = {
         "ethical_invariants": ["反爹味、反谄媚，守住平等真诚"],

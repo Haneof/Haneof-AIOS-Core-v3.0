@@ -134,6 +134,29 @@ DEFAULT_RUNTIME: dict[TaskKind, TaskRuntimeConfig] = {
         # empty array (a real answer) from a failed call (no answer).
         failure_policy=FailurePolicy.SKIP_RETRY_NEXT,
     ),
+    TaskKind.DISCOVER_DIMENSION: TaskRuntimeConfig(
+        task=TaskKind.DISCOVER_DIMENSION,
+        # A discovery judgement: hold the dimension catalogue + recent cross-links/
+        # claims in mind and decide whether a NEW axis is warranted. That is
+        # STANDARD work, but the output is a short JSON array of proposals, so it
+        # keeps ANNOTATE's budget rather than DIGEST's.
+        model_tier=ModelTier.STANDARD,
+        # Cold, like the other structured jobs: a proposal that flips between runs
+        # is worse than one that is slightly conservative — the same world is
+        # re-judged next cycle either way.
+        temperature=0.0,
+        # Same reasoning-token cliff as every structured task here: the answer is
+        # short, the thinking is not, and 1200-2000 came back empty on this
+        # endpoint. Matched to ANNOTATE's measured floor of 3000.
+        max_output_tokens=3000,
+        timeout_seconds=180.0,
+        max_retries=2,
+        # Missing proposals cost nothing permanent — the pattern stays in the world
+        # and the next review may find it. Crucially, a failed call must never be
+        # read as "no new axis is warranted", so the caller distinguishes an empty
+        # array (a real answer) from a failed call (no answer).
+        failure_policy=FailurePolicy.SKIP_RETRY_NEXT,
+    ),
     TaskKind.DIALOGUE: TaskRuntimeConfig(
         task=TaskKind.DIALOGUE,
         model_tier=ModelTier.STRONG,

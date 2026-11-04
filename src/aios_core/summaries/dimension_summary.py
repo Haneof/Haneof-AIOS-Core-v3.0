@@ -346,15 +346,22 @@ class DimensionSummaryService:
             payload = self.store.get_payload(hit.object_id, revision=hit.revision)
             source_class = "observation"
             if hit.object_type == "claim":
-                # A Claim that CROSS_LINK attributed to this axis is *cognition*,
-                # not a fact of this axis. Off unless the caller asked for it —
-                # otherwise every summary would silently start citing beliefs.
-                if not include_cognition_sources:
-                    continue
                 meta = payload.get("metadata") or {}
                 if str(meta.get("dimension") or "") != dimension:
                     continue
+                # A Claim is cognition by construction, never a fact of this
+                # axis. Only CROSS_LINK-attributed beliefs are gated behind the
+                # opt-in: a Claim that natively lives in this axis (AI-self
+                # claims, CognitionWriteback claims) has always been a
+                # legitimate summary source. Gating *all* claims silently
+                # erased them from every dimension summary by default.
                 source_class = "cognition"
+                if (
+                    str(meta.get("summary_kind") or "")
+                    == "cross_dimension_attribution"
+                    and not include_cognition_sources
+                ):
+                    continue
             if hit.object_type == "summary":
                 if not include_summary_sources:
                     continue

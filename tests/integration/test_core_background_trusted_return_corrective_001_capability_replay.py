@@ -78,6 +78,7 @@ from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
+from aios_core.dimensions import DimensionProposalGate, DimensionProposalRequest
 from aios_core.query.search import WorldSearchIndex
 from aios_core.review.periodic import PeriodicReviewRequest, ReviewAnchor
 from aios_core.runtime.capabilities import CapabilityCall
@@ -475,21 +476,6 @@ def prep_upsert_relation(rt: FusedTurnRuntime) -> dict[str, Any]:
     }
 
 
-def prep_propose_dimension(rt: FusedTurnRuntime) -> dict[str, Any]:
-    return {
-        "dimension_key": "dim:corrective001_axis",
-        "name": "Corrective Axis",
-        "description": "A corrective observation axis",
-        "data_shape": "scalar",
-        "evidence_refs": [leaf_ref(LEAF)],
-        "why_existing_dimensions_are_insufficient": "no existing axis covers it",
-        "continuity_rationale": "keeps continuity",
-        "user_value_rationale": "serves the user",
-        "maintenance_cost_rationale": "cheap to maintain",
-        "confidence": 0.7,
-    }
-
-
 def prep_transition_dimension(rt: FusedTurnRuntime) -> dict[str, Any]:
     definition = [
         p
@@ -758,21 +744,6 @@ SCENARIOS: tuple[Scenario, ...] = (
         ),
     ),
     Scenario(
-        name="propose_dimension",
-        prepare=prep_propose_dimension,
-        identity=ObjectType.DIMENSION_DEFINITION,
-        family="create",
-        primary=("dimension_id",),
-        conflicts=(
-            ("changed description", _mutate("description", "changed description")),
-            ("changed data shape", _mutate("data_shape", "series")),
-            ("changed evidence", _mutate_evidence()),
-        ),
-        identity_shifts=(
-            ("changed dimension key", _mutate("dimension_key", "dim:corrective001_other")),
-        ),
-    ),
-    Scenario(
         name="transition_dimension",
         prepare=prep_transition_dimension,
         identity=ObjectType.DIMENSION_DEFINITION,
@@ -1009,7 +980,7 @@ def _seed(rt: FusedTurnRuntime, leaf: str, **kwargs) -> None:
 def seed_for(scenario_name: str, rt: FusedTurnRuntime) -> None:
     """Seed the durable prerequisites that ``scenario_name`` mutates."""
     if scenario_name in {"create_attention_watch", "create_task", "commit_claim",
-                         "commit_ai_world_claim", "propose_entity", "propose_dimension",
+                         "commit_ai_world_claim", "propose_entity",
                          "propose_goal", "form_event", "propose_cognitive_policy",
                          "commit_operation_experience", "record_communication_experience"}:
         return
@@ -1025,10 +996,29 @@ def seed_for(scenario_name: str, rt: FusedTurnRuntime) -> None:
         _seed(rt, "propose_entity", entity_key="entity:relation-right", entity_kind="concept",
               evidence_refs=[leaf_ref(leaf)], canonical_name="Right Entity")
     elif scenario_name == "transition_dimension":
-        _seed(rt, "propose_dimension", dimension_key="dim:transition_seed", name="Seed Axis",
-              description="seed axis", data_shape="scalar", evidence_refs=[leaf_ref(leaf)],
-              why_existing_dimensions_are_insufficient="none", continuity_rationale="c",
-              user_value_rationale="u", maintenance_cost_rationale="m", confidence=0.5)
+        # Live-chat can no longer register dimensions inline (Dimension Registration
+        # Constitution §14); the CANDIDATE seed axis is filed directly through the
+        # registry, which is the constitutional path the summary AI uses.
+        rt.dimensions.propose(
+            DimensionProposalRequest(
+                dimension_key="dim:transition_seed",
+                name="Seed Axis",
+                description="seed axis",
+                data_shape="scalar",
+                evidence_refs=(ObjectRef(object_id=f"leaf_{leaf}", revision=1),),
+                why_existing_dimensions_are_insufficient="seeded for transition test",
+                continuity_rationale="seeded recurring observation",
+                user_value_rationale="seeded user value",
+                maintenance_cost_rationale="seeded maintenance cost",
+                confidence=0.5,
+                registration_gate=DimensionProposalGate(
+                    duplicate_checked_keys=(),
+                    recurrence_rationale="seeded recurring observation across turns",
+                    is_novel_axis_reason="seeded novel axis not covered by existing dimensions",
+                ),
+            ),
+            proposed_at=T,
+        )
     elif scenario_name == "transition_goal":
         _seed(rt, "propose_goal", source_type="user_explicit", title="transition-goal-seed",
               description="seed goal", evidence_refs=[leaf_ref(leaf)], confidence=0.5)

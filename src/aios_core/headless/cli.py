@@ -127,6 +127,15 @@ def _global_parser() -> argparse.ArgumentParser:
         default=os.getenv("AIOS_DIMENSION_SUMMARY_HANDLER"),
         help="Optional existing dimension-summary callable as module:attribute.",
     )
+    parser.add_argument(
+        "--dimension-discovery-handler",
+        default=os.getenv("AIOS_DIMENSION_DISCOVERY_HANDLER"),
+        help=(
+            "Optional new-axis discovery callable (module:attribute) taking a "
+            "DimensionDiscoveryInput and returning model text. Wired into the "
+            "summary scheduler; when absent, discovery is skipped."
+        ),
+    )
 
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("status", help="Open the configured World and report operational status.")
@@ -280,6 +289,11 @@ def _build_core(args: argparse.Namespace) -> HeadlessCore:
         if not args.dimension_summary_handler
         else load_model_handler(args.dimension_summary_handler)
     )
+    dimension_discovery = (
+        None
+        if not args.dimension_discovery_handler
+        else load_model_handler(args.dimension_discovery_handler)
+    )
 
     _warn_on_missing_summary_handlers(round_summary, dimension_summary)
 
@@ -293,6 +307,7 @@ def _build_core(args: argparse.Namespace) -> HeadlessCore:
         model_handler=model_handler,
         round_summary_handler=round_summary,
         dimension_summary_handler=dimension_summary,
+        dimension_discovery_handler=dimension_discovery,
     )
 
 

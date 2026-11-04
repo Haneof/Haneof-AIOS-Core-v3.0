@@ -37,6 +37,7 @@ Resident AI 自己观察 / 搜索 / 比较 / 判断
 - 写新的 evidence-grounded Claim
 - 写 Calibration / Strategy / Self cognition
 - 沉淀 OperationExperience
+- 提议新的观察轴候选（按《维度注册宪法》十四的注册门立案为 Candidate；这是新维度“发现与注册”的合法位置，不在实时对话工具里顺手注册）
         ↓
 Evidence + Dependency + Revision
         ↓

@@ -52,6 +52,10 @@ STRUCTURED_TASKS: frozenset[TaskKind] = frozenset(
         # usable JSON is "no answer", and must not be mistaken for "nothing
         # belongs anywhere" (the empty array, which *is* an answer).
         TaskKind.CROSS_LINK,
+        # DISCOVER_DIMENSION answers with a JSON array of axis proposals. A reply
+        # that is not parseable JSON is "no answer", and must not be mistaken for
+        # "there is nothing worth a new axis" — the empty array is the real answer.
+        TaskKind.DISCOVER_DIMENSION,
     }
 )
 

@@ -64,6 +64,7 @@ STRUCTURED_TASKS = (
     TaskKind.GATE,
     TaskKind.EXTRACT,
     TaskKind.CROSS_LINK,
+    TaskKind.DISCOVER_DIMENSION,
 )
 
 
@@ -151,6 +152,18 @@ SAMPLE_PARAMS: dict[TaskKind, PromptRenderParams] = {
             "recent_turns": [{"role": "user", "text": "昨天呢？"}],
         }
     ),
+    TaskKind.DISCOVER_DIMENSION: PromptRenderParams(
+        dimensions=(
+            DimensionProfile(dimension_key="dim:user_ai_interaction", name="人机互动"),
+            DimensionProfile(dimension_key="dim:note", name="记事本"),
+        ),
+        records=(
+            {"id": "clm_reflux_1", "text": "这两天反酸烧心，饭后躺下更明显", "dimension": "dim:user_ai_interaction"},
+            {"id": "clm_reflux_4", "text": "又反酸了，这周第四次", "dimension": "dim:note"},
+            {"id": "clm_run_2", "text": "今早跑了五公里，状态不错", "dimension": "dim:user_ai_interaction"},
+        ),
+        extra={"max_proposals": 8},
+    ),
 }
 
 
@@ -166,7 +179,7 @@ def test_registry_covers_every_task_kind_exactly():
     真实对话暴露失忆。多登记同样要失败，避免出现没人调用的孤儿提示词。"""
 
     assert set(PROMPT_REGISTRY) == set(TaskKind)
-    assert len(PROMPT_REGISTRY) == len(ALL_TASKS) == 7
+    assert len(PROMPT_REGISTRY) == len(ALL_TASKS) == 8
 
 
 def test_every_registered_entry_is_a_matching_prompt_spec():
@@ -425,6 +438,7 @@ def test_model_tiers_are_routed_by_contract():
     assert resolve_runtime(TaskKind.SUMMARIZE).model_tier == ModelTier.STANDARD
     assert resolve_runtime(TaskKind.DIGEST).model_tier == ModelTier.STANDARD
     assert resolve_runtime(TaskKind.DIALOGUE).model_tier == ModelTier.STRONG
+    assert resolve_runtime(TaskKind.DISCOVER_DIMENSION).model_tier == ModelTier.STANDARD
 
 
 def test_summarize_and_digest_token_budget_is_the_measured_4000():

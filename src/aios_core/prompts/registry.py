@@ -29,7 +29,13 @@ from .contracts import (
     TaskRuntimeConfig,
 )
 from .task_runtime import DEFAULT_RUNTIME, resolve_model, resolve_runtime
-from .templates_structured import AnnotatePrompt, CrossLinkPrompt, ExtractPrompt, GatePrompt
+from .templates_structured import (
+    AnnotatePrompt,
+    CrossLinkPrompt,
+    DimensionDiscoveryPrompt,
+    ExtractPrompt,
+    GatePrompt,
+)
 from .templates_text import DialoguePrompt, DigestPrompt, SummarizePrompt
 
 PROMPT_REGISTRY: dict[TaskKind, PromptSpec] = {
@@ -39,6 +45,7 @@ PROMPT_REGISTRY: dict[TaskKind, PromptSpec] = {
     TaskKind.SUMMARIZE: SummarizePrompt(),
     TaskKind.DIGEST: DigestPrompt(),
     TaskKind.CROSS_LINK: CrossLinkPrompt(),
+    TaskKind.DISCOVER_DIMENSION: DimensionDiscoveryPrompt(),
     TaskKind.DIALOGUE: DialoguePrompt(),
 }
 

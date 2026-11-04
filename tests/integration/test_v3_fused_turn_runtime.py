@@ -721,7 +721,12 @@ def test_new_session_loads_only_explicit_core_ai_world_context(tmp_path):
     assert result.runtime.response == "继续当前项目主线。"
 
 
-def test_resident_model_can_check_existing_dimensions_then_propose_candidate(tmp_path):
+def test_resident_model_pins_observation_as_claim_not_inline_dimension(tmp_path):
+    """宪法对齐（维度注册宪法 §14 / 周期复盘 §2）：实时对话不得内联注册新维度。
+
+    当驻留 AI 在对话里注意到一个值得成轴的反复模式时，正确做法是把它作为
+    Claim 写回世界（锚定到证据），交由周期复盘 / 总结环节统一判断是否立新轴，
+    而不是在对话里顺手调用维度注册能力。"""
     db = tmp_path / "world.db"
     store = SQLiteWorldStore(db)
     evidence = Observation(
@@ -778,35 +783,35 @@ def test_resident_model_can_check_existing_dimensions_then_propose_candidate(tmp
                 item for item in search.data
                 if item["object_id"] == evidence.object_id
             )
+            # 宪法要求的动作：把反复出现的观察作为 Claim 写回，绝不内联注册维度。
             return ModelDirective(
                 capability_calls=(
                     CapabilityCall(
-                        name="propose_dimension",
+                        name="commit_ai_world_claim",
                         arguments={
-                            "dimension_key": "dim:learning_ability",
-                            "name": "学习能力",
-                            "description": "长期观察用户独立解决学习任务的能力变化。",
-                            "data_shape": "evidence_grounded_cognition_over_time",
+                            "domain": "user_understanding",
+                            "statement": (
+                                "用户多次独立解决复杂学习任务，长期学习能力似为一条值得"
+                                "单独观察的轴；先作为事实写回，待周期复盘 / 总结环节判断是否立新轴。"
+                            ),
                             "evidence_refs": [
                                 {
                                     "object_id": source["object_id"],
                                     "revision": source["revision"],
                                 }
                             ],
-                            "why_existing_dimensions_are_insufficient": "现有事实维度记录单次学习事件，但没有持续能力观察轴。",
-                            "continuity_rationale": "后续学习事件和结果可持续更新该观察轴。",
-                            "user_value_rationale": "有助于调整教学难度和帮助方式。",
-                            "maintenance_cost_rationale": "只记录有证据的变化和总结，不复制原始学习事实。",
                             "confidence": 0.72,
+                            "tags": ["candidate_axis:learning_ability"],
                         },
                     ),
                 )
             )
 
-        proposed = history[-1]
-        assert proposed.ok is True
-        assert proposed.data["lifecycle"] == "candidate"
-        return ModelDirective(response="我已把它作为候选观察轴登记，先通过真实运行继续验证。")
+        claimed = history[-1]
+        assert claimed.ok is True
+        return ModelDirective(
+            response="我已把这个观察记成事实，等总结环节再决定是否立为观察轴。"
+        )
 
     runtime = FusedTurnRuntime(
         store=store,
@@ -824,15 +829,15 @@ def test_resident_model_can_check_existing_dimensions_then_propose_candidate(tmp
 
     assert [
         item.name for item in result.runtime.capability_history
-    ] == ["list_dimensions", "search_world", "propose_dimension"]
+    ] == ["list_dimensions", "search_world", "commit_ai_world_claim"]
     definitions = store.list_payloads()
     dynamic = [
         item for item in definitions
         if item.get("object_type") == "dimension_definition"
         and (item.get("metadata") or {}).get("dimension_key") == "dim:learning_ability"
     ]
-    assert len(dynamic) == 1
-    assert dynamic[0]["lifecycle"] == "candidate"
+    # 实时对话不得内联注册候选轴 —— 这条轴根本不应出现。
+    assert len(dynamic) == 0
 
 
 def test_resident_model_can_move_candidate_dimension_into_trial(tmp_path):

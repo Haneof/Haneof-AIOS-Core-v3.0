@@ -219,6 +219,7 @@ class HeadlessCore:
         model_handler: ModelHandler,
         round_summary_handler: Callable[[Any], str] | None = None,
         dimension_summary_handler: Callable[[Any], str] | None = None,
+        dimension_discovery_handler: Callable[[Any], str] | None = None,
     ) -> None:
         if not callable(model_handler):
             raise HeadlessConfigurationError("model_handler must be callable")
@@ -226,6 +227,7 @@ class HeadlessCore:
         self.model_handler = model_handler
         self.round_summary_handler = round_summary_handler
         self.dimension_summary_handler = dimension_summary_handler
+        self.dimension_discovery_handler = dimension_discovery_handler
         self._lease = _WriterLease(config.lock_path)
         self.store: SQLiteWorldStore | None = None
         self.index: WorldSearchIndex | None = None
@@ -249,6 +251,7 @@ class HeadlessCore:
                 model_handler=self.model_handler,
                 round_summary_handler=self.round_summary_handler,
                 dimension_summary_handler=self.dimension_summary_handler,
+                dimension_discovery_handler=self.dimension_discovery_handler,
                 durable_fact_extractor=(
                     durable_extractor if callable(durable_extractor) else None
                 ),

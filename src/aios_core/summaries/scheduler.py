@@ -10,7 +10,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import StrEnum
-from typing import Callable, Mapping, Sequence
+import json
+import re
+from typing import Any, Callable, Mapping, Sequence
 
 from aios_core.contracts.enums import ObjectType
 from aios_core.contracts.time import as_utc
@@ -20,9 +22,44 @@ from aios_core.contracts.refs import ObjectRef
 
 from .cognitive_derivation import CognitiveDerivationReconcileResult, CognitiveDerivationScheduler
 from .daily_digest import DIGEST_DIMENSION, DailyDigestService
+from .dimension_discovery import (
+    DimensionDiscoveryCommit,
+    DimensionDiscoveryInput,
+    DimensionDiscoveryService,
+)
 from .dimension_summary import DimensionSummaryInput, DimensionSummaryService, SummaryCommit
 
 UTC = timezone.utc
+
+
+def _parse_discovery_json(content: str) -> Any:
+    """Tolerant JSON extraction for the discovery handler's text reply.
+
+    The handler returns a model string (per ``ResilientDiscoveryHandler``); the
+    discovery service wants the already-parsed array. Mirror the executor's
+    ``_extract_json`` so fenced or prose-wrapped JSON still parses, and so an
+    unparseable reply becomes a clean fail-soft rather than a crash.
+    """
+
+    stripped = (content or "").strip()
+    if not stripped:
+        raise ValueError("empty discovery reply")
+    candidates = [stripped]
+    for match in re.finditer(r"```(?:json)?\s*(.*?)```", stripped, re.DOTALL):
+        candidates.append(match.group(1).strip())
+    for candidate in candidates:
+        try:
+            return json.loads(candidate)
+        except ValueError:
+            continue
+    start = stripped.find("[")
+    end = stripped.rfind("]")
+    if start >= 0 and end > start:
+        try:
+            return json.loads(stripped[start : end + 1])
+        except ValueError:
+            pass
+    raise ValueError("discovery reply was not parseable JSON")
 
 
 class SummaryScale(StrEnum):
@@ -75,6 +112,7 @@ class SummaryScheduleResult:
     skipped_empty: tuple[ScheduledSummaryJob, ...]
     truncated: bool
     failed: tuple[FailedSummaryJob, ...] = ()
+    dimension_discoveries: tuple[DimensionDiscoveryCommit, ...] = ()
 
 
 def window_bounds(moment: datetime, scale: SummaryScale) -> tuple[datetime, datetime]:
@@ -142,6 +180,8 @@ class MultiScaleSummaryScheduler:
         source_admission: Callable[[str, str, dict], bool] | None = None,
         dimension_source_caps: Mapping[str, int] | None = None,
         enable_daily_digest: bool = True,
+        discovery_service: DimensionDiscoveryService | None = None,
+        discovery_handler: Callable[[DimensionDiscoveryInput], str] | None = None,
     ) -> None:
         """``source_admission`` is forwarded to the summary service (identical
         policy in prepare and commit). ``dimension_source_caps`` overrides
@@ -178,6 +218,11 @@ class MultiScaleSummaryScheduler:
                 allowed_subject_ids=self.source_subject_ids,
             )
         )
+        # New-axis discovery is opt-in: it only runs when both the service and a
+        # model handler are wired in. It is a maintenance/cognition step, not
+        # resident dialogue (《维度注册宪法》十四: discovery lives in review).
+        self.discovery_service = discovery_service
+        self.discovery_handler = discovery_handler
 
     def reconcile_cognitive_derivation(self) -> CognitiveDerivationReconcileResult:
         """Re-ensure durable C14 opportunities after process restart."""
@@ -519,6 +564,24 @@ class MultiScaleSummaryScheduler:
                 )
                 semantic_jobs += 1
 
+        # New-axis discovery runs after every dimension's summaries + digest so it
+        # sees the freshest cross-dimension signal. It is a global artifact, so it
+        # is only scheduled on full sweeps — explicitly scoped runs (dimensions=...)
+        # never run discovery as a side effect.
+        discoveries: tuple[DimensionDiscoveryCommit, ...] = ()
+        if (
+            self.discovery_service is not None
+            and self.discovery_handler is not None
+            and dimensions is None
+        ):
+            # Discovery is a first-class citizen of the full sweep, not a
+            # leftover: even when the summary budget was exhausted (truncated),
+            # give it one chance. A skipped discovery would silently freeze the
+            # axis catalogue, which is exactly what constitution §14 forbids.
+            discoveries = self._run_discovery(
+                now=current, max_jobs=max(1, max_jobs - semantic_jobs)
+            )
+
         return SummaryScheduleResult(
             attempted_jobs=tuple(jobs),
             commits=tuple(commits),
@@ -526,4 +589,77 @@ class MultiScaleSummaryScheduler:
             skipped_empty=tuple(skipped_empty),
             truncated=truncated,
             failed=tuple(failed),
+            dimension_discoveries=discoveries,
         )
+
+    def _run_discovery(
+        self, *, now: datetime, max_jobs: int = 8
+    ) -> tuple[DimensionDiscoveryCommit, ...]:
+        """Run the new-axis discovery step once. Fail-soft like the digest loop.
+
+        Returns zero or more commits; a failure on the model call or the registry
+        is recorded, never silently dropped, and never aborts the whole sweep.
+        """
+
+        if max_jobs < 1:
+            return ()
+        prepared = self.discovery_service.prepare(window_end=now)
+        if not prepared.signals and not prepared.catalogue:
+            return ()
+
+        try:
+            content = self.discovery_handler(prepared)
+        except Exception as exc:  # noqa: BLE001
+            return (
+                DimensionDiscoveryCommit(
+                    proposal_receipts=(),
+                    reused_dimension_keys=(),
+                    failed=(("discover_dimension", f"{type(exc).__name__}: {exc}"),),
+                    world_revision=int(self.store.current_world_revision()),
+                ),
+            )
+        if not isinstance(content, str) or not content.strip():
+            return (
+                DimensionDiscoveryCommit(
+                    proposal_receipts=(),
+                    reused_dimension_keys=(),
+                    failed=(("discover_dimension", "handler returned blank text"),),
+                    world_revision=int(self.store.current_world_revision()),
+                ),
+            )
+        try:
+            parsed = _parse_discovery_json(content)
+        except Exception as exc:  # noqa: BLE001
+            return (
+                DimensionDiscoveryCommit(
+                    proposal_receipts=(),
+                    reused_dimension_keys=(),
+                    failed=(("discover_dimension", f"unparseable JSON: {exc}"),),
+                    world_revision=int(self.store.current_world_revision()),
+                ),
+            )
+        try:
+            items = self.discovery_service.parse_items(prepared, parsed)
+        except Exception as exc:  # noqa: BLE001
+            return (
+                DimensionDiscoveryCommit(
+                    proposal_receipts=(),
+                    reused_dimension_keys=(),
+                    failed=(("discover_dimension", f"{type(exc).__name__}: {exc}"),),
+                    world_revision=int(self.store.current_world_revision()),
+                ),
+            )
+        try:
+            commit = self.discovery_service.commit(
+                prepared, items, generated_at=now
+            )
+        except Exception as exc:  # noqa: BLE001
+            return (
+                DimensionDiscoveryCommit(
+                    proposal_receipts=(),
+                    reused_dimension_keys=(),
+                    failed=(("discover_dimension", f"{type(exc).__name__}: {exc}"),),
+                    world_revision=int(self.store.current_world_revision()),
+                ),
+            )
+        return (commit,)
