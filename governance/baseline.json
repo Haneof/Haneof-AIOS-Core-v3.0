@@ -1,7 +1,7 @@
 {
   "_comment": "AIOS 基线钉住文件。受保护路径的任何变更，必须由对应 task 授权，且提交信息含 Authorized-Task trailer。由 PM 维护，实现方不得自行更新。",
-  "pinned_sha": "823a633bcae61cdb2c13ed51b8db78d641f6a603",
-  "pinned_at": "2026-11-20T07:57:06Z",
+  "pinned_sha": "defddddde9396b7291f50914e393641c8036edaf",
+  "pinned_at": "2026-11-20T15:38:44Z",
   "pinned_by": "PM",
   "task_id": [
     "PM-GOVERNANCE-SECURITY-GATE-001",
@@ -57,6 +57,7 @@
     "allowed_paths 内变更无需 trailer（治理/文档类）。",
     "protected_paths 内变更若无 trailer 或无匹配 task_id，CI 直接 FAIL。",
     "reviews/internal_habitation 属封存证据，任何情况下不得变更。",
-    "2026-11-20 PM 追认裁决（owner 授权 PM 按宪法目标决定）：8eae6b3 / 54f507c（summaries，PM-SUMMARIES-DAILY-DIGEST-001）与 823a633（prompts，PM-PROMPTS-TASK-SEPARATION-001）三提交的 14 处受保护路径变更予以追认，pin 推进至 823a633。历史提交本身无 trailer，不改写历史、不 retroactively 补 trailer；追认是治理层登记，详见任务板 2026-11-20 块。此举不是为清漂移而替换 pin：被追认的工作有实测价值（prompts 77 守护栏 + 真实端点验证；summaries DAY1 echo 7/7、噪声污染 0），revert 将丢弃已验证工作且无助于审计。"
+    "2026-11-20 PM 追认裁决（owner 授权 PM 按宪法目标决定）：8eae6b3 / 54f507c（summaries，PM-SUMMARIES-DAILY-DIGEST-001）与 823a633（prompts，PM-PROMPTS-TASK-SEPARATION-001）三提交的 14 处受保护路径变更予以追认，pin 推进至 823a633。历史提交本身无 trailer，不改写历史、不 retroactively 补 trailer；追认是治理层登记，详见任务板 2026-11-20 块。此举不是为清漂移而替换 pin：被追认的工作有实测价值（prompts 77 守护栏 + 真实端点验证；summaries DAY1 echo 7/7、噪声污染 0），revert 将丢弃已验证工作且无助于审计。",
+    "2026-11-20 PM 追认裁决（快照推送压平所致）：远端 main 的快照提交 defdddd 把本地 13 提交（含带 trailer 的 e52878e / cf7d766 / b1fd221）压平成一次提交，丢失了 Authorized-Task trailer，同步后复核治理 FAIL（8 处受保护路径变更未授权；测试本身 558 passed / 3 skipped）。三项任务（PM-WINDOW80-GAPS-G1G2-001、PM-PROVENANCE-MODEL-FIELD-001、PM-HEADLESS-SERVE-HARDENING-001）此前已登记在 task_id，工作本身均经独立验收；pin 推进至 defdddd，不改写历史、不 retroactively 补 trailer；追认是治理层登记。此举不是为清漂移而替换 pin：被追认的修复均已独立验证，revert 将丢弃已验证工作。"
   ]
 }

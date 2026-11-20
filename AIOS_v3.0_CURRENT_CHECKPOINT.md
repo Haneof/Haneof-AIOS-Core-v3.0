@@ -1,3 +1,11 @@
+## 2026-11-20 — PUBLISHED (defdddd) / SNAPSHOT-SQUASH RATIFICATION / GATE RE-CHECK PENDING
+
+- **已发布（PM 已核对）**：远端 main `8317769 → defdddd`（25 文件）；review 分支 + draft PR #407（RV20261120-001）与 #408（RV20261120-002），均为 REVIEW_ONLY、不合并。本地已同步到 defdddd，5 份验收/探针报告现已在 main 上受控。
+- **同步后发现治理 FAIL 并已追认**：快照推送把 13 个本地提交压平成一次提交，丢了 Authorized-Task trailer，复核治理 FAIL（8 处受保护路径变更未授权；测试本身 558 passed / 3 skipped）。三项任务此前已登记、工作均已独立验收，PM 按此前追认机制把 pin 推进至 defdddd（不改写历史、不补 trailer），详见 baseline.json 注释。
+- **下一步**：把这次治理修复推上 main（3 文件），再同步复核（预期 PASS）；defdddd 触发的那次 convergence gate 会报 FAIL，修复触发的那次应通过——本会话没有读 Actions 运行的工具，gate 结果以 Actions 页为准。
+
+---
+
 ## 2026-11-20 — SERVE HARDENING ACCEPTED / NO ENGINEERING TASK OPEN
 
 - **加固验收出口（PM 已接受）**：独立验收 `PM-HEADLESS-SERVE-HARDENING-ACCEPTANCE-001` 出口为 **ACCEPTED**，5/5 全 PASS。SIGTERM/SIGINT 用真实信号对 live serve 子进程独立复现（各 rc=0、`serve_stopped`、`interrupted=true`，数据完整）；`_emit` 刷盘用独立 pipe 复现；3 个测试确认为真（修复树 20/20，未修树 handler 测试 ImportError、flush 测试 AssertionError、SIGTERM 测试杀死 runner 退出码 143）。快检 558 passed / 3 skipped、治理 PASS。G-3 的 N-1、N-2 均已修完并验收，Window80 接线验收的缺口清单全部关闭。
