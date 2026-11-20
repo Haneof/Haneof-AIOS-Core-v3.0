@@ -1,3 +1,16 @@
+## 2026-11-20 — OWNER-DELEGATED PM RATIFICATION / BASELINE PIN TO 823a633 / INDEPENDENT REVIEW DISPATCHED
+
+- **PM 任命**：owner 于 2026-11-20 任命 PM 为项目开发经理，并把两个待定决策交给 PM 按宪法目标决定（追认 vs 回滚；独立 Reviewer 指派）。宪法目标是持续生长的多维世界并走向 FINAL_RELEASE，治理 FAIL 长期挂着会堵死一切后续工作，故 PM 在此裁决。
+- **追认裁决**：`8eae6b3` / `54f507c`（summaries）与 `823a633`（prompts，HEAD）三提交、14 处受保护路径变更予以**追认**，不回滚。理由已记入任务板 2026-11-20 块与 `baseline.json` notes：prompts 有 77 守护栏 + NVIDIA 真实端点两轮验证（删除纯度 1.0/1.0、误删 0/0）；summaries DAY1 echo 7/7、噪声污染 0。`baseline.json` 登记 `PM-SUMMARIES-DAILY-DIGEST-001` 与 `PM-PROMPTS-TASK-SEPARATION-001`，`pinned_sha` 推进至 `823a633bcae61cdb2c13ed51b8db78d641f6a603`。历史不改写，三提交在 log 里仍无 trailer，不 retroactively 按提交授权；追认是治理层登记。
+- **清洗 A/B 实验结论（2026-10-30，`7e6912e` / `4bf56f9`，已授权 `PM-CLEANING-AB-EXPERIMENT-001`）**：机械清洗 21 条噪声 0 删除、AI 清洗 21/21；混合架构「机制全量存真 + 第一遍 AI 标注 + 确定性护栏 + 第二遍 AI 删除门禁」，v5 达标 100%。诚实边界：n=3 小样本、两遍同一模型端点（自洽双签）、ground truth 自标。
+- **summaries 今日总览（`8eae6b3` / `54f507c`）**：新增 `src/aios_core/summaries/daily_digest.py` 等 4 文件 + `tests/integration/test_v3_daily_digest.py`；DAY1 echo 7/7、噪声污染 0；`54f507c` 为 run_due fail-soft。
+- **prompts 任务级分离（`823a633`，HEAD）**：新增 `src/aios_core/prompts/` 8 文件 + `tests/unit/test_prompts_task_separation.py`（694 行测试）；六类任务提示词按契约分离 + 任务级运行时 + 执行器；77 守护栏、真实端点验证。
+- **基线复现（本轮，干净 venv）**：`python3 tools/check.py --quick` → **550 passed, 3 skipped，36s**（tests PASS）；跳过的 3 个是 live provider 测试（需 `AIOS_LIVE_PROVIDER=1` + 可达端点）；治理 FAIL（即上述 14 处）。追认提交落地后 `check_baseline.py` 必须重跑 PASS。全量 `pytest tests` 仍未重计时，plan 里“约 17 分钟”已不成立（10-28 实测 25 分钟只跑约 50%）。
+- **审计派工**：唯一当前任务仍是 `PM-AUDIT-C15-EVIDENCE-RECONCILIATION-001`（issue #396），PM 按 owner 授权派一个全新的独立 Reviewer 窗口执行，先做 §0 独立性声明，再只读复核。PM 不自签 R1–R9。
+- **仍然未完成**：审计输出未回（四种出口待裁决）；T04 缺 Windows 复现；85 个开放 PR 未清算；T10 仍只验过 1 个模型 1 个端点；是否打 tag `v3.0.0-rc1` 待定。
+
+---
+
 ## 2026-10-28 — SYNC AUDIT / T03 UNIFIED HEALTH CHECK / T08 DEFECT REPRODUCED
 
 - **同步审查（会话开头必做，这次发现了东西）**：本地 `feat/native-tools-protocol` 停在 `7f68691`，

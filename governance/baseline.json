@@ -1,7 +1,7 @@
 {
   "_comment": "AIOS 基线钉住文件。受保护路径的任何变更，必须由对应 task 授权，且提交信息含 Authorized-Task trailer。由 PM 维护，实现方不得自行更新。",
-  "pinned_sha": "467704377310ed098be15f7a9da75ec7c5e1994e",
-  "pinned_at": "2026-10-28T09:00:26Z",
+  "pinned_sha": "823a633bcae61cdb2c13ed51b8db78d641f6a603",
+  "pinned_at": "2026-11-20T07:57:06Z",
   "pinned_by": "PM",
   "task_id": [
     "PM-GOVERNANCE-SECURITY-GATE-001",
@@ -14,7 +14,9 @@
     "PM-SUITE-RUNNABILITY-001",
     "PM-T08-DEDUP-SCOPE-CORRECTIVE-001",
     "PM-CODE-HEALTH-ENTRY-001",
-    "PM-CLEANING-AB-EXPERIMENT-001"
+    "PM-CLEANING-AB-EXPERIMENT-001",
+    "PM-SUMMARIES-DAILY-DIGEST-001",
+    "PM-PROMPTS-TASK-SEPARATION-001"
   ],
   "allowed_paths": [
     "governance/",
@@ -50,6 +52,7 @@
     "推进新窗口时必须由 PM 更新 task_id 与 pinned_sha。",
     "allowed_paths 内变更无需 trailer（治理/文档类）。",
     "protected_paths 内变更若无 trailer 或无匹配 task_id，CI 直接 FAIL。",
-    "reviews/internal_habitation 属封存证据，任何情况下不得变更。"
+    "reviews/internal_habitation 属封存证据，任何情况下不得变更。",
+    "2026-11-20 PM 追认裁决（owner 授权 PM 按宪法目标决定）：8eae6b3 / 54f507c（summaries，PM-SUMMARIES-DAILY-DIGEST-001）与 823a633（prompts，PM-PROMPTS-TASK-SEPARATION-001）三提交的 14 处受保护路径变更予以追认，pin 推进至 823a633。历史提交本身无 trailer，不改写历史、不 retroactively 补 trailer；追认是治理层登记，详见任务板 2026-11-20 块。此举不是为清漂移而替换 pin：被追认的工作有实测价值（prompts 77 守护栏 + 真实端点验证；summaries DAY1 echo 7/7、噪声污染 0），revert 将丢弃已验证工作且无助于审计。"
   ]
 }
