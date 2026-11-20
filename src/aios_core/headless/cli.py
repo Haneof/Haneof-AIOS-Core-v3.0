@@ -8,7 +8,9 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import signal
 import sys
+import threading
 from typing import Any
 
 from aios_core.runtime.background_attempt import (
@@ -62,6 +64,10 @@ def _emit(value: Any, *, stream: Any = None) -> None:
     if stream is None:
         stream = sys.stdout
     print(json.dumps(value, ensure_ascii=False, sort_keys=True, default=str), file=stream)
+    # Flush immediately: stdout redirected to a file is block buffered, and a
+    # supervisor (or a killed process) would otherwise lose the most recent
+    # lines — the G-3 probe watched serve_cycle lines sit unflushed for 60 s.
+    stream.flush()
 
 
 def _summarize_dimension_result(value: Any) -> Any:
@@ -296,6 +302,47 @@ def _build_core(args: argparse.Namespace) -> HeadlessCore:
     )
 
 
+def _raise_keyboard_interrupt(signum: int, frame: Any) -> None:
+    """Serve-loop signal handler: turn SIGTERM/SIGINT into KeyboardInterrupt.
+
+    The loop already treats KeyboardInterrupt as a clean stop — ``core.stop()``
+    runs via the ``with core:`` exit in ``_run`` — so converting the signal
+    gives SIGTERM the same graceful path as Ctrl-C instead of an abrupt
+    process kill with no ``stop()`` (G-3 probe finding N-1).
+    """
+    raise KeyboardInterrupt
+
+
+def _install_serve_signal_handlers() -> dict[int, Any]:
+    """Install SIGTERM/SIGINT -> KeyboardInterrupt handlers for the serve loop.
+
+    Returns the previous handlers so the caller can restore them. Signal
+    handlers can only be installed in the main thread; anywhere else this is
+    a no-op returning an empty mapping.
+    """
+    if threading.current_thread() is not threading.main_thread():
+        return {}
+    previous: dict[int, Any] = {}
+    for signum in (signal.SIGTERM, signal.SIGINT):
+        try:
+            previous[signum] = signal.getsignal(signum)
+            signal.signal(signum, _raise_keyboard_interrupt)
+        except (ValueError, OSError, RuntimeError):
+            pass
+    return previous
+
+
+def _restore_signal_handlers(previous: dict[int, Any]) -> None:
+    """Restore the signal handlers saved by ``_install_serve_signal_handlers``."""
+    if threading.current_thread() is not threading.main_thread():
+        return
+    for signum, handler in previous.items():
+        try:
+            signal.signal(signum, handler)
+        except (ValueError, OSError, RuntimeError):
+            pass
+
+
 def _run_serve(core: HeadlessCore, args: argparse.Namespace) -> dict[str, Any]:
     """Run the maintenance loop until interrupted or ``--max-cycles`` is reached.
 
@@ -310,40 +357,44 @@ def _run_serve(core: HeadlessCore, args: argparse.Namespace) -> dict[str, Any]:
     total_reviews = 0
     total_dimension_commits = 0
     interrupted = False
+    previous_handlers = _install_serve_signal_handlers()
     try:
-        while True:
-            if args.max_cycles and cycles >= args.max_cycles:
-                break
-            moment = datetime.now(timezone.utc)
-            result = core.process_due_work(
-                now=moment,
-                max_wakes=args.max_wakes,
-                include_periodic_review=not args.skip_periodic_review,
-                include_dimension_summaries=not args.skip_dimension_summaries,
-                token_budget=args.token_budget,
-            )
-            cycles += 1
-            total_wakes += len(result.wakes)
-            if result.periodic_review is not None:
-                total_reviews += 1
-            dimension = _summarize_dimension_result(result.dimension_summaries)
-            if isinstance(dimension, dict):
-                total_dimension_commits += int(dimension.get("commits", 0) or 0)
-            _emit(
-                {
-                    "status": "serve_cycle",
-                    "cycle": cycles,
-                    "at": moment.isoformat(),
-                    "wakes": len(result.wakes),
-                    "periodic_review": result.periodic_review is not None,
-                    "dimension_summaries": dimension,
-                }
-            )
-            if args.max_cycles and cycles >= args.max_cycles:
-                break
-            time.sleep(max(float(args.interval), 0.0))
-    except KeyboardInterrupt:
-        interrupted = True
+        try:
+            while True:
+                if args.max_cycles and cycles >= args.max_cycles:
+                    break
+                moment = datetime.now(timezone.utc)
+                result = core.process_due_work(
+                    now=moment,
+                    max_wakes=args.max_wakes,
+                    include_periodic_review=not args.skip_periodic_review,
+                    include_dimension_summaries=not args.skip_dimension_summaries,
+                    token_budget=args.token_budget,
+                )
+                cycles += 1
+                total_wakes += len(result.wakes)
+                if result.periodic_review is not None:
+                    total_reviews += 1
+                dimension = _summarize_dimension_result(result.dimension_summaries)
+                if isinstance(dimension, dict):
+                    total_dimension_commits += int(dimension.get("commits", 0) or 0)
+                _emit(
+                    {
+                        "status": "serve_cycle",
+                        "cycle": cycles,
+                        "at": moment.isoformat(),
+                        "wakes": len(result.wakes),
+                        "periodic_review": result.periodic_review is not None,
+                        "dimension_summaries": dimension,
+                    }
+                )
+                if args.max_cycles and cycles >= args.max_cycles:
+                    break
+                time.sleep(max(float(args.interval), 0.0))
+        except KeyboardInterrupt:
+            interrupted = True
+    finally:
+        _restore_signal_handlers(previous_handlers)
     return {
         "status": "serve_stopped",
         "interrupted": interrupted,

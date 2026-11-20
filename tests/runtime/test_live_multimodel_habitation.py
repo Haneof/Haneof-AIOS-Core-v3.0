@@ -271,7 +271,11 @@ def test_05_sse_stream_parsing_against_loopback_stub(sse_stub_server):
 
     assert text == "AIOS_ONLINE"
     assert provenance.provider == "grok"
-    assert provenance.model == "grok-4.7"
+    # The stub returns no "model" field, so provenance must say UNKNOWN
+    # rather than echo the requested model (PM-PROVENANCE-MODEL-FIELD-001:
+    # the request parameter is not evidence of which model answered).
+    assert provenance.model == "UNKNOWN"
+    assert usage.model == "UNKNOWN"
     assert provenance.request_id == "chatcmpl-stub-001"
     assert usage.input_tokens == 12
     assert usage.output_tokens == 4

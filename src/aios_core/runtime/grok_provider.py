@@ -705,12 +705,14 @@ class GrokStreamingProvider:
 
         accumulated_chunks: list[str] = []
         captured_id: str | None = None
+        captured_model: str | None = None
         raw_usage: dict[str, Any] | None = None
 
         start_time = time.perf_counter()
         for attempt in range(3):
             accumulated_chunks = []
             captured_id = None
+            captured_model = None
             raw_usage = None
             attempt_start = time.perf_counter()
             # Socket timeout guards a stalled read; an overall deadline additionally
@@ -744,6 +746,15 @@ class GrokStreamingProvider:
 
                         if captured_id is None and chunk.get("id"):
                             captured_id = str(chunk["id"])
+
+                        # Provenance must record what the server says served the
+                        # response, not what was requested: the requested model
+                        # is not evidence of which model actually answered.
+                        # First non-blank server model wins, mirroring captured_id.
+                        if captured_model is None:
+                            server_model = chunk.get("model")
+                            if isinstance(server_model, str) and server_model.strip():
+                                captured_model = server_model.strip()
 
                         if chunk.get("usage"):
                             raw_usage = chunk["usage"]
@@ -827,9 +838,14 @@ class GrokStreamingProvider:
             # 估算分支无法得知思考开销，显式留空而不是编造数字。
             reasoning_tokens = None
 
+        # No server model field anywhere in the stream means the response
+        # cannot be attributed to any model. Record that explicitly instead
+        # of echoing the requested model as if the server had confirmed it.
+        server_model = captured_model or "UNKNOWN"
+
         provenance = ModelCallProvenance(
             provider="grok",
-            model=chosen_model,
+            model=server_model,
             request_id=request_id,
         )
 
@@ -840,7 +856,9 @@ class GrokStreamingProvider:
             reasoning_tokens=reasoning_tokens,
             cached_input_tokens=cached_tokens if cached_tokens > 0 else None,
             provider="grok",
-            model=chosen_model,
+            # ModelDirective requires usage.model to agree with provenance.model;
+            # both name the model the server says served the response.
+            model=server_model,
             request_id=request_id,
         )
 
@@ -901,6 +919,7 @@ class GrokStreamingProvider:
         # stream cannot collapse into each other.
         partial_calls: dict[int, dict[str, str]] = {}
         captured_id: str | None = None
+        captured_model: str | None = None
         raw_usage: dict[str, Any] | None = None
         finish_reason: str | None = None
 
@@ -908,6 +927,7 @@ class GrokStreamingProvider:
             accumulated_chunks = []
             partial_calls = {}
             captured_id = None
+            captured_model = None
             raw_usage = None
             finish_reason = None
             attempt_start = time.perf_counter()
@@ -938,6 +958,15 @@ class GrokStreamingProvider:
 
                         if captured_id is None and chunk.get("id"):
                             captured_id = str(chunk["id"])
+
+                        # Provenance must record what the server says served the
+                        # response, not what was requested: the requested model
+                        # is not evidence of which model actually answered.
+                        # First non-blank server model wins, mirroring captured_id.
+                        if captured_model is None:
+                            server_model = chunk.get("model")
+                            if isinstance(server_model, str) and server_model.strip():
+                                captured_model = server_model.strip()
 
                         if chunk.get("usage"):
                             raw_usage = chunk["usage"]
@@ -1024,9 +1053,14 @@ class GrokStreamingProvider:
                 )
             )
 
+        # No server model field anywhere in the stream means the response
+        # cannot be attributed to any model. Record that explicitly instead
+        # of echoing the requested model as if the server had confirmed it.
+        server_model = captured_model or "UNKNOWN"
+
         provenance = ModelCallProvenance(
             provider="grok",
-            model=chosen_model,
+            model=server_model,
             request_id=request_id,
         )
         if raw_usage:
@@ -1073,7 +1107,9 @@ class GrokStreamingProvider:
             reasoning_tokens=reasoning_tokens,
             cached_input_tokens=cached_tokens if cached_tokens > 0 else None,
             provider="grok",
-            model=chosen_model,
+            # ModelDirective requires usage.model to agree with provenance.model;
+            # both name the model the server says served the response.
+            model=server_model,
             request_id=request_id,
         )
 

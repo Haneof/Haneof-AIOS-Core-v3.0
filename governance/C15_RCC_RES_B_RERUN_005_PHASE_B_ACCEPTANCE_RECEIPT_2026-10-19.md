@@ -68,3 +68,9 @@ Chief Architect & Supreme Commander Verdict: **`ACCEPTANCE_PASS / 10 OF 10 PROBE
    **`WINDOW 75 — C15-RCC-RES-C-RERUN-005 (Phase-C Fresh Resident C Replacement-Execution Habitation Rerun)`** 正式解冻并核准放行！
    - Resident C 将继承 Phase B 完工后的私有 SQLite AIOS World（版本 60）与 `release-state.json`；
    - 顺序推进游标 `23..30`（游标 30 ACK 达成后执行全流程终验封存）。
+
+---
+
+## Erratum (appended 2026-11-20 by PM adjudication; frozen text above untouched)
+
+Phase-B `completion_report.md` §一 lists process `4020a4ca-d93a-4da2-b1ba-fa4e99fc3646` / session `resident-b-005-cfd07e6067fc8662` / conversation `sess-resident-b-005-a35fef6bb8be19ca`. The authoritative values are process `d0642375-5fef-4ca1-ac5c-d5af0e585635` / session `resident-b-005-32ed51751aee40a2` / conversation `sess-resident-b-005-632f06ba3df940f3` per `RUN_IDENTITY.json` (corroborated by FREEZE_MANIFEST and IA P09). The old triple is treated as an unaccepted-draft remnant pending written Operator confirmation. Source: independent reviews RV20261120-001 (`RUN_IDENTITY_RECONCILIATION.md` Discrepancy 1) and RV20261120-002.

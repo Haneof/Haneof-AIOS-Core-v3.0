@@ -55,3 +55,9 @@
 Window 76 Independent Acceptance is hereby **APPROVED AND SEALED**.
 Phase C candidate is officially certified as **ACCEPTED**.
 The entire 30-cursor sealed fixture lifecycle (Phase A 1..13, Phase B 14..22, Phase C 23..30) across three independent resident model sessions is fully complete and compliant. Downstream Evaluator and Release Gate are formally authorized to proceed.
+
+---
+
+## Erratum (appended 2026-11-20 by PM adjudication; frozen text above untouched)
+
+`94221b51` (run `c15-rcc-res-c-rerun-005-bd8446e1205d`) was the first, unaccepted PR #394 candidate; it was replaced by `6cd89d6e3761347487946ca95e59bae380a3ae46` (run `c15-rcc-res-c-rerun-005-cf585be261f9`), accepted via Window76 IA. The old object is not retained locally; the replacement reason is to be supplied by the Operator/author. The accepted identity is run `…cf585be261f9` only. Source: independent reviews RV20261120-001 (`RUN_IDENTITY_RECONCILIATION.md` Discrepancy 2) and RV20261120-002.

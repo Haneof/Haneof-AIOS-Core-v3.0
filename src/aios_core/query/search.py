@@ -68,6 +68,9 @@ _TEXT_FIELDS: dict[str, tuple[str, ...]] = {
     "prediction": ("expected_change", "reasoning"),
     "reinterpretation": ("statement",),
     "life_chapter": ("chapter_title",),
+    "narrative_segment": ("title", "description"),
+    "dimension_curve_point": ("anomaly_description",),
+    "tool_proposal": ("capability_gap", "expected_benefit", "validation_plan"),
     "communication_experience": ("scenario", "style", "tone"),
 }
 _TIME_FIELDS: dict[str, tuple[str, ...]] = {

@@ -9,6 +9,7 @@ vertical slice stays green.
 from __future__ import annotations
 
 import hashlib
+import logging
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from typing import Any, Callable, Mapping, Sequence
@@ -177,6 +178,9 @@ _C14_COGNITIVE_SIDE_EFFECT_ALLOWLIST = frozenset(
     }
 )
 _C14_SEMANTIC_TERMINATIONS = frozenset({"responded", "silence"})
+
+_LOGGER = logging.getLogger(__name__)
+
 
 # The writes whose silent failure loses continuity. These are the capabilities the
 # standing prompt instructions already tell the model to call; if their required
@@ -457,6 +461,9 @@ class FusedTurnRuntime:
             service=self.communication_experience,
             subject_id=self.subject_id,
         )
+        # G-2: failures of the automatic per-turn experience write must leave a
+        # trace instead of vanishing in a bare ``except: pass``.
+        self.experience_record_failures = 0
         self.topic_associator = DynamicTopicAssociator(
             store=store,
             index=index,
@@ -3027,7 +3034,16 @@ class FusedTurnRuntime:
                 recorded_at=occurred_at,
             )
         except Exception:
-            pass
+            # G-2: never swallow this silently — the turn's feedback would be
+            # lost with no signal. The turn itself still completes; the failure
+            # is observable via the counter and the warning log.
+            self.experience_record_failures += 1
+            _LOGGER.warning(
+                "failed to record turn experience (style=%s, reaction=%s)",
+                style,
+                reaction,
+                exc_info=True,
+            )
 
     def _record_ai_promise(
         self,

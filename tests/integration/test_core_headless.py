@@ -618,3 +618,81 @@ def test_serve_loop_runs_bounded_cycles_and_stops(capsys):
     lines = [ln for ln in capsys.readouterr().out.strip().splitlines() if ln]
     assert len(lines) == 2
     assert all('"serve_cycle"' in ln for ln in lines)
+
+
+def test_serve_signal_handlers_turn_sigterm_and_sigint_into_keyboard_interrupt():
+    """N-1: serve 循环的信号 handler 必须把 SIGTERM/SIGINT 转成 KeyboardInterrupt。"""
+    import signal
+
+    from aios_core.headless.cli import (
+        _install_serve_signal_handlers,
+        _restore_signal_handlers,
+    )
+
+    # pytest 自带 SIGINT handler：恢复后应回到安装前的值，而不是 SIG_DFL。
+    before_term = signal.getsignal(signal.SIGTERM)
+    before_int = signal.getsignal(signal.SIGINT)
+    previous = _install_serve_signal_handlers()
+    try:
+        for signum in (signal.SIGTERM, signal.SIGINT):
+            handler = signal.getsignal(signum)
+            with pytest.raises(KeyboardInterrupt):
+                handler(signum, None)
+    finally:
+        _restore_signal_handlers(previous)
+    assert signal.getsignal(signal.SIGTERM) == before_term
+    assert signal.getsignal(signal.SIGINT) == before_int
+
+
+def test_serve_loop_stops_gracefully_on_real_sigterm():
+    """N-1: 真 SIGTERM 到达 serve 循环时必须走优雅停止路径，不杀死进程。
+
+    不杀进程：信号发给测试进程自身，但循环已装好 handler 把它转成
+    KeyboardInterrupt，所以进程存活、循环干净退出、handler 被恢复。
+    """
+    import signal
+    from argparse import Namespace
+
+    from aios_core.headless.cli import _run_serve
+    from aios_core.headless.core import DueWorkResult
+
+    class SignallingStubCore:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def process_due_work(self, **kwargs):
+            self.calls += 1
+            signal.raise_signal(signal.SIGTERM)
+            return DueWorkResult(
+                wakes=(),
+                periodic_review=None,
+                dimension_summaries={"skipped": True, "reason": "stub"},
+            )
+
+    before_term = signal.getsignal(signal.SIGTERM)
+    stub = SignallingStubCore()
+    args = Namespace(
+        interval=0.0,
+        max_cycles=0,
+        max_wakes=4,
+        skip_periodic_review=False,
+        skip_dimension_summaries=False,
+        token_budget=None,
+    )
+    summary = _run_serve(stub, args)
+    assert summary["status"] == "serve_stopped"
+    assert summary["interrupted"] is True
+    assert stub.calls == 1
+    assert signal.getsignal(signal.SIGTERM) == before_term
+
+
+def test_emit_flushes_stream_immediately(tmp_path):
+    """N-2: _emit 必须立即 flush，否则重定向到文件时输出会被块缓冲扣住。"""
+    from aios_core.headless.cli import _emit
+
+    path = tmp_path / "out.jsonl"
+    # 8 KiB 缓冲：不 flush 的话这一行会一直留在缓冲区里。
+    with open(path, "w", encoding="utf-8", buffering=8192) as stream:
+        _emit({"status": "probe"}, stream=stream)
+        # 不关写端、另开读端：内容必须已经落盘。
+        assert '"probe"' in path.read_text(encoding="utf-8")

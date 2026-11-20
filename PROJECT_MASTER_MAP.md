@@ -97,9 +97,9 @@
 |---|---|
 | C13 / 历史 T34/T36/T28/T35/T33 修复 | 已有 task-board 完成证据；不因旧 Issue OPEN 重做 |
 | C14 持续认知派生 | 正式收口 PASS |
-| C15-RCC (A/B/C 三阶段共生心智栖居) | **CLOSED / PRODUCTION READY**：Phase A (PR #392)、Phase B (PR #393)、Phase C (PR #394) 全量 10/10 PASS 独立验收通过；综合评估器 9/9 轴 VALID；Gate 0 正式签署 (`governance/C15_RCC_GATE_0_FORMAL_CLOSE_RECEIPT_2026-10-19.md`)；PR #391 已合入 `main` (`2e55834d`) |
+| C15-RCC (A/B/C 三阶段共生心智栖居) | **REVALIDATION_REQUIRED（2026-11-20 独立复核 RV20261120-001）**：Phase A/B/C 的历史验收记录保留，但综合评估器 9 轴对 pin 定基线为 R1 PARTIAL、R2 PARTIAL、R3 INVALID、R4 INVALID、R5 PARTIAL、R6 PARTIAL、R7 PARTIAL、R8 INVALID、R9 PARTIAL，C15 不 PASS；Gate 0 签署记录保留为历史状态，不作为当前放行依据。下一任务 `PM-REVALIDATION-BASELINE-001`（新基线 8317769）复核漂移区间 `259d0353 → 8317769`；在再验证裁决前，C15-RCC 不得表述为 CLOSED / PRODUCTION READY。PR #391 已合入 `main` (`2e55834d`) 这一事实不变。 |
 | Post-C15 issue reconciliation | **CLOSED / 100% RECONCILED**：`POST-C15-ISSUE-RECONCILIATION-001` 全量对账完成 (`governance/POST_C15_ISSUE_RECONCILIATION_001_RECEIPT_2026-10-19.md`)；Issue #23/#28/#33/#34/#35 逐项验证并在 GitHub 全部关闭 |
-| C16 系统改进反馈 | **UNBLOCKED / READY**；Resident proposal 与用户 World 分离，独立复现/工程/Gate/再验证 |
+| C16 系统改进反馈 | **HOLD_PENDING_REVALIDATION（2026-11-20 任务板裁决）**；在 `PM-REVALIDATION-BASELINE-001` 裁决前不放行，Resident proposal 与用户 World 分离、独立复现/工程/Gate/再验证的要求不变 |
 | 广泛 P16 | C15-RCC 已正式收口，放行有效分段 ledger、多 provider/model 长期入住与真实设备集成 |
 | P17 / P18 / P19 | 发布 Gate → `P18-REALITY-HELP-INTEGRATION-001` → `P19-HELP-EXPERIENCE-001`，依次推进 |
 

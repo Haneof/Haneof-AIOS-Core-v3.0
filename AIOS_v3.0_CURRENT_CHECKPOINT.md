@@ -1,3 +1,91 @@
+## 2026-11-20 — SERVE HARDENING ACCEPTED / NO ENGINEERING TASK OPEN
+
+- **加固验收出口（PM 已接受）**：独立验收 `PM-HEADLESS-SERVE-HARDENING-ACCEPTANCE-001` 出口为 **ACCEPTED**，5/5 全 PASS。SIGTERM/SIGINT 用真实信号对 live serve 子进程独立复现（各 rc=0、`serve_stopped`、`interrupted=true`，数据完整）；`_emit` 刷盘用独立 pipe 复现；3 个测试确认为真（修复树 20/20，未修树 handler 测试 ImportError、flush 测试 AssertionError、SIGTERM 测试杀死 runner 退出码 143）。快检 558 passed / 3 skipped、治理 PASS。G-3 的 N-1、N-2 均已修完并验收，Window80 接线验收的缺口清单全部关闭。
+- **带出的观察（不阻塞）**：O-1 SIGTERM 测试依赖主线程（已记录）；O-2 serve 周期即使跳过定期回顾与维度摘要也可能让 world revision +1（revision 数不是承诺）；O-3 `status` 的 `writer_lease_held` 是报告进程自己的租约，杀后判断应看新命令能否启动 + 内容对比。
+- **当前状态**：审计 → 再验证 → 接线验收 → G1G2 修 + 验收 → provenance 修 + 验收 → G-3 探针 → serve 加固修 + 验收，整条链已完成，无新的工程任务派出。剩下两件：(a) 发布，等 owner 审批（review 分支创建超时未重试；自 8317769 起的本地提交待推）；(b) 外部材料 L1/L4/L7 与 R6 的 live 重取证（需真实端点，本会话没有）。
+
+---
+
+## 2026-11-20 — SERVE HARDENING IMPLEMENTED (b1fd221) / NEXT TASK PM-HEADLESS-SERVE-HARDENING-ACCEPTANCE-001
+
+- **实现已验（PM 复核）**：`b1fd221` 修完 serve 加固，带 `Authorized-Task: PM-HEADLESS-SERVE-HARDENING-001` trailer。2 文件、162 增 33 删：serve 循环装 SIGTERM/SIGINT handler（转成 KeyboardInterrupt，复用现有优雅停路径调 `core.stop()`），`_emit` 每次 print 后 flush。新建 3 个回归测试，PM 复跑集成文件 20/20 通过；3 个新测试在未修树上全部失败（SIGTERM 测试在旧代码下直接把子进程杀死、退出码 143），是真回归测试。快检仍为 558 passed / 3 skipped（新测试在 tests/integration，不在 quick 范围内）、治理 PASS。未推、未开 PR。
+- **记录**：SIGTERM 测试依赖主线程（signal 只能在主线程装 handler），将来套件若改多进程/多线程执行器，该测试需改为只测 handler 回调。
+- **下一唯一任务**：`PM-HEADLESS-SERVE-HARDENING-ACCEPTANCE-001`，对 `b1fd221` 做独立验收（独立验证 SIGTERM/SIGINT 优雅停、_emit 及时刷出、确认 3 个测试为真回归、核对改动范围、确认集成文件与快检通过），交付 `reviews/HEADLESS_SERVE_HARDENING_ACCEPTANCE_2026-11-20/`。
+
+---
+
+## 2026-11-20 — G-3 PROBE RECOVERY_VERIFIED / NEXT TASK PM-HEADLESS-SERVE-HARDENING-001
+
+- **探针出口（PM 已接受）**：独立探针 `PM-WINDOW80-G3-RESTART-PROBE-001` 出口为 **RECOVERY_VERIFIED**，报告 `reviews/WINDOW80_G3_RESTART_PROBE_2026-11-20/PROBE_REPORT.md`，SHA256SUMS 由 PM 验过。一个会话 3 轮 turn，中间对持有租约的 serve 进程各杀一次（SIGTERM、SIGKILL）：两次杀后 world + index 的 SHA-256 与杀前完全相同、零丢失；重启本身对内容是 no-op；每轮新 turn 精确新增 4 对象 + 3 commit，无重复；租约活着时持有、死后释放；索引 watermark 追平（10 = world rev 10，lag 0）；关键词能搜到三轮。7/7 探针项全 PASS。G-3 关闭。
+- **带出的两个小问题（不阻塞）**：N-1 headless CLI 没有 signal 处理，SIGTERM 实际上是 abrupt 终止、不会调 `core.stop()`（恢复本身成立，但 SIGTERM 若想表达优雅停止需补 handler）；N-2 serve 输出重定向时是块缓冲，`serve_cycle` 行杀前没刷出来（周期执行本身由持久化证据证明）。
+- **下一唯一任务**：`PM-HEADLESS-SERVE-HARDENING-001`，最小加固任务：(a) serve 循环加 SIGTERM/SIGINT handler 调 `core.stop()` 优雅停 + 测试；(b) 每次 `_emit` 后 flush stdout + 测试。修完另开独立验收。
+
+---
+
+## 2026-11-20 — PROVENANCE FIX ACCEPTED / NEXT TASK PM-WINDOW80-G3-RESTART-PROBE-001
+
+- **修复验收出口（PM 已接受）**：独立验收 `PM-PROVENANCE-MODEL-FIELD-ACCEPTANCE-001` 出口为 **ACCEPTED**，5/5 全 PASS。两条路径用 raw socket mock 服务端独立复现（修复树 17/17 通过；未修树恰好 9 项 provenance 断言失败、全部回显请求名）。6 个 shipped 测试确认为真（修复树 6/6 通过、未修树 6/6 失败）。全仓只有 3 处 `ModelCallProvenance(` 构造点，两条 live 路径均已修。快检 558 passed / 3 skipped、治理 PASS。provenance 任务关闭。
+- **带入 live 重取证的检查项**：N-1 两处 live 测试断言 grok-4.7 的前提是真实端点返回 model 字段（首次 live 时确认）；N-3 chunk 无 id 时 request-id 回退为本地合成值（首次 live 时确认端点实际返回 chunk id）。N-2 用量字段仍是请求侧/估算值（计量口径，另立任务）。
+- **下一唯一任务**：`PM-WINDOW80-G3-RESTART-PROBE-001`，对本地精确树做 live kill-and-restart 探针（确定性本地 handler，不调外部模型、不碰凭证、不启动 Resident），验证重启后状态恢复端到端成立，交付 `reviews/WINDOW80_G3_RESTART_PROBE_2026-11-20/`。这是验证任务，不改代码、不提交。
+
+---
+
+## 2026-11-20 — PROVENANCE FIX IMPLEMENTED (cf7d766) / NEXT TASK PM-PROVENANCE-MODEL-FIELD-ACCEPTANCE-001
+
+- **实现已验（PM 复核）**：`cf7d766` 修完 provenance.model 回显问题，带 `Authorized-Task: PM-PROVENANCE-MODEL-FIELD-001` trailer。3 文件、252 增 5 删：两条 streaming 路径都取服务端返回的第一个非空 model 字段记进 provenance，没有就记 UNKNOWN；`ModelUsage.model` 同步改（`cognitive_runtime` 强制两者一致，不同步会抛错）；request-id 本来就是服务端来源，无需改。新建 6 个 mock 回归测试，test_05 断言按新契约更新。PM 复跑新测试 6/6 通过，快检 558 passed / 3 skipped、VERDICT: PASS。未推、未开 PR。
+- **说明**：这修的是让 live 取证成为可能的前提，本身不产生 live 证据；R6 要真正 PASS 仍需一次带服务端 model 字段的 live 重取证或可信 attestation。
+- **下一唯一任务**：`PM-PROVENANCE-MODEL-FIELD-ACCEPTANCE-001`，对 `cf7d766` 做独立验收（mock 服务端独立复现两条路径与 UNKNOWN 情形、确认 6 个测试为真回归、核对改动范围、确认快检通过），交付 `reviews/PROVENANCE_MODEL_FIELD_ACCEPTANCE_2026-11-20/`。
+
+---
+
+## 2026-11-20 — G1G2 FIX ACCEPTED / NEXT TASK PM-PROVENANCE-MODEL-FIELD-001
+
+- **修复验收出口（PM 已接受）**：独立验收 `PM-WINDOW80-GAPS-G1G2-ACCEPTANCE-001` 出口为 **ACCEPTED**，5/5 全 PASS。两处修复均用与 shipped 测试不同的 fixture/关键词独立复现（G-1 修复树 5/5 命中、未修树 0/5；G-2 失败写入记日志 + 计数、整轮不中断、正常写入不变）。回归测试确认为真（修复树 2/2 通过、未修树 2/2 失败）。快检 552 passed / 3 skipped、治理 PASS。G1G2 任务关闭。
+- **待办（不阻塞）**：N-1 白名单键重复（下次动 search.py 时顺带去重）；N-2 list 字段索引（另立索引器任务）；G-3 live 重启探针（审计后验证任务）；L8 部署命令 UNKNOWN。
+- **下一唯一任务**：`PM-PROVENANCE-MODEL-FIELD-001`，修 R6 的根因——provenance.model 目前是请求字符串回显，从不读服务端返回的 model 字段。范围：响应路径里改记服务端返回的 model（有 request-id 也一并记）；服务端没给就记 UNKNOWN，绝不再把请求字符串当成服务端的答案。只用 mock 回归测试，不需要真实端点。修完另开独立验收。
+
+---
+
+## 2026-11-20 — G1G2 FIX IMPLEMENTED (e52878e) / NEXT TASK PM-WINDOW80-GAPS-G1G2-ACCEPTANCE-001
+
+- **实现已验（PM 复核）**：`e52878e` 修完 G-1、G-2，带 `Authorized-Task: PM-WINDOW80-GAPS-G1G2-001` trailer。3 文件、178 增 1 删：`search.py` 白名单补三类，`turn_runtime.py` 裸 except 改为计数 + warning 日志，新建 2 个回归测试。PM 复跑新测试 2/2 通过，`tools/check.py --quick` VERDICT: PASS（552 passed / 3 skipped）。未推、未开 PR。
+- **顺带发现（未修）**：`_TEXT_FIELDS` 里 `communication_experience` 重复出现两次（值相同，去重后无害）；list 字段仍不在关键词索引内（索引器只取 str 值），要覆盖需另立任务。
+- **下一唯一任务**：`PM-WINDOW80-GAPS-G1G2-ACCEPTANCE-001`，对 `e52878e` 做独立验收（复跑回归测试、独立复现两处修复、核对改动范围、确认 quick check 通过），交付 `reviews/WINDOW80_GAPS_G1G2_ACCEPTANCE_2026-11-20/`。
+
+---
+
+## 2026-11-20 — WINDOW80 WIRING ACCEPTANCE ACCEPTED_WITH_GAPS / NEXT TASK PM-WINDOW80-GAPS-G1G2-001
+
+- **接线验收出口（PM 已接受）**：独立验收 `PM-WINDOW80-WIRING-ACCEPTANCE-001` 出口为 **ACCEPTED_WITH_GAPS**，报告 `reviews/WINDOW80_WIRING_ACCEPTANCE_2026-11-20/ACCEPTANCE_REPORT.md`，SHA256SUMS 由 PM 验过。7 项全 PASS、0 FAIL，冻结树 `8317769` 上的 Window80 接线成立。证据：`tools/check.py --quick` 550 passed / 3 skipped（live provider）、治理 PASS；Window80 专项子集 83 passed / 0 failed。记录一处笔误：报告 §0 的文件清单把 B/C 收据文件名写错（多写了个 RES_A），实际 diff 经 PM 核对无误，不影响结论；另 capability 实际清点为 11 个（任务书写的“约 10 个”）。
+- **缺口**：G-1（中）三类产物不可关键词检索；G-2（中）自动经验写入失败被裸 except 吞掉；G-3（低）无 live 重启探针；O-1 自动经验启发式较粗、O-2 非 active turn 回退当前时间（仅观察）。
+- **PM 裁决**：G-1、G-2 合并为一个最小工程任务 `PM-WINDOW80-GAPS-G1G2-001`（已登记进 `governance/baseline.json`，提交须带 `Authorized-Task:` trailer），修完另开独立验收；G-3、L8 记入待办不阻塞；O-1/O-2 不行动；不因此重开审计基线，R1–R9 仍以两次复核为准。
+
+---
+
+## 2026-11-20 — REVALIDATION EXIT GAPS_CONFIRMED / NEXT TASK PM-WINDOW80-WIRING-ACCEPTANCE-001
+
+- **再验证出口（PM 已接受）**：独立复核 `RV20261120-002`（`PM-REVALIDATION-BASELINE-001`）出口为 **GAPS_CONFIRMED**。8 份输出齐全，SHA256SUMS 由 PM 验过。新基线 `8317769` 冻结并复核通过（受保护树、合同 blobs、4 个候选 HEAD 全一致）。剩下的是证据生产、工程任务与 PM 裁决，不再是又一轮再验证。C15 仍不通过（R1–R9：PARTIAL×4 / INVALID×3 / INSUFFICIENT_EVIDENCE×2；R6 PARTIAL、R3/R4/R8 INVALID）。
+- **对第一次复核的纠正**：漂移计数 158 → 159（第一次只数了 4 棵目录树，漏了 `pyproject.toml`；74 增 / 85 改 / 0 删 / 0 改名，78 个提交）。154 vs 155 是定义差异（manifest 列 154 个成员不含自身，目录共 155 个文件）。`5a0c38a` 无 trailer 但早于 `4677043` pin，不作新的 FAIL。
+- **Window80 接线结论被推翻（对新树）**：`259d0353` 上“未接线”是对的，但 Window82 提交 `5a0c38a` 已把 7 个子系统接入 `FusedTurnRuntime`（导入、构造、10 个 capability 注册、每轮自动调 `ExperienceTracker`）。旧 `CommunicationExperienceService` 仍并存；`headless/` 仍零引用。接线已做，缺的是验收——接线证据是作者自述，无独立验收、无新树 CI。
+- **Window67 冻结证据完整验证（L2 已解）**：分支 HEAD 与远端一致，根树与审计常量一致，manifest SHA 一致，154 个成员全部重算哈希 + 大小，零不匹配。7 个失败在全部 4 次记录运行中完全相同。**PM 裁决：original38 第 1–6 项为确认的绑定失败（STILL_BINDING），第 7 项维持 STILL_BINDING。** 验过的 Window67 候选是 PR #370 的，不是 RERUN-005 的。Phase-C World 重聚合与第一次复核完全一致。
+- **勘误已补到指定位置**：B 勘误追加到 Phase-B 验收收据，C 勘误追加到 Phase-C 验收收据与任务板 Window75 块，冻结原文未动。
+- **仍缺的材料**：L1（Window69 原始报告）、L4（可信 attestation）、L7（逐案语义表），按原定合格提供方角色索取；拿到之前 R6 保持 PARTIAL，C15 不得表述为 CLOSED / PRODUCTION READY。
+- **待办 PM 动作**：`8317769` 上还没有 `p16-convergence-gate` 运行（公开 API 只有 governance-drift 成功）；该 gate 只在推代码路径或 PR 时触发，治理提交推不上去，待有代码路径改动或 PR 时安排。
+- **下一唯一任务**：`PM-WINDOW80-WIRING-ACCEPTANCE-001`，对精确冻结树 `8317769` 做 Window80 接线的独立验收（7 子系统接线、capability 授权链、索引可见性、重启恢复），交付 `reviews/WINDOW80_WIRING_ACCEPTANCE_2026-11-20/`。这是验收任务，不是接线任务——接线已经存在。
+
+---
+
+## 2026-11-20 — AUDIT EXIT REVALIDATION_REQUIRED / NEXT TASK PM-REVALIDATION-BASELINE-001
+
+- **审计出口（PM 已接受）**：独立复核 `RV20261120-001`（`PM-AUDIT-C15-EVIDENCE-RECONCILIATION-001`）出口为 **REVALIDATION_REQUIRED**。8 份输出齐全，SHA256SUMS 由 PM 验过。漂移是实测的：审计基线 `259d0353` 的 5 个受保护对象与当前 main `8317769` 的全部不同，158 个受保护文件改动；5 个合同 blobs 全未变；4 个候选 PR head 与 pin 一致。R1–R9：R1 PARTIAL、R2 PARTIAL、R3 INVALID、R4 INVALID、R5 PARTIAL、R6 PARTIAL（INSUFFICIENT_EVIDENCE）、R7 PARTIAL、R8 INVALID、R9 PARTIAL——C15 不 PASS。
+- **关键新发现**：NI-01——R6 收据的支撑文件在基线 `259d0353` 中根本不存在（`7d70e12` 引入）；`provenance.model` 是请求字符串回显，服务端 `model` 字段从未被读取；live 测试默认跳过。NI-02——R9 把 `total_requests=47` 写死，从未计数。NI-03——最终 World 只有 1 条 claim、45 条 observation。R6 冻结 Phase-C World 复核：47 条 attempts 的 provider/model 全 NULL、metering 全 NULL、`usage_complete=0`、0 response receipts、0 handoffs。Window80 四子系统真实存在（1,836 行、18 测试）但未接入主运行链。
+- **勘误（只追加记录，不改冻结原文）**：B 完成报告三值以 RUN_IDENTITY 为准（疑似叙述笔误）；C 候选变迁 `94221b51` → `6cd89d6e…`。`PROJECT_MASTER_MAP.md` 的 stale 行已在同批治理提交中修正（C15-RCC 非 CLOSED / PRODUCTION READY；C16 为 HOLD）。
+- **PM 裁决**：R6 保持 PARTIAL，直到拿到绑定真实 A/B/C session 的可信外部 attestation，或带服务端 `model` 字段 + request-id 的 live 重取证（须先修 provenance 回显问题，该工程任务本次不授权）。Window80 接线另立精确冻结任务（本次不授权）。S1 证据包不得冒充复核结论；R1–R9 不得由 PM 或实现方自签。
+- **下一唯一任务**：`PM-REVALIDATION-BASELINE-001`，新基线冻结于 main `8317769`，清单 `reviews/PM_REVALIDATION_BASELINE_001/BASELINE.json` 已重发。范围：复核漂移区间 `259d0353 → 8317769`，按 LIMITATIONS §4 的 9 条最小需求推进。新进展：Window67 冻结证据分支远端存在（`391c4815…`，与 pin 一致），PM 已只读取回，L2 可解；L1（Window69 原始报告，仅宿主绝对路径）、L4、L7 仍未拿到，由再验证 Reviewer 记为 UNKNOWN。
+- **发布**：复核以 REVIEW_ONLY 分支 + PR 交回（绝不合并）；分支创建待 owner 在审批卡上确认（一次审批超时未执行，未重试）。
+
+---
+
 ## 2026-11-20 — OWNER-DELEGATED PM RATIFICATION / BASELINE PIN TO 823a633 / INDEPENDENT REVIEW DISPATCHED
 
 - **PM 任命**：owner 于 2026-11-20 任命 PM 为项目开发经理，并把两个待定决策交给 PM 按宪法目标决定（追认 vs 回滚；独立 Reviewer 指派）。宪法目标是持续生长的多维世界并走向 FINAL_RELEASE，治理 FAIL 长期挂着会堵死一切后续工作，故 PM 在此裁决。
