@@ -541,8 +541,33 @@ def test_checkpoint_loss_cannot_bypass_via_accepted_a_import(tmp_path):
 def test_isolation_exception_classification_namespace_permission():
     """Explicit namespace permission insufficient -> NOT_TESTED/INCONCLUSIVE, not FAIL."""
     from tools.c15_preflight.isolation_probe import probe
+    # Hermetic interpreter/setpriv discovery: probe() picks its interpreter from
+    # hardcoded /usr/bin candidates (3.11, 3, 3.12, 3.10) requiring a real
+    # non-symlink file. That layout is Ubuntu 24.04; on Ubuntu 26.04 (system
+    # Python 3.14) every candidate misses, so the probe raised "no suitable
+    # python interpreter found" before ever reaching the unshare call this test
+    # is about (gate #590). Present a deterministic fake interpreter + setpriv
+    # and an empty ldd output so the probe always reaches the mocked unshare
+    # call, independent of the machine's /usr/bin layout.
+    _fake_binaries = ("/usr/bin/python3.11", "/usr/bin/setpriv")
+    _real_is_file = Path.is_file
+    _real_is_symlink = Path.is_symlink
+
+    def _fake_is_file(self):
+        if str(self) in _fake_binaries:
+            return True
+        return _real_is_file(self)
+
+    def _fake_is_symlink(self):
+        if str(self) in _fake_binaries:
+            return False
+        return _real_is_symlink(self)
+
     # Simulate permission error by patching subprocess.run to raise PermissionError
-    with patch("tools.c15_preflight.isolation_probe.subprocess.run", side_effect=PermissionError("unshare: Operation not permitted")):
+    with patch.object(Path, "is_file", _fake_is_file), \
+         patch.object(Path, "is_symlink", _fake_is_symlink), \
+         patch("tools.c15_preflight.isolation_probe.subprocess.check_output", return_value=""), \
+         patch("tools.c15_preflight.isolation_probe.subprocess.run", side_effect=PermissionError("unshare: Operation not permitted")):
         try:
             probe()
         except RuntimeError as e:
