@@ -68,10 +68,9 @@ _TEXT_FIELDS: dict[str, tuple[str, ...]] = {
     "prediction": ("expected_change", "reasoning"),
     "reinterpretation": ("statement",),
     "life_chapter": ("chapter_title",),
-    "narrative_segment": ("title", "description"),
+    "narrative_segment": ("title", "description", "theme_tags"),
     "dimension_curve_point": ("anomaly_description",),
-    "tool_proposal": ("capability_gap", "expected_benefit", "validation_plan"),
-    "communication_experience": ("scenario", "style", "tone"),
+    "tool_proposal": ("capability_gap", "expected_benefit", "validation_plan", "use_cases", "current_limitations"),
 }
 _TIME_FIELDS: dict[str, tuple[str, ...]] = {
     "event": ("event_time",),
@@ -436,6 +435,18 @@ class WorldSearchIndex:
             value = payload.get(name)
             if object_type == "observation" and name == "value":
                 texts.extend(_iter_projection_scalar_texts(value))
+            elif (
+                isinstance(value, list)
+                and (
+                    (object_type == "tool_proposal" and name in {"use_cases", "current_limitations"})
+                    or (object_type == "narrative_segment" and name == "theme_tags")
+                )
+            ):
+                texts.extend(
+                    item.strip()
+                    for item in value
+                    if isinstance(item, str) and item.strip()
+                )
             elif isinstance(value, str) and value.strip():
                 texts.append(value.strip())
         tokens: set[str] = set()
