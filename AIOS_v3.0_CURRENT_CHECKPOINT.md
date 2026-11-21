@@ -1,3 +1,36 @@
+## 2026-11-20 — GATE FIX ACCEPTED / TASK CLOSED
+
+- **修复已接受，任务关闭**：独立验收出口 ACCEPTED，5/5 通过。验收员用自己写的 26.04 模拟（没用实现员的脚本）重跑了一遍：旧树在旧第 551 行以 gate #590 一模一样的报错失败，新树通过；还单独证明了测试不是空过（mock 的 unshare 调用恰好一次，probe 从自己的分支抛错；换成成功的 mock，probe 会返回 dict，测试会失败）。范围、断言原意、回归（558 passed / 3 skipped，治理通过）全确认。
+- **遗留（不阻塞）**：生产 probe 还是只认 3.11/3/3.12/3.10 这几个版本，在 26.04 上真跑还是会在做事之前就报 INCONCLUSIVE；但其他没 mock 的调用方都把这个错当作环境不支持处理，所以 gate 只挂了这一个测试。让 probe 学会找 3.14 是另外的生产任务，今天不派。
+- **没有在做的工程任务了。** bb69ad5 之后本地攒了几笔未推的提交（L7 裁决、gate 任务登记、修复、实施记录、本次裁决），下次推送一起带上去。下一次 gate 跑到含修复的提交，那个测试在 26.04 上应该能过。
+
+---
+
+## 2026-11-20 — GATE FIX IMPLEMENTED (9da1355) / ACCEPTANCE DISPATCHED
+
+- **修复已实现（本地提交 `9da1355`，未推）**：测试现在把 `Path.is_file`/`Path.is_symlink` 打补丁，让 `/usr/bin/python3.11` 和 `/usr/bin/setpriv` 稳定地表现为真实非符号链接文件，并把 `subprocess.check_output` 打成返回空串，probe 一定能走到已被 mock 的 unshare 调用。第 551 行的关键词断言原样保留。只改 1 个文件（+26/−1），trailer 齐全。PM 独立复核：修复后单测 1/1 过，整个文件 18/18 过，`tools/check.py --quick` 通过（558 passed / 3 skipped），治理检查通过。真假验证（模拟 26.04 下四个解释器候选全不命中）：旧树 AssertionError 失败，新树通过。没动生产代码、工作流和封存证据。
+- **独立验收已派**：`PM-PREFLIGHT-ISOLATION-GATE-FIX-ACCEPTANCE-001`，新窗口，交付在 `reviews/PREFLIGHT_ISOLATION_GATE_FIX_ACCEPTANCE_2026-11-20/`。
+
+---
+
+## 2026-11-20 — GATE #590 ROOT CAUSE FOUND / FIX TASK DISPATCHED
+
+- **gate #590 根因已定（非产品回归）**：defdddd 的 gate 只挂了一个测试（preflight 的 isolation 异常分类，第 551 行）。probe 抛出的 INCONCLUSIVE 里有 "INCONCLUSIVE" 但没有 "unshare"/"permission"/"not permitted"。原因是 GitHub 在 10 月 19 日到 11 月 19 日把 ubuntu-latest 从 24.04 迁到 26.04，系统 Python 从 3.12.3 变成 3.14.4；probe 的解释器候选（/usr/bin/python3.11、python3、python3.12、python3.10，要求非符号链接）在 26.04 上全不命中，还没走到被 mock 的 unshare 调用就报了 "no suitable python interpreter found"。旧的 gate 成功跑（259d0353）是在 24.04 上，那里 /usr/bin/python3.12 是真实文件。本地（Ubuntu 24.04.5）测试通过，与之吻合。"3 errors and 1 warning" 是同一失败的 3 条注释加一条无关的 Node.js 20 弃用警告。完整 CI 日志公开渠道看不到（需登录），但根因已由注释、代码与镜像迁移三方定死，不需要日志。
+- **修复任务已派：`PM-PREFLIGHT-ISOLATION-GATE-FIX-001`**（已登记进 `baseline.json`，18 项）。范围只限测试文件本身：让测试不依赖机器的 /usr/bin 布局（把 probe 的解释器/setpriv 发现也 mock 掉，让被 mock 的权限错误成为 probe 看到的东西），测试本意不变（权限不足 → 含权限字眼的 INCONCLUSIVE）。不改生产代码，不把 runner pin 回 24.04（那只是把漂移往后推）。独立验收在自己的窗口里做。
+
+---
+
+## 2026-11-20 — L7 ACCEPTED / C15 STILL NOT PASS / NO NEW TASK
+
+- **L7 已接受（PM 已核对）**：独立语义评估员交付逐案证据表（268 行），SHA256SUMS 由 PM 验过，未改任何已有文件。各轴：R1 PARTIAL、R2 PARTIAL、R3 PARTIAL、R4 PARTIAL、R5 PARTIAL、R6 PARTIAL / 证据不足、R7 PARTIAL、R8 INVALID、R9 PARTIAL。C15 仍不通过——最宽松读法下也没有一轴达到 VALID。
+- **关键发现**：R3/R4 的探针结论（INVALID）成立，但探针本身被证伪（只查回复字串）；冻结 World 里确实有一个真正的校准对象 C-1 和一个真实经验对象 C-5，但 B/C 里都没被检索过。R7 是全记录最强的实质影响证据：三条检索→决策链（B17/C26/C28），同一批 10 个对象驱动了拒删、保生产决策。R6 的 47 NULL 重验无误，provenance 修复只是让将来取证成为可能，不得改 PASS。R8 零 cognition 对象修订。
+- **L1 范围缩小**：L7 明确结论——R1–R9 没有任何一案依赖 L1；L1 只堵 PM-AUD-03 的安全闭环。关键外部项剩下 L4 与 R6 的 live 重取证。
+- **顺带修正**：再验证基线 manifest 里 "158 protected files" 的 stale 文本已纠正为 159（再验证 NII-01 已核验数值，之前只改了报告没改 manifest）。
+- **Owner 指示（2026-11-20）**：PM 按宪法目标自己继续推进，走到界面开发那一步停下来汇报。
+- **下一步**：无新任务派出。剩下的是外部材料（L1/L4、R6 live 重取证）与新 Resident 运行的缺口对象，都会话内派不出去。gate #590 的失败（一个 preflight 测试、目前只在 CI 出现）另在查；bb69ad5 没触发 gate（只改了文档/治理文件）。
+
+---
+
 ## 2026-11-20 — PUBLISHED (defdddd) / SNAPSHOT-SQUASH RATIFICATION / GATE RE-CHECK PENDING
 
 - **已发布（PM 已核对）**：远端 main `8317769 → defdddd`（25 文件）；review 分支 + draft PR #407（RV20261120-001）与 #408（RV20261120-002），均为 REVIEW_ONLY、不合并。本地已同步到 defdddd，5 份验收/探针报告现已在 main 上受控。
