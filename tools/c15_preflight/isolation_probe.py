@@ -122,8 +122,8 @@ def probe(repo: Path | None = None, private_a: Path | None = None) -> dict:
         allowed_sha256 = hashlib.sha256(allowed.read_bytes()).hexdigest()
         script = base / "probe.py"
         script.write_text(PROBE)
-        # Interpreter selection: try 3.11, then 3, 3.12, 3.10
-        interpreter_candidates = [Path('/usr/bin/python3.11'), Path('/usr/bin/python3'), Path('/usr/bin/python3.12'), Path('/usr/bin/python3.10')]
+        # Interpreter selection: try 3.11, then 3, 3.12, 3.10, then 3.14 (Ubuntu 26.04)
+        interpreter_candidates = [Path('/usr/bin/python3.11'), Path('/usr/bin/python3'), Path('/usr/bin/python3.12'), Path('/usr/bin/python3.10'), Path('/usr/bin/python3.14')]
         interpreter = None
         for cand in interpreter_candidates:
             if cand.is_file() and not cand.is_symlink():
@@ -136,7 +136,7 @@ def probe(repo: Path | None = None, private_a: Path | None = None) -> dict:
             raise RuntimeError("isolation probe INCONCLUSIVE: setpriv not found")
         mounts = {str(interpreter): str(interpreter), str(setpriv): str(setpriv),
                   str(packet): '/packet', str(script): '/probe.py'}
-        for lib_dir in [f'/usr/lib/{interpreter.name}', '/usr/lib/python3.11', '/usr/lib/python3.12', '/usr/lib/python3.10', '/usr/lib/python3']:
+        for lib_dir in [f'/usr/lib/{interpreter.name}', '/usr/lib/python3.11', '/usr/lib/python3.12', '/usr/lib/python3.10', '/usr/lib/python3', '/usr/lib/python3.14']:
             if Path(lib_dir).is_dir():
                 mounts[lib_dir] = lib_dir
         for binary in (interpreter, setpriv):
