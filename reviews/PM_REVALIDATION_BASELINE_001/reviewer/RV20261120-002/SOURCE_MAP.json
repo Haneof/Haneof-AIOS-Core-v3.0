@@ -1,0 +1,441 @@
+{
+  "schema": "aios.pm.evidence-reconciliation.reviewer-source-map.v1",
+  "review_id": "RV20261120-002",
+  "task_id": "PM-REVALIDATION-BASELINE-001",
+  "repository": "Haneof/Haneof-AIOS-Core-v3.0",
+  "observed_at_utc": "2026-11-20T08:43/08:50Z",
+  "new_baseline": {
+    "sha": "8317769b5f59eb0c28745bb9bd867d82eec37a5d",
+    "subject": "governance: ratify summaries/prompts work (owner-delegated PM adjudication), advance baseline pin to 823a633",
+    "protected_code_identical_to": "823a633bcae61cdb2c13ed51b8db78d641f6a603",
+    "proof": "git diff --name-only 823a633 8317769 = 3 governance files only (AIOS_v3.0_CURRENT_CHECKPOINT.md, governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md, governance/baseline.json)"
+  },
+  "prior_audit_baseline": {
+    "sha": "259d035386ea203981c6247eeb4433dbfd8eed3f",
+    "subject": "feat(kernel): Window 80 - complete core gaps GAP-001 through GAP-004"
+  },
+  "local_main_at_review": {
+    "sha": "1f769d1",
+    "subject": "governance: adjudicate audit exit REVALIDATION_REQUIRED, dispatch PM-REVALIDATION-BASELINE-001",
+    "pushed_to_remote": false,
+    "note": "All baseline verifications use explicit SHAs 259d0353 and 8317769, not the working tree."
+  },
+  "protected_trees": {
+    "at_259d0353": {
+      ".github/workflows": "9f98c39f1c02456523d62f5279d74bf48055e1fb",
+      "pyproject.toml": "b38833c7537fa60d5c2f02ed4bb19158d8995a11",
+      "src/aios_core": "9b9d4f9bab67b05fcf71ae0c29c2859cd12d0a40",
+      "tests": "3947c5a7b3d6e12f4da59e27f91f10acbd8837ee",
+      "tools": "4d007e425a35c19ae066f07d14f294356b24cfd2"
+    },
+    "at_8317769": {
+      ".github/workflows": "49621e32a1426fbc851ac2281d709f04367110e1",
+      "pyproject.toml": "079bb5b827486b180705c2049a842261e7a987e5",
+      "src/aios_core": "9462c51dd1a26ca6559a5c24b6b3b26945f13d1f",
+      "tests": "1cf82cde0966e24d101c29aa22ff09a76127ee3b",
+      "tools": "d61b04e14d0daa22f2f5f61845ed5f7d0e8a45d4"
+    },
+    "all_five_changed": true,
+    "matches_new_BASELINE_json": true,
+    "matches_first_review_SOURCE_MAP": true
+  },
+  "drift_259d0353_to_8317769": {
+    "commits": 78,
+    "protected_path_files_changed": 159,
+    "first_review_count": 158,
+    "count_correction": "First review counted 158 = the four directory trees only (39 workflows + 48 src + 59 tests + 12 tools). The full protected-path count including pyproject.toml is 159. Verdict unaffected: all five protected objects changed either way.",
+    "by_status": {
+      "added": 74,
+      "modified": 85,
+      "deleted": 0,
+      "renamed": 0
+    },
+    "by_top_dir": {
+      ".github": 39,
+      "pyproject.toml": 1,
+      "src": 48,
+      "tests": 59,
+      "tools": 12
+    },
+    "files": [
+      ".github/workflows/all-dimensions-projection.yml",
+      ".github/workflows/c09-wake-dispatch.yml",
+      ".github/workflows/c14-cognitive-derivation-loop.yml",
+      ".github/workflows/c14-cognitive-derivation-runtime.yml",
+      ".github/workflows/c14-cognitive-derivation-scheduler.yml",
+      ".github/workflows/c15-cognition-evidence-policy.yml",
+      ".github/workflows/c15-operator-preflight.yml",
+      ".github/workflows/cognition-revision.yml",
+      ".github/workflows/cognition-writeback.yml",
+      ".github/workflows/cognitive-runtime.yml",
+      ".github/workflows/constitutional-cognition-closure.yml",
+      ".github/workflows/conversation-runtime.yml",
+      ".github/workflows/conversation-world.yml",
+      ".github/workflows/core-background-trusted-return-recovery-001.yml",
+      ".github/workflows/core-headless.yml",
+      ".github/workflows/core-rc-refreeze-002-formal-gate.yml",
+      ".github/workflows/core-recovery.yml",
+      ".github/workflows/core-scale.yml",
+      ".github/workflows/dimension-summary.yml",
+      ".github/workflows/fused-turn-runtime.yml",
+      ".github/workflows/governance-drift.yml",
+      ".github/workflows/memory-recommendation.yml",
+      ".github/workflows/p10-ai-world-gate.yml",
+      ".github/workflows/p10-ai-world.yml",
+      ".github/workflows/p11-dimension-gate.yml",
+      ".github/workflows/p11-dimension-registry.yml",
+      ".github/workflows/p12-execution-gate.yml",
+      ".github/workflows/p12-execution-world.yml",
+      ".github/workflows/p13-ingest-gate.yml",
+      ".github/workflows/p13-reality-ingest.yml",
+      ".github/workflows/p14-long-context.yml",
+      ".github/workflows/p15-periodic-review.yml",
+      ".github/workflows/p16-convergence-gate.yml",
+      ".github/workflows/p16-habitation-harness.yml",
+      ".github/workflows/p16-provider-evaluation-manual.yml",
+      ".github/workflows/p16-provider-habitation-manual.yml",
+      ".github/workflows/p9-revision-gate.yml",
+      ".github/workflows/world-index.yml",
+      ".github/workflows/world-kernel.yml",
+      "pyproject.toml",
+      "src/aios_core/cleaning/__init__.py",
+      "src/aios_core/cleaning/pipeline.py",
+      "src/aios_core/cognition/__init__.py",
+      "src/aios_core/cognition/ai_self.py",
+      "src/aios_core/context/__init__.py",
+      "src/aios_core/context/active_window.py",
+      "src/aios_core/context/budget_policy.py",
+      "src/aios_core/context/controller.py",
+      "src/aios_core/context/tokenization.py",
+      "src/aios_core/contracts/enums.py",
+      "src/aios_core/headless/cli.py",
+      "src/aios_core/headless/core.py",
+      "src/aios_core/headless/recovery.py",
+      "src/aios_core/ingest/__init__.py",
+      "src/aios_core/ingest/multimodal_edge.py",
+      "src/aios_core/ingest/sensor_pipeline.py",
+      "src/aios_core/prompts/__init__.py",
+      "src/aios_core/prompts/constitutional_prefix.py",
+      "src/aios_core/prompts/contracts.py",
+      "src/aios_core/prompts/executor.py",
+      "src/aios_core/prompts/registry.py",
+      "src/aios_core/prompts/task_runtime.py",
+      "src/aios_core/prompts/templates_structured.py",
+      "src/aios_core/prompts/templates_text.py",
+      "src/aios_core/query/__init__.py",
+      "src/aios_core/query/search.py",
+      "src/aios_core/query/topic_associator.py",
+      "src/aios_core/recommendation/proactive.py",
+      "src/aios_core/recommendation/topic_state.py",
+      "src/aios_core/review/periodic.py",
+      "src/aios_core/runtime/__init__.py",
+      "src/aios_core/runtime/_filelock.py",
+      "src/aios_core/runtime/capabilities.py",
+      "src/aios_core/runtime/cognitive_runtime.py",
+      "src/aios_core/runtime/edge_model_scheduler.py",
+      "src/aios_core/runtime/grok_provider.py",
+      "src/aios_core/runtime/live_handler.py",
+      "src/aios_core/runtime/resilient_handler.py",
+      "src/aios_core/runtime/resilient_text.py",
+      "src/aios_core/runtime/siliconflow_handler.py",
+      "src/aios_core/runtime/turn_runtime.py",
+      "src/aios_core/summaries/__init__.py",
+      "src/aios_core/summaries/daily_digest.py",
+      "src/aios_core/summaries/dimension_summary.py",
+      "src/aios_core/summaries/scheduler.py",
+      "src/aios_core/tools/adaptive_temporal_compressor.py",
+      "src/aios_core/tools/proposal_pipeline.py",
+      "src/aios_core/writeback/cognition.py",
+      "tests/audit/test_check_baseline.py",
+      "tests/audit/test_pm_audit_remediation.py",
+      "tests/c15_persistence/conftest.py",
+      "tests/c15_persistence/test_environment_reattach.py",
+      "tests/c15_persistence/test_resident_surface.py",
+      "tests/cleaning/test_garbage_retraction.py",
+      "tests/cognition/test_ai_self.py",
+      "tests/context/test_active_window.py",
+      "tests/context/test_context_budget_real_scale.py",
+      "tests/context/test_tokenization.py",
+      "tests/habitation/fixtures/catalog.json",
+      "tests/habitation/fixtures/dimension_discovery_v1.manifest.json",
+      "tests/habitation/fixtures/longitudinal_multiscale_v1.manifest.json",
+      "tests/habitation/fixtures/oracle/dimension_discovery_v1.json",
+      "tests/habitation/fixtures/oracle/longitudinal_multiscale_v1.json",
+      "tests/habitation/fixtures/resident/dimension_discovery_v1.jsonl",
+      "tests/habitation/fixtures/resident/longitudinal_multiscale_v1.jsonl",
+      "tests/ingest/test_sensor_pipeline.py",
+      "tests/integration/test_core_background_late_trusted_return_corrective_002.py",
+      "tests/integration/test_core_background_late_trusted_return_sigkill_001.py",
+      "tests/integration/test_core_background_response_recovery_001_corrective_001.py",
+      "tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py",
+      "tests/integration/test_core_background_trusted_return_adversarial_001.py",
+      "tests/integration/test_core_background_trusted_return_corrective_001_capability_replay.py",
+      "tests/integration/test_core_background_trusted_return_corrective_001_process_loss.py",
+      "tests/integration/test_core_headless.py",
+      "tests/integration/test_core_recovery.py",
+      "tests/integration/test_p16_memory_directive_anchor.py",
+      "tests/integration/test_v3_daily_digest.py",
+      "tests/integration/test_v3_multi_claim_same_turn.py",
+      "tests/integration/test_v3_periodic_review.py",
+      "tests/preflight/test_c15_operator_preflight.py",
+      "tests/preflight/test_driver.py",
+      "tests/preflight/test_round4_fixes.py",
+      "tests/preflight/test_round5_fixes.py",
+      "tests/query/test_topic_associator.py",
+      "tests/runtime/test_capability_argument_feedback.py",
+      "tests/runtime/test_capability_prompt_contract.py",
+      "tests/runtime/test_claim_deduplication.py",
+      "tests/runtime/test_continuity_end_to_end.py",
+      "tests/runtime/test_dropped_sections_prompt.py",
+      "tests/runtime/test_durable_fact_extraction.py",
+      "tests/runtime/test_edge_model_scheduler.py",
+      "tests/runtime/test_filelock.py",
+      "tests/runtime/test_fused_turn_cognitive_integration.py",
+      "tests/runtime/test_identity_continuity_prompt.py",
+      "tests/runtime/test_json_schema_conversion.py",
+      "tests/runtime/test_live_handler.py",
+      "tests/runtime/test_live_multimodel_habitation.py",
+      "tests/runtime/test_model_directive_coexistence.py",
+      "tests/runtime/test_native_tools_stream.py",
+      "tests/runtime/test_p16_recall_bench_guardrails.py",
+      "tests/runtime/test_prompt_cockpit_coverage.py",
+      "tests/runtime/test_resilient_rate_limit_isolation.py",
+      "tests/tools/test_adaptive_temporal_compressor.py",
+      "tests/tools/test_live_continuity_probe_attribution.py",
+      "tests/unit/test_m1_001r_adv_independent_redteam.py",
+      "tests/unit/test_m1_001r_high_entropy_audio.py",
+      "tests/unit/test_prompts_task_separation.py",
+      "tools/c15_persistence/backend.py",
+      "tools/c15_persistence/resident_surface_check.py",
+      "tools/c15_preflight/driver.py",
+      "tools/c15_preflight/freeze.py",
+      "tools/c15_preflight/publication.py",
+      "tools/c15_preflight/transport.py",
+      "tools/check.py",
+      "tools/core_scale_001_bench.py",
+      "tools/governance/check_bare_raise.py",
+      "tools/governance/check_baseline.py",
+      "tools/live_continuity_probe.py",
+      "tools/p16_recall_bench.py"
+    ]
+  },
+  "selected_contract_blobs": {
+    "contract_drift": false,
+    "governance/AIOS_CORE_COMPLETION_PLAN_2026-09-24.md": "8680841b3520c8da85ffbbe9f9e862898fe510c3",
+    "governance/C15_RESIDENT_COGNITIVE_CONTINUITY_RULING_2026-09-22.md": "572a5b27275ea659d94a8e52025422d54dbe73b5",
+    "governance/C15_RESIDENT_COGNITIVE_CONTINUITY_TEST_PLAN_2026-09-22.md": "6d6e90df4b880e34a15ce5cff9d6d1d963a34209",
+    "governance/WINDOW_80_CORE_KERNEL_GAP_CLOSURE_RECEIPT_2026-10-19.md": "53b2f889af81a787bfca41a6a3277ff63c64666a",
+    "reviews/C15_RCC_EVALUATOR_001_2026-10-19/c15_rcc_evaluator_probes.py": "b03625151c0b8aa2264cac17b64e132fc2bc9840"
+  },
+  "candidates": {
+    "candidate_drift": false,
+    "option_b_engineering": {
+      "pr": 390,
+      "pinned_head": "52d169e8fb96248b058ab3685d9dcb1f6cbce204",
+      "live_head_via_ls_remote": "52d169e8fb96248b058ab3685d9dcb1f6cbce204",
+      "match": true
+    },
+    "resident_a_evidence": {
+      "pr": 392,
+      "pinned_head": "2d92328205e16ec8b5317eaca8f3b666656ad09b",
+      "live_head_via_ls_remote": "2d92328205e16ec8b5317eaca8f3b666656ad09b",
+      "match": true
+    },
+    "resident_b_evidence": {
+      "pr": 393,
+      "pinned_head": "302dab2565f61dd37ca57195bae7ed9337cdfede",
+      "live_head_via_ls_remote": "302dab2565f61dd37ca57195bae7ed9337cdfede",
+      "match": true
+    },
+    "resident_c_evidence": {
+      "pr": 394,
+      "pinned_head": "6cd89d6e3761347487946ca95e59bae380a3ae46",
+      "live_head_via_ls_remote": "6cd89d6e3761347487946ca95e59bae380a3ae46",
+      "match": true
+    }
+  },
+  "window67_frozen_evidence": {
+    "branch": "review/window67-formal-security-evidence",
+    "head": "391c4815ac77ef82cabcf13798de4d8fa8e7c0b0",
+    "head_subject": "review: record Window67 evidence publication receipt",
+    "head_matches_remote_via_ls_remote": true,
+    "root_tree": "d4dc287feb2e59f42bdaadbc15cf4d3406c9845a",
+    "root_tree_matches_audit_constant_WINDOW67_TREE": true,
+    "manifest_sha256": "a9acee9a91d28920d42a91ff2db35d63630331a7dd9aaa6868a725fa35d42a76",
+    "manifest_sha256_matches_audit_constant": true,
+    "manifest_members": 154,
+    "manifest_self_listed": false,
+    "tracked_files_in_evidence_dir": 155,
+    "tracked_equals_manifest_plus_manifest_file": true,
+    "all_154_members_hash_and_size_verified": true,
+    "member_verification_method": "SHA-256 + size recomputed from git show output per member, compared with SHA256.json",
+    "candidate_validated": "6fb725407569bc719c049587f67fe65e797eb734 (PR #370 head; PR #367 parent 9d3b19b0e7bf090e5d472d9781b9156f73ea2088)",
+    "test_results": {
+      "original38": "31 PASS / 7 FAIL / 0 SKIP",
+      "parent-original38": "31 PASS / 7 FAIL / 0 SKIP",
+      "window55": "33 PASS / 0 FAIL",
+      "window57": "29 PASS / 0 FAIL",
+      "formal_disposition": "FORMAL_VALIDATION_FAIL",
+      "do_not_merge": "YES"
+    },
+    "original38_runs_parsed": {
+      "raw/original38.xml": {
+        "pass": 31,
+        "fail": 7
+      },
+      "raw/parent-original38.xml": {
+        "pass": 31,
+        "fail": 7
+      },
+      "raw/regression-attempt1/original38.xml": {
+        "pass": 24,
+        "fail": 14
+      },
+      "raw/parent-attempt1/parent-original38.xml": {
+        "pass": 28,
+        "fail": 10
+      },
+      "same_seven_fail_in_all_four_runs": [
+        "test_sigkill_after_request_never_regenerates_or_redispatches",
+        "test_absent_external_response_bounded_fail_closed",
+        "test_real_core_external_publisher_with_c15_remote_barriers[due]",
+        "test_real_core_external_publisher_with_c15_remote_barriers[user]",
+        "test_real_core_external_publisher_with_c15_remote_barriers[summary]",
+        "test_real_core_external_publisher_with_c15_remote_barriers[delivered]",
+        "test_signer_not_importable_in_recovery_caller"
+      ]
+    },
+    "blockers": [
+      "W67-VAL-001 AUTHORIZATION_BLOCKED (no new TEST_ONLY enrollment)",
+      "W67-VAL-002 BINDING_REGRESSION_FAIL (seven original assertions binding pending PM adjudication)",
+      "W67-VAL-003 CROSS_ENVIRONMENT_BLOCKED"
+    ]
+  },
+  "phase_c_world_sqlite": {
+    "git_blob": "edae25c1a46b382baca521d438888d3cf1e962fa",
+    "path_in_candidate_394": "reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-C-RERUN-005/world/world.sqlite",
+    "read_method": "read-only sqlite3, file:...?mode=ro&immutable=1, on a /tmp copy outside the repo",
+    "sha256": "e02c0e18012dbb44a6b3372b987933b9977a1c72b49fab561afe44136fe64ba6",
+    "size_bytes": 528384,
+    "verified_aggregates_match_first_review": true,
+    "verified_aggregates": {
+      "background_model_attempts": 47,
+      "attempts_provider_model_null": 47,
+      "metering_records": 47,
+      "metering_provider_model_null": 47,
+      "metering_usage_complete_0": 47,
+      "background_model_response_receipts": 0,
+      "background_model_return_handoffs": 0,
+      "object_revisions": 100,
+      "max_world_revision": 82,
+      "user_observations_obs_conv_user_pct": 15,
+      "claim": 1,
+      "operation_experience": 0,
+      "object_types": {
+        "claim": 1,
+        "cognitive_policy": 3,
+        "communication_experience": 1,
+        "dependency": 14,
+        "evidence_set": 4,
+        "observation": 45,
+        "task": 2,
+        "wake": 30
+      },
+      "world_commits": 82
+    }
+  },
+  "first_review_RV20261120_001": {
+    "sha256sums_verified": true,
+    "files_ok": [
+      "REVIEW_IDENTITY.md",
+      "SOURCE_MAP.json",
+      "AXIS_EVIDENCE_MATRIX.md",
+      "FINDING_DISPOSITION.md",
+      "RUN_IDENTITY_RECONCILIATION.md",
+      "CORE_IMPACT_MATRIX.md",
+      "LIMITATIONS.md"
+    ],
+    "corrections_by_this_review": [
+      "Drift count 158 -> 159 (pyproject.toml was excluded from the first count; see drift.count_correction).",
+      "Window80 'not wired in' finding is superseded at 8317769: Window 82 (5a0c38a) wired the four subsystems into FusedTurnRuntime (see FINDING_DISPOSITION.md NII-02)."
+    ]
+  },
+  "ci_at_new_baseline": {
+    "runs_at_head_8317769_total": 1,
+    "run_44698960019": {
+      "workflow": "governance-drift",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-20T07:59:02Z",
+      "run_number": 49,
+      "event": "push"
+    },
+    "p16_convergence_gate_run_at_8317769": "NONE (no run at this head; the old success run 39223062778 at 259d0353 does not certify the new tree)",
+    "p16_convergence_gate_run_at_5a0c38a": "NOT_OBTAINED (second public API query rate-limited HTTP 403, not retried)"
+  },
+  "window80_wiring_at_8317769": {
+    "wiring_commit": "5a0c38a2b1335cb07d5746091c190f2020440ec4 (2026-10-19 17:28 +08, 'feat(runtime): Window 82 - integrate 7 cognitive subsystems into FusedTurnRuntime (54/54 PASS)', no Authorized-Task trailer; predates the 4677043 pin)",
+    "imports": "src/aios_core/runtime/turn_runtime.py:35,37,38,40",
+    "construction": "turn_runtime.py:442,447,451,455",
+    "capabilities_registered": [
+      "get_effective_communication_style",
+      "record_ai_promise",
+      "reconcile_ai_promise",
+      "inspect_ai_self_mind",
+      "open_narrative_segment",
+      "seal_narrative_segment",
+      "record_dimension_curve_point",
+      "detect_burnout_risk",
+      "propose_tool",
+      "associate_topics"
+    ],
+    "auto_per_turn_call": "turn_runtime.py:4302 self._record_turn_experience(...) inside run_turn (def at 3937), comment 'DEF-002: Close Bayesian communication adaptation loop automatically'",
+    "old_service_coexists": "CommunicationExperienceService still instantiated at turn_runtime.py:378",
+    "headless_references_to_four_classes": 0,
+    "headless_handler": "src/aios_core/headless/core.py:23-46 load_model_handler(module:attribute) via importlib — deployment configuration still statically unknowable (L8)"
+  },
+  "key_spot_checks_recomputed": {
+    "probes_total_requests_literal": "reviews/C15_RCC_EVALUATOR_001_2026-10-19/c15_rcc_evaluator_probes.py:306 (f\"total_requests=47 ...\" literal; no counting logic in eval_r9)",
+    "grok_provider_server_model_field": "src/aios_core/runtime/grok_provider.py at 8317769 reads only chunk.get(\"id\") (:745,:939); no chunk.get(\"model\") anywhere",
+    "live_habitation_test_skip": "tests/runtime/test_live_multimodel_habitation.py:62 live_only skipif, needs AIOS_LIVE_PROVIDER=1 + reachable endpoint; default endpoint http://127.0.0.1:8080/v1"
+  },
+  "unreachable_or_missing": {
+    "L1_window69_raw_report": {
+      "path_cited": "/workspaces/c15-formal-review-20261018T0104Z/FINAL_SIGNED_MATRIX_REPORT.json",
+      "status": "NOT_FOUND_IN_REPO",
+      "provider_role": "Operator (host holder) + independent Reviewer (after declassification)"
+    },
+    "L3_old_phase_c_candidate": {
+      "sha": "94221b512a573bbe9922eea444552ac9122b3a0e",
+      "run_id": "c15-rcc-res-c-rerun-005-bd8446e1205d",
+      "status": "OBJECT_NOT_IN_LOCAL_STORE",
+      "provider_role": "PR #394 author / Operator"
+    },
+    "L4_trusted_attestation": {
+      "status": "NOT_FOUND_IN_ANY_FROZEN_EVIDENCE",
+      "provider_role": "platform evidence provider (Operator + model platform)"
+    },
+    "L5_phase_b_triple_explanation": {
+      "status": "NO_RECORD_ANYWHERE",
+      "note": "Erratum recorded in task-board 2026-11-20 control block (narrative typo, RUN_IDENTITY governs); written Operator confirmation still not supplied.",
+      "provider_role": "Phase-B evidence author / Operator"
+    },
+    "L6_ci_run_39223062778_logs": {
+      "status": "PUBLIC_API_METADATA_ONLY",
+      "provider_role": "Repository-authorized party"
+    },
+    "L7_per_case_semantic_table_R1_R9": {
+      "status": "NOT_SUBMITTED_BY_ANY_PARTY",
+      "provider_role": "Independent semantic Evaluator"
+    },
+    "L8_headless_deployment_config": {
+      "status": "STATICALLY_UNKNOWABLE",
+      "provider_role": "Deployment / operations party"
+    },
+    "L9_github_comment_originals": {
+      "status": "NOT_RE_READ_IN_THIS_WINDOW",
+      "provider_role": "Main reviewer / PM (remote is authoritative)"
+    }
+  },
+  "no_secrets": "No private key, token, credential, or hidden chain was read, exported, or reproduced in this review. The NVIDIA key restore commit b81635c targets src/aios_core/runtime/resilient_handler.py, the exact file/pattern in the owner-authorized allowlist in governance/baseline.json; no literal credential value is recorded anywhere in this package."
+}
