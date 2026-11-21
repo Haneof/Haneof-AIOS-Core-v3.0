@@ -44,6 +44,94 @@ class HeadlessWriterBusy(RuntimeError):
     """Another live process already owns the configured World writer lease."""
 
 
+def _read_writer_lease_holder(handle: Any) -> tuple[int | None, str | None]:
+    """Read diagnostic holder metadata without changing the lease file."""
+    try:
+        handle.seek(0)
+        metadata = json.loads(handle.read())
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return None, None
+    if not isinstance(metadata, dict):
+        return None, None
+    pid = metadata.get("pid")
+    host = metadata.get("host")
+    return (
+        pid if type(pid) is int else None,
+        host if isinstance(host, str) else None,
+    )
+
+
+def probe_writer_lease(
+    lock_path: str | os.PathLike[str],
+) -> dict[str, bool | int | str | None]:
+    """Inspect an existing writer lease without creating or modifying its file.
+
+    A successful non-blocking lock attempt is released immediately. Contention
+    means another live process owns the OS lock; its JSON metadata is diagnostic
+    only and is read on a best-effort basis.
+    """
+    path = Path(lock_path)
+    try:
+        handle = path.open("rb")
+    except FileNotFoundError:
+        return {
+            "held_by_other": False,
+            "holder_pid": None,
+            "holder_host": None,
+        }
+
+    try:
+        if os.name == "nt":
+            import msvcrt
+
+            # acquire() creates a one-byte file before locking; an existing empty
+            # file therefore cannot represent a lease held by this implementation.
+            handle.seek(0, os.SEEK_END)
+            if handle.tell() == 0:
+                return {
+                    "held_by_other": False,
+                    "holder_pid": None,
+                    "holder_host": None,
+                }
+            handle.seek(0)
+            try:
+                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            except OSError:
+                pid, host = _read_writer_lease_holder(handle)
+                return {
+                    "held_by_other": True,
+                    "holder_pid": pid,
+                    "holder_host": host,
+                }
+            # msvcrt.locking advances the descriptor position, so mirror
+            # release() and seek back to the locked byte before unlocking.
+            handle.seek(0)
+            msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+
+            try:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError as exc:
+                if exc.errno in {errno.EACCES, errno.EAGAIN}:
+                    pid, host = _read_writer_lease_holder(handle)
+                    return {
+                        "held_by_other": True,
+                        "holder_pid": pid,
+                        "holder_host": host,
+                    }
+                raise
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+        return {
+            "held_by_other": False,
+            "holder_pid": None,
+            "holder_host": None,
+        }
+    finally:
+        handle.close()
+
+
 def load_model_handler(spec: str) -> ModelHandler:
     """Load an existing AIOS ModelHandler from a module:attribute reference.
 
@@ -122,6 +210,7 @@ class _WriterLease:
     def __init__(self, path: Path) -> None:
         self.path = path
         self._file: Any | None = None
+        self._metadata: dict[str, Any] | None = None
 
     def acquire(self) -> None:
         if self._file is not None:
@@ -167,6 +256,7 @@ class _WriterLease:
             handle.write(json.dumps(metadata, sort_keys=True) + "\n")
             handle.flush()
             os.fsync(handle.fileno())
+            self._metadata = metadata
         except Exception:
             handle.close()
             raise
@@ -192,6 +282,15 @@ class _WriterLease:
         finally:
             handle.close()
             self._file = None
+            self._metadata = None
+
+    @property
+    def holder(self) -> dict[str, int | str | None]:
+        metadata = self._metadata or {}
+        return {
+            "pid": metadata.get("pid"),
+            "host": metadata.get("host"),
+        }
 
     @property
     def held(self) -> bool:
@@ -299,7 +398,7 @@ class HeadlessCore:
             "world_revision": int(store.current_world_revision()),
             "index_watermark": int(index.watermark()),
             "index_lag": int(index.lag()),
-            "writer_lease_held": self._lease.held,
+            "writer_lease_holder": self._lease.holder,
         }
 
     def submit_user_turn(

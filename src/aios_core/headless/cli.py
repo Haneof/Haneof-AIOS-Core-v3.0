@@ -31,6 +31,7 @@ from .core import (
     HeadlessCore,
     HeadlessWriterBusy,
     load_model_handler,
+    probe_writer_lease,
 )
 from .recovery import (
     RecoveryError,
@@ -139,6 +140,10 @@ def _global_parser() -> argparse.ArgumentParser:
     sub.add_parser(
         "recovery-status",
         help="Inspect World/schema/index recovery state without invoking a model provider.",
+    )
+    sub.add_parser(
+        "lease-probe",
+        help="Inspect the writer lease without starting Core or creating its lock file.",
     )
     sub.add_parser(
         "rebuild-index",
@@ -406,8 +411,20 @@ def _run_serve(core: HeadlessCore, args: argparse.Namespace) -> dict[str, Any]:
 
 
 def _run(args: argparse.Namespace) -> dict[str, Any]:
-    if args.command in {"recovery-status", "rebuild-index", "backup", "restore"}:
+    if args.command in {
+        "recovery-status",
+        "lease-probe",
+        "rebuild-index",
+        "backup",
+        "restore",
+    }:
         config = _build_recovery_config(args)
+        if args.command == "lease-probe":
+            if config.lock_path is None:
+                raise HeadlessConfigurationError(
+                    "canonical writer lease path is unavailable"
+                )
+            return probe_writer_lease(config.lock_path)
         if args.command == "recovery-status":
             return recovery_status(config)
         if args.command == "rebuild-index":

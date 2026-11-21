@@ -113,7 +113,7 @@ def test_headless_single_writer_fails_closed_and_releases_on_stop(tmp_path):
 
     try:
         second.start()
-        assert second.status()["writer_lease_held"] is True
+        assert second.status()["writer_lease_holder"]["pid"] > 0
         assert second.status()["world_revision"] == before
     finally:
         second.stop()
@@ -163,7 +163,7 @@ def test_headless_alternate_lock_path_cannot_bypass_live_world_writer(tmp_path):
         model_handler=CountingHandler(),
     ).start()
     try:
-        assert writer_b.status()["writer_lease_held"] is True
+        assert writer_b.status()["writer_lease_holder"]["pid"] > 0
         assert writer_b.status()["world_revision"] == before
     finally:
         writer_b.stop()
@@ -183,7 +183,7 @@ def test_headless_stale_canonical_lock_file_without_os_lease_reopens(tmp_path):
 
     second = HeadlessCore(config=cfg, model_handler=CountingHandler()).start()
     try:
-        assert second.status()["writer_lease_held"] is True
+        assert second.status()["writer_lease_holder"]["pid"] > 0
         assert second.status()["world_revision"] == before
     finally:
         second.stop()
