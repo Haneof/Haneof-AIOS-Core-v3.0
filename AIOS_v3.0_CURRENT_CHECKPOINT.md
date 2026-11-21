@@ -16,7 +16,7 @@
 ## 2026-11-20 — GATE #590 ROOT CAUSE FOUND / FIX TASK DISPATCHED
 
 - **gate #590 根因已定（非产品回归）**：defdddd 的 gate 只挂了一个测试（preflight 的 isolation 异常分类，第 551 行）。probe 抛出的 INCONCLUSIVE 里有 "INCONCLUSIVE" 但没有 "unshare"/"permission"/"not permitted"。原因是 GitHub 在 10 月 19 日到 11 月 19 日把 ubuntu-latest 从 24.04 迁到 26.04，系统 Python 从 3.12.3 变成 3.14.4；probe 的解释器候选（/usr/bin/python3.11、python3、python3.12、python3.10，要求非符号链接）在 26.04 上全不命中，还没走到被 mock 的 unshare 调用就报了 "no suitable python interpreter found"。旧的 gate 成功跑（259d0353）是在 24.04 上，那里 /usr/bin/python3.12 是真实文件。本地（Ubuntu 24.04.5）测试通过，与之吻合。"3 errors and 1 warning" 是同一失败的 3 条注释加一条无关的 Node.js 20 弃用警告。完整 CI 日志公开渠道看不到（需登录），但根因已由注释、代码与镜像迁移三方定死，不需要日志。
-- **修复任务已派：`PM-PREFLIGHT-ISOLATION-GATE-FIX-001`**（已登记进 `baseline.json`，18 项）。范围只限测试文件本身：让测试不依赖机器的 /usr/bin 布局（把 probe 的解释器/setpriv 发现也 mock 掉，让被 mock 的权限错误成为 probe 看到的东西），测试本意不变（权限不足 → 含权限字眼的 INCONCLUSIVE）。不改生产代码，不把 runner pin 回 24.04（那只是把漂移往后推）。独立验收在自己的窗口里做。
+- **修复任务已派：`PM-PREFLIGHT-ISOLATION-GATE-FIX-001`**（已登记进 baseline.json，18 项）。范围只限测试文件本身：让测试不依赖机器的 /usr/bin 布局（把 probe 的解释器/setpriv 发现也 mock 掉，让被 mock 的权限错误成为 probe 看到的东西），测试本意不变（权限不足 → 含权限字眼的 INCONCLUSIVE）。不改生产代码，不把 runner pin 回 24.04（那只是把漂移往后推）。独立验收在自己的窗口里做。
 
 ---
 
